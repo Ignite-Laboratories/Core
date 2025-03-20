@@ -60,7 +60,7 @@ func (e *engine) Loop(action Action) {
 // Ignite begins neural activation.
 func (e *engine) Ignite() error {
 	if e.Active {
-		return fmt.Errorf("this engine is already active")
+		return fmt.Errorf("this neural impulse engine is already active")
 	}
 	e.Active = true
 
@@ -135,13 +135,17 @@ func (e *engine) impulse(ctx Context, activations []*Activation, wg *sync.WaitGr
 		go func() {
 			defer wg.Done()
 			defer func() {
+				// The activation had a failure of some kind
 				if r := recover(); r != nil {
+					// Mark it as not executing and log the issue
+					a.Executing = false
+					a.Last.End = time.Now()
 					log.Printf("[%d] activation panic ", a.ID)
 				}
 			}()
 
 			// Calculate the refractory period
-			a.Last.RefractoryPeriod = ctx.Moment.Sub(a.Last.End)
+			a.Last.RefractoryPeriod = start.Sub(a.Last.End)
 
 			// Save off the runtime info
 			ctx.LastActivation = a.Last

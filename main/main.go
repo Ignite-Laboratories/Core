@@ -1,18 +1,12 @@
 package main
 
-import (
-	"fmt"
-	"github.com/ignite-laboratories/core"
-	"time"
-)
+import "github.com/ignite-laboratories/core"
 
 func main() {
-	engine := core.NewEngine()
-	engine.Loop(PrintAndWait, core.Activate.Always())
-	engine.Start()
+	core.Self.Loop(printBeat)
+	_ = core.Self.Ignite()
 }
 
-func PrintAndWait(ctx core.Context) {
-	fmt.Println(ctx.Beat)
-	time.Sleep(time.Second * 100)
+func printBeat(ctx core.Context) {
+	println(ctx.Beat)
 }

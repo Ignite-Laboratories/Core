@@ -7,23 +7,23 @@ import (
 )
 
 func Test_Engine_CannotStartWhileAlreadyRunning(t *testing.T) {
-	engine := core.NewEngine()
-
+	// Fire engine A
 	go func() {
-		err := engine.Start()
-		if err == nil {
+		err := core.Self.Ignite()
+		if err != nil {
 			t.Error("Expected no error, got one")
 		}
 	}()
 
+	// Pause for a moment
 	time.Sleep(100)
 
-	go func() {
-		err := engine.Start()
-		if err == nil {
-			t.Error("Expected error, got nil")
-		}
-	}()
+	// Fire engine B
+	err := core.Self.Ignite()
+	if err == nil {
+		t.Error("Expected error, got nil")
+	}
 
-	DelayKill(100)
+	// Shut them both down
+	core.Shutdown(100)
 }

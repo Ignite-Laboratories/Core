@@ -1,9 +1,7 @@
 package test
 
 import (
-	"github.com/ignite-laboratories/core"
 	"testing"
-	"time"
 )
 
 // ShouldPanic fails the test if the test did not panic.

@@ -10,7 +10,9 @@ type Context struct {
 
 	// Beat is the engine's current impulse count.
 	//
-	// 	NOTE: This will loop over when all activations finish at the same time.
+	// 	NOTE:
+	//	This will loop over when all activations finish at the same time.
+	//  For impulsive activations they never flag as 'Executing', so they naturally don't increment the beat.
 	Beat int
 
 	// Moment is the moment in time this impulse represents.
@@ -19,9 +21,9 @@ type Context struct {
 	// Delta is the amount of time that has passed since the last impulse's Moment.
 	Delta time.Duration
 
-	// ImpulseStats provides information about the last impulse of the engine.
-	ImpulseStats runtimeStats
+	// LastImpulse provides runtime information about the last impulse of the engine.
+	LastImpulse runtime
 
-	// ActivationStats provides information about the last activation.
-	ActivationStats runtimeStats
+	// LastActivation provides runtime information about the last activation.
+	LastActivation runtime
 }

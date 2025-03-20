@@ -1,57 +1,51 @@
 package core
 
-import "sync"
+// Activation is a logical unit of execution.
+type Activation struct {
+	Entity
 
-// activation is a way of invoking functions on neural impulses.
-type activation struct {
-	serialNumber uint64
-	function     Action
-	executing    bool
+	// Executing indicates if the activation is currently executing.
+	Executing bool
+
+	// Action is what to execute.
+	Action Action
+
+	// Last provides temporal runtime information for the last completed activation.
+	Last runtime
 }
 
 // newBlockingActivation creates a new activation that blocks the impulse.
-func newBlockingActivation(function Action) activation {
-	var a activation
-	a.function = func(ctx Context) {
-		a.executing = true
+func newBlockingActivation(function Action) *Activation {
+	var a Activation
+	a.ID = NextID()
+	a.Action = func(ctx Context) {
+		a.Executing = true
 		function(ctx)
-		a.executing = false
+		a.Executing = false
 	}
-	return a
+	return &a
 }
 
-// newStimulation creates a new activation that fires asynchronously on every impulse.
-func newStimulation(function Action) activation {
-	var a activation
-	a.function = func(ctx Context) {
-		go a.function(ctx)
+// newImpulsiveActivation creates a new activation that fires asynchronously on every impulse.
+func newImpulsiveActivation(function Action) *Activation {
+	var a Activation
+	a.ID = NextID()
+	a.Action = func(ctx Context) {
+		go a.Action(ctx)
 	}
-	return a
+	return &a
 }
 
 // newLoopingActivation creates a new activation that fires in an asynchronous loop.
-func newLoopingActivation(function Action) activation {
-	var a activation
-	a.function = func(ctx Context) {
-		a.executing = true
+func newLoopingActivation(function Action) *Activation {
+	var a Activation
+	a.ID = NextID()
+	a.Action = func(ctx Context) {
+		a.Executing = true
 		go func() {
 			function(ctx)
-			a.executing = false
+			a.Executing = false
 		}()
 	}
-	return a
-}
-
-// newClusteredActivation creates a new looping activation that calls Done() on the provided wait group upon completion.
-func newClusteredActivation(function Action, wg *sync.WaitGroup) activation {
-	var a activation
-	a.function = func(ctx Context) {
-		a.executing = true
-		go func() {
-			function(ctx)
-			a.executing = false
-			wg.Done()
-		}()
-	}
-	return a
+	return &a
 }

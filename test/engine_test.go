@@ -9,7 +9,7 @@ import (
 func Test_Engine_CannotStartWhileAlreadyRunning(t *testing.T) {
 	// Fire engine A
 	go func() {
-		err := core.Self.Ignite()
+		err := core.Impulse.Spark()
 		if err != nil {
 			t.Error("Expected no error, got one")
 		}
@@ -19,7 +19,7 @@ func Test_Engine_CannotStartWhileAlreadyRunning(t *testing.T) {
 	time.Sleep(100)
 
 	// Fire engine B
-	err := core.Self.Ignite()
+	err := core.Impulse.Spark()
 	if err == nil {
 		t.Error("Expected error, got nil")
 	}

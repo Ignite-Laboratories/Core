@@ -9,8 +9,6 @@ import (
 
 // engine is a neural impulse driver.
 type engine struct {
-	Entity
-
 	// Active indicates if the neural impulse engine is currently firing activations or not.
 	Active bool
 
@@ -21,7 +19,7 @@ type engine struct {
 	LastImpulse runtime
 
 	beat        int
-	activations map[uint64]*Activation
+	activations map[uint64]*Activation // This is instantiated on init()
 	mutex       sync.Mutex
 }
 
@@ -51,8 +49,8 @@ func (e *engine) Loop(action Action) {
 	e.addActivation(newLoopingActivation(action))
 }
 
-// Ignite begins neural activation.
-func (e *engine) Ignite() error {
+// Spark begins neural activation.
+func (e *engine) Spark() error {
 	if e.Active {
 		return fmt.Errorf("this neural impulse engine is already active")
 	}

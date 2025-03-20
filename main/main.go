@@ -6,18 +6,23 @@ import (
 	"time"
 )
 
+// In this example -
+//	- The loop should activate every third 16th beat
+// 	- The block should activate every 16th beat
+//	- The stimulation should activate every 8th beat
+
 func main() {
-	// Loop every 16 beats as fast as calculable
-	core.Self.Loop(core.When(potential.Modulo(16), calculation))
+	// Loop every 16th beat as fast as calculable
+	core.Impulse.Loop(core.When(potential.Modulo(16), calculation))
 
 	// Block every 16 beats by 1 second
-	core.Self.Block(core.When(potential.Modulo(16), regulation))
+	core.Impulse.Block(core.When(potential.Modulo(16), regulation))
 
-	// Stimulate every 16 beats
-	core.Self.Stimulate(core.When(potential.Modulo(16), stimulation))
+	// Stimulate every 8 beats
+	core.Impulse.Stimulate(core.When(potential.Modulo(8), stimulation))
 
 	// Make it so
-	_ = core.Self.Ignite()
+	_ = core.Impulse.Spark()
 }
 
 func stimulation(ctx core.Context) {
@@ -31,5 +36,5 @@ func regulation(ctx core.Context) {
 
 func calculation(ctx core.Context) {
 	println("Calculating on beat ", ctx.Beat)
-	time.Sleep(3 * time.Second)
+	time.Sleep(2500 * time.Millisecond)
 }

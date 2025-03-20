@@ -6,7 +6,8 @@ import (
 )
 
 func init() {
-	Impulse.activations = make(map[uint64]*activation)
+	// Initialize the impulse engine.
+	Impulse.Initialize()
 }
 
 // Alive globally keeps activations looping until it is set to false.
@@ -19,7 +20,7 @@ var Inception = time.Now()
 var ID uint64 = NextID()
 
 // Impulse is the neural impulse engine.
-var Impulse engine
+var Impulse Engine
 
 // currentId holds the last provided identifier.
 var currentId uint64

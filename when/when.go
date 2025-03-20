@@ -1,4 +1,4 @@
-// Package when provides a way of creating Action potentials.
+// Package when provides a way of creating action potentials.
 package when
 
 import "github.com/ignite-laboratories/core"
@@ -22,8 +22,8 @@ func Downbeats(action core.Action) core.Action {
 	}
 }
 
-// EvenBeats provides a potential that fires the action when the beat is even.
-func EvenBeats(action core.Action) core.Action {
+// Even provides a potential that fires the action when the beat is even.
+func Even(action core.Action) core.Action {
 	return func(ctx core.Context) {
 		if ctx.Beat%2 == 0 {
 			action(ctx)
@@ -31,8 +31,8 @@ func EvenBeats(action core.Action) core.Action {
 	}
 }
 
-// OddBeats provides a potential that returns true when the beat is odd.
-func OddBeats(action core.Action) core.Action {
+// Odd provides a potential that returns true when the beat is odd.
+func Odd(action core.Action) core.Action {
 	return func(ctx core.Context) {
 		if ctx.Beat%2 != 0 {
 			action(ctx)

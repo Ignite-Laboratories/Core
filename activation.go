@@ -5,8 +5,8 @@ type activation struct {
 	// ID is the unique identifier for this activation.
 	ID uint64
 
-	// Executing indicates if the activation is currently activating.
-	Executing bool
+	// executing indicates if the activation is currently activating.
+	executing bool
 
 	// Muted indicates if the activation has been explicitly told to temporarily stop activating.
 	Muted bool

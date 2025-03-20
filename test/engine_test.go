@@ -15,7 +15,7 @@ func Test_Engine_CannotStartWhileAlreadyRunning(t *testing.T) {
 		}
 	}()
 
-	// Pause for a moment
+	// Mute for a moment
 	time.Sleep(100)
 
 	// Fire engine B

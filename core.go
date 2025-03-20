@@ -6,7 +6,7 @@ import (
 )
 
 func init() {
-	Impulse.activations = make(map[uint64]*Activation)
+	Impulse.activations = make(map[uint64]*activation)
 }
 
 // Alive globally keeps activations looping until it is set to false.

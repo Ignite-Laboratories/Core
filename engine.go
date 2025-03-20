@@ -19,14 +19,14 @@ type engine struct {
 	LastImpulse runtime
 
 	beat        int
-	activations map[uint64]*Activation // This is instantiated on init()
+	activations map[uint64]*activation // This is instantiated on init()
 	mutex       sync.Mutex
 }
 
-func (e *engine) addActivation(a *Activation) {
+func (e *engine) addActivation(a *activation) {
+	defer e.mutex.Unlock()
 	e.mutex.Lock()
 	e.activations[a.ID] = a
-	e.mutex.Unlock()
 }
 
 // Stop causes the impulse engine to cease firing neural activations.
@@ -34,19 +34,86 @@ func (e *engine) Stop() {
 	e.Active = false
 }
 
+// Trigger activates the provided activation ID -once- on the first possible impulse.
+func (e *engine) Trigger(id uint64) {
+
+}
+
+// Mute stops the provided activation ID from activating until Unmute is called.
+func (e *engine) Mute(id uint64) {
+	defer e.mutex.Unlock()
+	e.mutex.Lock()
+	for _, a := range e.activations {
+		if a.ID == id {
+			a.Muted = true
+			return
+		}
+	}
+}
+
+// Unmute lets the provided activation ID begin activating again.
+func (e *engine) Unmute(id uint64) {
+	defer e.mutex.Unlock()
+	e.mutex.Lock()
+	for _, a := range e.activations {
+		if a.ID == id {
+			a.Muted = false
+			return
+		}
+	}
+}
+
+// ClearActivation removes the activation ID from neural activity.
+func (e *engine) ClearActivation(id uint64) {
+	defer e.mutex.Unlock()
+	e.mutex.Lock()
+	delete(e.activations, a.ID)
+}
+
 // Block activates the provided Action on every impulse in a blocking fashion.
-func (e *engine) Block(action Action) {
-	e.addActivation(newBlockingActivation(action))
+//
+// It returns the activation's ID.
+func (e *engine) Block(action Action) uint64 {
+	var a activation
+	a.ID = NextID()
+	a.Potential = func(ctx Context) {
+		a.Executing = true
+		action(ctx)
+		a.Executing = false
+	}
+	e.addActivation(&a)
+	return a.ID
 }
 
 // Stimulate activates the provided Action on every impulse in an asynchronous fashion.
-func (e *engine) Stimulate(action Action) {
-	e.addActivation(newImpulsiveActivation(action))
+//
+// It returns the activation's ID.
+func (e *engine) Stimulate(action Action) uint64 {
+	// NOTE: The trick here is that it never sets 'Executing' =)
+	var a activation
+	a.ID = NextID()
+	a.Potential = func(ctx Context) {
+		go action(ctx)
+	}
+	e.addActivation(&a)
+	return a.ID
 }
 
 // Loop activates the provided Action in an asynchronous fashion cyclically.
-func (e *engine) Loop(action Action) {
-	e.addActivation(newLoopingActivation(action))
+//
+// It returns the activation's ID.
+func (e *engine) Loop(action Action) uint64 {
+	var a activation
+	a.ID = NextID()
+	a.Potential = func(ctx Context) {
+		a.Executing = true
+		go func() {
+			action(ctx)
+			a.Executing = false
+		}()
+	}
+	e.addActivation(&a)
+	return a.ID
 }
 
 // Spark begins neural activation.
@@ -70,7 +137,7 @@ func (e *engine) Spark() error {
 
 		// Get the current impulse wave of activations
 		e.mutex.Lock()
-		activations := make([]*Activation, len(e.activations))
+		activations := make([]*activation, len(e.activations))
 		var hasExecution bool
 		for i, a := range e.activations {
 			activations[i] = a
@@ -111,7 +178,7 @@ func (e *engine) Spark() error {
 	return nil
 }
 
-func (e *engine) impulse(ctx Context, activations []*Activation, wg *sync.WaitGroup) {
+func (e *engine) impulse(ctx Context, activations []*activation, wg *sync.WaitGroup) {
 	// Launch all kernels...
 	for _, a := range activations {
 		// Grab this activation's start ASAP!

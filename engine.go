@@ -25,12 +25,6 @@ type engine struct {
 	mutex       sync.Mutex
 }
 
-func newEngine() *engine {
-	e := engine{}
-	e.ID = NextID()
-	return &e
-}
-
 func (e *engine) addActivation(a *Activation) {
 	e.mutex.Lock()
 	e.activations[a.ID] = a

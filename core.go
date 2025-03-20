@@ -6,22 +6,19 @@ import (
 )
 
 func init() {
-	Alive = true
-	Inception = time.Now()
-	ID = NextID() // Default ID 1
 	Impulse.activations = make(map[uint64]*Activation)
 }
 
 // Alive globally keeps activations looping until it is set to false.
-var Alive bool
+var Alive = true
 
 // Inception provides the moment this operating system was initialized.
-var Inception time.Time
+var Inception = time.Now()
 
 // ID is the operating system identifier - it defaults to 1.
-var ID uint64
+var ID uint64 = NextID()
 
-// Impulse is the core neural impulse engine.
+// Impulse is the neural impulse engine.
 var Impulse engine
 
 // currentId holds the last provided identifier.

@@ -2,13 +2,14 @@ package core
 
 // Activation is a logical unit of execution.
 type Activation struct {
-	Entity
+	// ID is the unique identifier for this Activation.
+	ID uint64
 
 	// Executing indicates if the activation is currently executing.
 	Executing bool
 
-	// Action is what to execute.
-	Action Action
+	// Potential is what this Activation could do.
+	Potential Action
 
 	// Last provides temporal runtime information for the last completed activation.
 	Last runtime
@@ -18,7 +19,7 @@ type Activation struct {
 func newBlockingActivation(function Action) *Activation {
 	var a Activation
 	a.ID = NextID()
-	a.Action = func(ctx Context) {
+	a.Potential = func(ctx Context) {
 		a.Executing = true
 		function(ctx)
 		a.Executing = false
@@ -30,8 +31,8 @@ func newBlockingActivation(function Action) *Activation {
 func newImpulsiveActivation(function Action) *Activation {
 	var a Activation
 	a.ID = NextID()
-	a.Action = func(ctx Context) {
-		go a.Action(ctx)
+	a.Potential = func(ctx Context) {
+		go a.Potential(ctx)
 	}
 	return &a
 }
@@ -40,7 +41,7 @@ func newImpulsiveActivation(function Action) *Activation {
 func newLoopingActivation(function Action) *Activation {
 	var a Activation
 	a.ID = NextID()
-	a.Action = func(ctx Context) {
+	a.Potential = func(ctx Context) {
 		a.Executing = true
 		go func() {
 			function(ctx)

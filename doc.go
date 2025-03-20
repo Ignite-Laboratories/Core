@@ -1,2 +1,2 @@
-// Package core represents the most basic components of a neural ecosystem.
+// Package core represents the most basic components of a neural system.
 package core

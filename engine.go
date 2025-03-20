@@ -143,7 +143,7 @@ func (e *engine) impulse(ctx Context, activations []*Activation, wg *sync.WaitGr
 			ctx.LastActivation = a.Last
 
 			// Fire the activation
-			a.Action(ctx)
+			a.Potential(ctx)
 			end := time.Now()
 
 			// Update the runtime info

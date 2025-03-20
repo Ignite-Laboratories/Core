@@ -2,39 +2,35 @@ package main
 
 import (
 	"github.com/ignite-laboratories/core"
-	"github.com/ignite-laboratories/core/potential"
+	"github.com/ignite-laboratories/core/when"
 	"time"
 )
 
-// In this example -
-//	- The loop should activate every third 16th beat
-// 	- The block should activate every 16th beat
-//	- The stimulation should activate every 8th beat
-
 func main() {
+	// Block every 16th beat by 1 second
+	core.Impulse.Block(when.Modulo(16, regulate))
+
 	// Loop every 16th beat as fast as calculable
-	core.Impulse.Loop(core.When(potential.Modulo(16), calculation))
+	// The loop takes 2.5 seconds, so it'll activate with every third blocking impulse.
+	core.Impulse.Loop(when.Modulo(16, pulse))
 
-	// Block every 16 beats by 1 second
-	core.Impulse.Block(core.When(potential.Modulo(16), regulation))
-
-	// Stimulate every 8 beats
-	core.Impulse.Stimulate(core.When(potential.Modulo(8), stimulation))
+	// Stimulate every 8th beat
+	core.Impulse.Stimulate(when.Modulo(8, stimulate))
 
 	// Make it so
 	_ = core.Impulse.Spark()
 }
 
-func stimulation(ctx core.Context) {
-	println("Stimulating beat ", ctx.Beat)
-}
-
-func regulation(ctx core.Context) {
+func regulate(ctx core.Context) {
 	println("Regulating beat ", ctx.Beat)
 	time.Sleep(1 * time.Second)
 }
 
-func calculation(ctx core.Context) {
-	println("Calculating on beat ", ctx.Beat)
+func pulse(ctx core.Context) {
+	println("Pulsing on beat ", ctx.Beat)
 	time.Sleep(2500 * time.Millisecond)
+}
+
+func stimulate(ctx core.Context) {
+	println("Stimulating beat ", ctx.Beat)
 }

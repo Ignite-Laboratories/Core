@@ -12,7 +12,7 @@ type Context struct {
 	//
 	// 	NOTE:
 	//	This will loop over when all activations finish at the same time.
-	//  For impulsive activations they never flag as 'Executing', so they naturally don't increment the beat.
+	//  For impulsive activations they never flag as 'Executing', so they naturally don't increment the Beat.
 	Beat int
 
 	// Moment is the moment in time this impulse represents.

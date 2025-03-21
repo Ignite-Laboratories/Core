@@ -18,7 +18,7 @@ type Engine struct {
 	// LastImpulse provides statistics regarding the last neural impulse.
 	LastImpulse runtime
 
-	beat        int
+	Beat        int
 	activations map[uint64]*Activation // This is instantiated on init()
 	mutex       sync.Mutex
 }
@@ -97,7 +97,7 @@ func (e *Engine) Once(action Action, potential Potential) {
 	ctx.ID = NextID()
 	ctx.Moment = now
 	ctx.Delta = now.Sub(lastImpulse.Inception)
-	ctx.Beat = e.beat
+	ctx.Beat = e.Beat
 	ctx.LastImpulse = e.LastImpulse
 
 	// Build the activation
@@ -196,9 +196,9 @@ func (e *Engine) Spark() error {
 		}
 		e.mutex.Unlock() // Unlock
 
-		// If none have execution, loop the beat back to 0
+		// If none have execution, loop the Beat back to 0
 		if !hasExecution {
-			e.beat = 0
+			e.Beat = 0
 		}
 
 		// Calculate the impulse stats
@@ -212,7 +212,7 @@ func (e *Engine) Spark() error {
 		ctx.ID = NextID()
 		ctx.Moment = now
 		ctx.Delta = now.Sub(lastNow)
-		ctx.Beat = e.beat
+		ctx.Beat = e.Beat
 		ctx.LastImpulse = e.LastImpulse
 
 		// Launch the wave of activations
@@ -225,7 +225,7 @@ func (e *Engine) Spark() error {
 		// Save off the incrementer variables
 		lastNow = now
 		lastFinishTime = finishTime
-		e.beat++
+		e.Beat++
 	}
 	return nil
 }

@@ -67,7 +67,7 @@ func (e *Engine) Unmute(id uint64) {
 func (e *Engine) ClearActivation(id uint64) {
 	defer e.mutex.Unlock()
 	e.mutex.Lock()
-	delete(e.activations, a.ID)
+	delete(e.activations, id)
 }
 
 // Range provides a slice of the current neural activations.
@@ -81,8 +81,9 @@ func (e *Engine) Range() []*Activation {
 	return out
 }
 
-// Once activates the provided Action once in an asynchronous fashion.
-func (e *Engine) Once(action Action) {
+// Once invokes the provided Action once in an asynchronous fashion, if the
+// provided Potential returns true.
+func (e *Engine) Once(action Action, potential Potential) {
 	defer e.mutex.Unlock()
 	e.mutex.Lock()
 
@@ -102,57 +103,64 @@ func (e *Engine) Once(action Action) {
 	// Build the activation
 	var a Activation
 	a.ID = NextID()
-	a.Potential = func(ctx Context) {
+	a.Action = func(ctx Context) {
 		go action(ctx)
 	}
+	a.Potential = potential
 
 	// Impulse the activation
-	wg := &sync.WaitGroup
-	e.impulse(ctx, &a, wg)
+	var wg sync.WaitGroup
+	e.impulse(ctx, &a, &wg)
 }
 
-// Block activates the provided Action on every impulse in a blocking fashion.
+// Block activates the provided Action on every impulse in a blocking fashion, if the provided
+// Potential returns true.
 //
 // It returns an Activation control surface.
-func (e *Engine) Block(action Action) *Activation {
+func (e *Engine) Block(action Action, potential Potential) *Activation {
 	var a Activation
 	a.ID = NextID()
-	a.Potential = func(ctx Context) {
+	a.Action = func(ctx Context) {
 		a.executing = true
 		action(ctx)
 		a.executing = false
 	}
+	a.Potential = potential
 	e.addActivation(&a)
 	return &a
 }
 
-// Stimulate activates the provided Action on every impulse in an asynchronous fashion.
+// Stimulate activates the provided Action on every impulse in an asynchronous fashion, if the
+// provided Potential returns true.
 //
 // It returns an Activation control surface.
-func (e *Engine) Stimulate(action Action) *Activation {
+func (e *Engine) Stimulate(action Action, potential Potential) *Activation {
 	// NOTE: The trick here is that it never sets 'Executing' =)
 	var a Activation
 	a.ID = NextID()
-	a.Potential = func(ctx Context) {
+	a.Action = func(ctx Context) {
 		go action(ctx)
 	}
+	a.Potential = potential
 	e.addActivation(&a)
 	return &a
 }
 
-// Loop activates the provided Action in an asynchronous fashion cyclically.
+// Loop activates the provided Action in an asynchronous fashion cyclically, if the provided
+// Potential returns true.
 //
 // It returns an Activation control surface.
-func (e *Engine) Loop(action Action) *Activation {
+func (e *Engine) Loop(action Action, potential Potential) *Activation {
 	var a Activation
 	a.ID = NextID()
-	a.Potential = func(ctx Context) {
+	a.Action = func(ctx Context) {
 		a.executing = true
 		go func() {
 			action(ctx)
 			a.executing = false
 		}()
 	}
+	a.Potential = potential
 	e.addActivation(&a)
 	return &a
 }
@@ -178,14 +186,16 @@ func (e *Engine) Spark() error {
 
 		// Get the current impulse wave of activations
 		e.mutex.Lock() // Lock synchronized data
-		activations := make([]*Activation, len(e.activations))
+		activations := make([]*Activation, 0, len(e.activations))
 		var hasExecution bool
-		for i, a := range e.activations {
-			activations[i] = a
+		for _, a := range e.activations {
+			activations = append(activations, a)
 			if a.executing {
 				hasExecution = true
 			}
 		}
+		e.mutex.Unlock() // Unlock
+
 		// If none have execution, loop the beat back to 0
 		if !hasExecution {
 			e.beat = 0
@@ -196,7 +206,6 @@ func (e *Engine) Spark() error {
 		e.LastImpulse.Start = lastNow
 		e.LastImpulse.End = lastFinishTime
 		e.LastImpulse.RefractoryPeriod = now.Sub(lastFinishTime)
-		e.mutex.Unlock()
 
 		// Build a temporal context
 		var ctx Context
@@ -208,7 +217,7 @@ func (e *Engine) Spark() error {
 
 		// Launch the wave of activations
 		for _, a := range activations {
-			e.impulse(ctx, activations, &wg)
+			e.impulse(ctx, a, &wg)
 		}
 		wg.Wait()
 		finishTime := time.Now()
@@ -225,9 +234,9 @@ func (e *Engine) impulse(ctx Context, activation *Activation, wg *sync.WaitGroup
 	// Grab this activation's start ASAP!
 	start := time.Now()
 
-	// Don't re-activate anything that's still executing
-	if a.Executing {
-		continue
+	// Don't re-activate anything that's still executing or muted
+	if activation.executing || activation.Muted {
+		return
 	}
 
 	// Handle the rest asynchronously...
@@ -238,26 +247,31 @@ func (e *Engine) impulse(ctx Context, activation *Activation, wg *sync.WaitGroup
 			// The activation had a failure of some kind
 			if r := recover(); r != nil {
 				// Mark it as not executing and log the issue
-				a.Executing = false
-				a.Last.End = time.Now()
-				log.Printf("[%d] Activation panic ", a.ID)
+				activation.executing = false
+				activation.Last.End = time.Now()
+				log.Printf("[%d] Activation panic ", activation.ID)
 			}
 		}()
 
+		// Test the potential first
+		ctx.LastActivation = activation.Last
+		if !activation.Potential(ctx) {
+			return
+		}
+
 		// Calculate the refractory period
-		a.Last.RefractoryPeriod = start.Sub(a.Last.End)
+		activation.Last.RefractoryPeriod = start.Sub(activation.Last.End)
 
 		// Save off the runtime info
-		ctx.LastActivation = a.Last
+		ctx.LastActivation = activation.Last
 
 		// Fire the activation
-		a.Potential(ctx)
+		activation.Action(ctx)
 		end := time.Now()
 
 		// Update the runtime info
-		a.Last.Inception = ctx.Moment
-		a.Last.Start = start
-		a.Last.End = end
-		a.Last.RefractoryPeriod = 0
+		activation.Last.Inception = ctx.Moment
+		activation.Last.Start = start
+		activation.Last.End = end
 	}()
 }

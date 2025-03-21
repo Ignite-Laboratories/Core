@@ -11,9 +11,22 @@ type Activation struct {
 	// Muted indicates if the activation has been explicitly told to temporarily stop activating.
 	Muted bool
 
-	// Potential is what this activation could do.
-	Potential Action
+	// Action is what this activation does.
+	Action Action
+
+	// Potential must return true for this activation to activate.
+	Potential Potential
 
 	// Last provides temporal runtime information for the last activation.
 	Last runtime
+}
+
+func (a *Activation) Mute() *Activation {
+	a.Muted = true
+	return a
+}
+
+func (a *Activation) Unmute() *Activation {
+	a.Muted = false
+	return a
 }

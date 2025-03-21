@@ -10,6 +10,12 @@ func init() {
 	Impulse.Initialize()
 }
 
+// Action functions are provided temporal context when invoked.
+type Action func(ctx Context)
+
+// Potential functions are provided temporal context when invoked in order to make decisions.
+type Potential func(ctx Context) bool
+
 // Alive globally keeps activations looping until it is set to false.
 var Alive = true
 

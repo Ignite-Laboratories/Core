@@ -4,24 +4,31 @@ import (
 	"fmt"
 	"github.com/ignite-laboratories/core"
 	"github.com/ignite-laboratories/core/when"
+	"time"
 )
 
 var mutable *core.Activation
 
 func main() {
-	mutable = core.Impulse.Loop(loop)
-	core.Impulse.Stimulate(when.Modulo(16, toggle))
-	_ = core.Impulse.Spark()
+	var muteDuration = time.Second * 3
+	core.Impulse.Loop(toggleMute, when.After.Period(muteDuration))
+
+	var loopDuration = time.Millisecond * 500
+	mutable = core.Impulse.Loop(loop, when.After.Period(loopDuration))
+	mutable.Mute()
+
+	core.Impulse.Spark()
 }
 
-func toggle(ctx core.Context) {
+func toggleMute(ctx core.Context) {
 	mutable.Muted = !mutable.Muted
+	if mutable.Muted {
+		fmt.Printf("Muted on %d\n", ctx.Beat)
+	} else {
+		fmt.Printf("Un-muted on %d\n", ctx.Beat)
+	}
 }
 
 func loop(ctx core.Context) {
-	core.Impulse.Once(when.Even(stimulation))
-}
-
-func stimulation(ctx core.Context) {
-	fmt.Println("Chain stimulated")
+	fmt.Printf("Stimulated on %d\n", ctx.Beat)
 }

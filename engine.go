@@ -1,7 +1,6 @@
 package core
 
 import (
-	"fmt"
 	"log"
 	"sync"
 	"time"
@@ -18,8 +17,14 @@ type Engine struct {
 	// LastImpulse provides statistics regarding the last neural impulse.
 	LastImpulse runtime
 
-	Beat        int
-	activations map[uint64]*Activation // This is instantiated on init()
+	// Resistance indicates how much to resist the next impulse, with zero providing no resistance.
+	Resistance int
+
+	// Beat is the current impulse beat of the engine.  It will loop to 0 whenever all activations
+	// stop executing at the same time.
+	Beat int
+
+	activations map[uint64]*Activation
 	mutex       sync.Mutex
 }
 
@@ -32,6 +37,13 @@ func (e *Engine) addActivation(a *Activation) {
 // Initialize must be called before the first Spark.
 func (e *Engine) Initialize() {
 	e.activations = make(map[uint64]*Activation)
+	e.Block(e.regulate, func(ctx Context) bool { return true })
+}
+
+// regulate blocks every impulse by counting to the engine's current resistance value.
+func (e *Engine) regulate(ctx Context) {
+	for i := 0; i < e.Resistance; i++ {
+	}
 }
 
 // Stop causes the impulse engine to cease firing neural activations.
@@ -166,9 +178,9 @@ func (e *Engine) Loop(action Action, potential Potential) *Activation {
 }
 
 // Spark begins neural activation.
-func (e *Engine) Spark() error {
+func (e *Engine) Spark() {
 	if e.Active {
-		return fmt.Errorf("this neural impulse engine is already active")
+		return
 	}
 	e.Active = true
 
@@ -227,7 +239,6 @@ func (e *Engine) Spark() error {
 		lastFinishTime = finishTime
 		e.Beat++
 	}
-	return nil
 }
 
 func (e *Engine) impulse(ctx Context, activation *Activation, wg *sync.WaitGroup) {

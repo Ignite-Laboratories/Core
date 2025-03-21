@@ -22,11 +22,11 @@ var Alive = true
 // Inception provides the moment this operating system was initialized.
 var Inception = time.Now()
 
-// ID is the operating system identifier - it defaults to 1.
-var ID uint64 = NextID()
-
 // Impulse is the neural impulse engine.
 var Impulse Engine
+
+// ID is the operating system identifier - it defaults to 1.
+var ID uint64 = NextID()
 
 // currentId holds the last provided identifier.
 var currentId uint64

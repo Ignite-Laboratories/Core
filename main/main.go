@@ -7,8 +7,6 @@ import (
 	"time"
 )
 
-var threshold = 1024
-
 func main() {
 	ls := NewLoopingSystem(time.Millisecond * 500)
 	ls.Activate()
@@ -16,20 +14,17 @@ func main() {
 	ms := NewMutingSystem(ls, time.Second*3)
 	ms.Activate()
 
-	core.Impulse.Loop(Calculate, when.Always)
-	core.Impulse.Block(Regulate, when.Always)
+	core.Impulse.Loop(TrimResistance, when.Always)
 	core.Impulse.Stimulate(PrintBeat, when.Always)
 
+	core.Impulse.Resistance = 1024000000
 	core.Impulse.Spark()
 }
 
-func Calculate(ctx core.Context) {
-	for core.Impulse.Beat < threshold {
+func TrimResistance(ctx core.Context) {
+	for core.Impulse.Beat < 22 {
 	}
-}
-
-func Regulate(ctx core.Context) {
-	time.Sleep(time.Millisecond * 10)
+	core.Impulse.Resistance /= 2
 }
 
 func PrintBeat(ctx core.Context) {

@@ -19,15 +19,3 @@ type Activation struct {
 	// Last provides temporal runtime information for the last activation.
 	Last runtime
 }
-
-// Mute suppresses activation.
-func (a *Activation) Mute() *Activation {
-	a.Muted = true
-	return a
-}
-
-// Unmute un-suppresses activation.
-func (a *Activation) Unmute() *Activation {
-	a.Muted = false
-	return a
-}

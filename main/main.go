@@ -7,30 +7,39 @@ import (
 	"time"
 )
 
-// Setup Systems
-var muter = NewMutingSystem(&basic.System, time.Second*3)
-var basic = NewBasicSystem(time.Millisecond * 500)
+var stimFreq = time.Millisecond * 500
+var muteFreq = time.Second * 3
 
-// initialize
-func init() {
-	basic.Mute()
-}
-
-// Run
 func main() {
+	// Stimulate every half second
+	stim := core.Impulse.Loop(Stimulate, when.After.Period(&stimFreq))
+	stim.Muted = true
+
+	// Mute/Unmute the stimulation every three seconds
+	core.Impulse.Loop(func(ctx core.Context) {
+		stim.Muted = !stim.Muted
+	}, when.After.Period(&muteFreq))
+
+	// Trim down the resistance cyclically
 	core.Impulse.Loop(TrimResistance, when.Always)
+
+	// Print out the current beat on every impulse
 	core.Impulse.Stimulate(PrintBeat, when.Always)
 
-	core.Impulse.Resistance = 1024000000
+	// Set the initial resistance high
+	core.Impulse.Resistance = 1000000000
+
+	// Make it so
 	core.Impulse.Spark()
 }
 
-/**
-Loops
-*/
+func Stimulate(ctx core.Context) {
+	fmt.Printf("Stimulated on %d\n", ctx.Beat)
+}
 
 func TrimResistance(ctx core.Context) {
 	for core.Impulse.Beat < 22 {
+		// Hold the impulse window open
 	}
 	core.Impulse.Resistance /= 2
 }

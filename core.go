@@ -17,7 +17,7 @@ var Alive = true
 // Inception provides the moment this operating system was initialized.
 var Inception = time.Now()
 
-// Impulse is the core neural impulse engine.
+// Impulse is the host engine.
 var Impulse = NewEngine()
 
 // ID is the operating system identifier - it defaults to 1.

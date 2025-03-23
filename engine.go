@@ -41,7 +41,7 @@ func NewEngine() *Engine {
 		for i := 0; i < e.Resistance; i++ {
 		}
 	}
-	e.Block(regulator, func(ctx Context) bool { return true })
+	e.Block(regulator, func(ctx Context) bool { return true }, false)
 
 	return &e
 }
@@ -51,19 +51,6 @@ func (e *Engine) addActivation(a *Activation) {
 	defer e.mutex.Unlock()
 	e.mutex.Lock()
 	e.activations[a.ID] = a
-}
-
-// CreateSystem instantiates a new System in either an asynchronous or blocking fashion using the provided functions.
-func (e *Engine) CreateSystem(async bool, loop Action, when Potential) System {
-	var s System
-	s.ID = NextID()
-	s.Engine = e
-	if async {
-		s.Activation = e.Loop(loop, when)
-	} else {
-		s.Activation = e.Block(loop, when)
-	}
-	return s
 }
 
 // Stop causes the impulse engine to cease firing neural activations.
@@ -114,7 +101,9 @@ func (e *Engine) Range() []*Activation {
 }
 
 // Block activates the provided action on every impulse in a blocking fashion, if the potential returns true.
-func (e *Engine) Block(action Action, potential Potential) *Activation {
+//
+// If 'muted' is true, the activation is lies dormant until un-muted.
+func (e *Engine) Block(action Action, potential Potential, muted bool) *Activation {
 	var a Activation
 	a.ID = NextID()
 	a.Action = func(ctx Context) {
@@ -123,12 +112,15 @@ func (e *Engine) Block(action Action, potential Potential) *Activation {
 		a.executing = false
 	}
 	a.Potential = potential
+	a.Muted = muted
 	e.addActivation(&a)
 	return &a
 }
 
 // Stimulate activates the provided action on every impulse in an asynchronous fashion, if the potential returns true.
-func (e *Engine) Stimulate(action Action, potential Potential) *Activation {
+//
+// If 'muted' is true, the activation is lies dormant until un-muted.
+func (e *Engine) Stimulate(action Action, potential Potential, muted bool) *Activation {
 	// NOTE: The trick here is that it never sets 'Executing' =)
 	var a Activation
 	a.ID = NextID()
@@ -136,12 +128,15 @@ func (e *Engine) Stimulate(action Action, potential Potential) *Activation {
 		go action(ctx)
 	}
 	a.Potential = potential
+	a.Muted = muted
 	e.addActivation(&a)
 	return &a
 }
 
 // Loop activates the provided action in an asynchronous fashion cyclically, if the potential returns true.
-func (e *Engine) Loop(action Action, potential Potential) *Activation {
+//
+// If 'muted' is true, the activation is lies dormant until un-muted.
+func (e *Engine) Loop(action Action, potential Potential, muted bool) *Activation {
 	var a Activation
 	a.ID = NextID()
 	a.Action = func(ctx Context) {
@@ -152,14 +147,15 @@ func (e *Engine) Loop(action Action, potential Potential) *Activation {
 		}()
 	}
 	a.Potential = potential
+	a.Muted = muted
 	e.addActivation(&a)
 	return &a
 }
 
-// Once activates the provided action once, if the potential returns true.
+// Trigger activates the provided action, if the potential returns true.
 //
 // If 'async' is true, the action is called asynchronously - otherwise, it blocks the firing impulse.
-func (e *Engine) Once(action Action, potential Potential, async bool) {
+func (e *Engine) Trigger(action Action, potential Potential, async bool) *Activation {
 	defer e.mutex.Unlock()
 	e.mutex.Lock()
 
@@ -185,16 +181,16 @@ func (e *Engine) Once(action Action, potential Potential, async bool) {
 		} else {
 			action(ctx)
 		}
+		e.Remove(a.ID)
 	}
 	a.Potential = potential
-
-	// Impulse the activation
 	var wg sync.WaitGroup
 	e.fire(ctx, &a, &wg)
+	return &a
 }
 
-// Spark begins driving impulses.
-func (e *Engine) Spark() {
+// Start begins driving impulses.
+func (e *Engine) Start() {
 	if e.Active {
 		return
 	}

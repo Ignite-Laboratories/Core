@@ -10,40 +10,38 @@ import (
 var stimFreq = time.Millisecond * 500
 var muteFreq = time.Second * 3
 
-func main() {
-	// Stimulate every half second
-	stim := core.Impulse.Loop(Stimulate, when.After.Period(&stimFreq))
-	stim.Muted = true
+// Stimulate every half second
+var stim = core.Impulse.Loop(Stimulate, when.After.Period(&stimFreq))
 
+func main() {
 	// Mute/Unmute the stimulation every three seconds
-	core.Impulse.Loop(func(ctx core.Context) {
-		stim.Muted = !stim.Muted
-	}, when.After.Period(&muteFreq))
+	core.Impulse.Loop(Toggle, when.After.Period(&muteFreq))
 
 	// Trim down the resistance cyclically
 	core.Impulse.Loop(TrimResistance, when.Always)
 
-	// Print out the current beat on every impulse
-	core.Impulse.Stimulate(PrintBeat, when.Always)
-
 	// Set the initial resistance high
-	core.Impulse.Resistance = 1000000000
+	core.Impulse.Resistance = 10000000
 
 	// Make it so
 	core.Impulse.Spark()
 }
 
+func Toggle(ctx core.Context) {
+	if stim.Muted {
+		fmt.Printf("[%d] Unmuting\n", ctx.Beat)
+	} else {
+		fmt.Printf("[%d] Muting\n", ctx.Beat)
+	}
+	stim.Muted = !stim.Muted
+}
+
 func Stimulate(ctx core.Context) {
-	fmt.Printf("Stimulated on %d\n", ctx.Beat)
+	fmt.Printf("[%d] Stimulated\n", ctx.Beat)
 }
 
 func TrimResistance(ctx core.Context) {
-	for core.Impulse.Beat < 22 {
-		// Hold the impulse window open
-	}
+	time.Sleep(time.Millisecond * 5000)
+	fmt.Printf("Trimming resistance\n")
 	core.Impulse.Resistance /= 2
-}
-
-func PrintBeat(ctx core.Context) {
-	fmt.Printf("Beat %d\n", ctx.Beat)
 }

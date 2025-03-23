@@ -6,7 +6,7 @@ import (
 )
 
 func init() {
-	// Initialize the impulse engine.
+	// Initialize the core neural impulse engine.
 	Impulse.Initialize()
 }
 
@@ -16,13 +16,13 @@ type Action func(ctx Context)
 // Potential functions are provided temporal context when invoked in order to make decisions.
 type Potential func(ctx Context) bool
 
-// Alive globally keeps activations looping until it is set to false.
+// Alive globally keeps activations looping until set to false - it's true by default.
 var Alive = true
 
 // Inception provides the moment this operating system was initialized.
 var Inception = time.Now()
 
-// Impulse is the neural impulse engine.
+// Impulse is the core neural impulse engine.
 var Impulse Engine
 
 // ID is the operating system identifier - it defaults to 1.
@@ -38,6 +38,8 @@ func NextID() uint64 {
 
 // Shutdown waits a period of time before setting Alive to false.
 func Shutdown(period time.Duration) {
-	time.Sleep(period)
-	Alive = false
+	go func() {
+		time.Sleep(period)
+		Alive = false
+	}()
 }

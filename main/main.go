@@ -7,13 +7,14 @@ import (
 	"time"
 )
 
+var muter = NewMuter(pacer, time.Second*3)
+var pacer = NewPacer(time.Millisecond * 500)
+
 func main() {
-	ls := NewLoopingSystem(time.Millisecond * 500)
-	ls.Activate()
-
-	ms := NewMutingSystem(ls, time.Second*3)
-	ms.Activate()
-
+	muter.Activate(true)
+	pacer.Activate(true)
+	pacer.Mute()
+	
 	core.Impulse.Loop(TrimResistance, when.Always)
 	core.Impulse.Stimulate(PrintBeat, when.Always)
 

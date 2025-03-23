@@ -8,26 +8,28 @@ import (
 
 // Engine is a neural impulse driver.
 type Engine struct {
-	// Active indicates if the neural impulse engine is currently firing activations or not.
+	// Active indicates if the engine is currently firing activations or not.
 	Active bool
 
-	// Ignition provides the first impulse moment of this neural impulse engine.
+	// Ignition provides the first impulse moment of this engine.
 	Ignition time.Time
 
-	// LastImpulse provides statistics regarding the last neural impulse.
+	// LastImpulse provides statistics regarding the last impulse.
 	LastImpulse runtime
 
-	// Resistance indicates how much to resist the next impulse, with zero providing no resistance.
+	// Resistance indicates how much to resist the next impulse, with 0 (default) providing no resistance.
 	Resistance int
 
-	// Beat is the current impulse beat of the engine.  It will loop to 0 whenever all activations
-	// stop executing at the same time.
+	// Beat provides the current number of impulses asynchronously executing activations.
+	//
+	// It will loop to 0 whenever all activations are finished.
 	Beat int
 
 	activations map[uint64]*Activation
 	mutex       sync.Mutex
 }
 
+// addActivation provides a thread-safe way of adding activations to the internal map.
 func (e *Engine) addActivation(a *Activation) {
 	defer e.mutex.Unlock()
 	e.mutex.Lock()
@@ -35,15 +37,19 @@ func (e *Engine) addActivation(a *Activation) {
 }
 
 // Initialize must be called before the first Spark.
+//
+// It sets up both the resistance regulator and the internal activation map.
 func (e *Engine) Initialize() {
+	// Make the activation map
 	e.activations = make(map[uint64]*Activation)
-	e.Block(e.regulate, func(ctx Context) bool { return true })
-}
 
-// regulate blocks every impulse by counting to the engine's current resistance value.
-func (e *Engine) regulate(ctx Context) {
-	for i := 0; i < e.Resistance; i++ {
+	// Set up temporal weight
+	regulator := func(ctx Context) {
+		for i := 0; i < e.Resistance; i++ {
+		}
 	}
+
+	e.Block(regulator, func(ctx Context) bool { return true })
 }
 
 // Stop causes the impulse engine to cease firing neural activations.
@@ -51,7 +57,7 @@ func (e *Engine) Stop() {
 	e.Active = false
 }
 
-// Mute stops the provided activation ID from activating until Unmute is called.
+// Mute suppresses the identified activation until Unmute is called.
 func (e *Engine) Mute(id uint64) {
 	defer e.mutex.Unlock()
 	e.mutex.Lock()
@@ -63,7 +69,7 @@ func (e *Engine) Mute(id uint64) {
 	}
 }
 
-// Unmute lets the provided activation ID begin activating again.
+// Unmute un-suppresses the identified activation.
 func (e *Engine) Unmute(id uint64) {
 	defer e.mutex.Unlock()
 	e.mutex.Lock()
@@ -75,8 +81,8 @@ func (e *Engine) Unmute(id uint64) {
 	}
 }
 
-// ClearActivation removes the activation ID from neural activity.
-func (e *Engine) ClearActivation(id uint64) {
+// Remove deletes the identified activation from the internal activation map.
+func (e *Engine) Remove(id uint64) {
 	defer e.mutex.Unlock()
 	e.mutex.Lock()
 	delete(e.activations, id)
@@ -93,42 +99,7 @@ func (e *Engine) Range() []*Activation {
 	return out
 }
 
-// Once invokes the provided Action once in an asynchronous fashion, if the
-// provided Potential returns true.
-func (e *Engine) Once(action Action, potential Potential) {
-	defer e.mutex.Unlock()
-	e.mutex.Lock()
-
-	// Grab 'now' ASAP!
-	now := time.Now()
-
-	lastImpulse := e.LastImpulse
-
-	// Create a temporal context
-	var ctx Context
-	ctx.ID = NextID()
-	ctx.Moment = now
-	ctx.Delta = now.Sub(lastImpulse.Inception)
-	ctx.Beat = e.Beat
-	ctx.LastImpulse = e.LastImpulse
-
-	// Build the activation
-	var a Activation
-	a.ID = NextID()
-	a.Action = func(ctx Context) {
-		go action(ctx)
-	}
-	a.Potential = potential
-
-	// Impulse the activation
-	var wg sync.WaitGroup
-	e.impulse(ctx, &a, &wg)
-}
-
-// Block activates the provided Action on every impulse in a blocking fashion, if the provided
-// Potential returns true.
-//
-// It returns an Activation control surface.
+// Block activates the provided action on every impulse in a blocking fashion, if the potential returns true.
 func (e *Engine) Block(action Action, potential Potential) *Activation {
 	var a Activation
 	a.ID = NextID()
@@ -142,10 +113,7 @@ func (e *Engine) Block(action Action, potential Potential) *Activation {
 	return &a
 }
 
-// Stimulate activates the provided Action on every impulse in an asynchronous fashion, if the
-// provided Potential returns true.
-//
-// It returns an Activation control surface.
+// Stimulate activates the provided action on every impulse in an asynchronous fashion, if the potential returns true.
 func (e *Engine) Stimulate(action Action, potential Potential) *Activation {
 	// NOTE: The trick here is that it never sets 'Executing' =)
 	var a Activation
@@ -158,10 +126,7 @@ func (e *Engine) Stimulate(action Action, potential Potential) *Activation {
 	return &a
 }
 
-// Loop activates the provided Action in an asynchronous fashion cyclically, if the provided
-// Potential returns true.
-//
-// It returns an Activation control surface.
+// Loop activates the provided action in an asynchronous fashion cyclically, if the potential returns true.
 func (e *Engine) Loop(action Action, potential Potential) *Activation {
 	var a Activation
 	a.ID = NextID()
@@ -177,7 +142,44 @@ func (e *Engine) Loop(action Action, potential Potential) *Activation {
 	return &a
 }
 
-// Spark begins neural activation.
+// Once activates the provided action once, if the potential returns true.
+//
+// If 'async' is true, the action is called asynchronously - otherwise, it blocks the firing impulse.
+func (e *Engine) Once(action Action, potential Potential, async bool) {
+	defer e.mutex.Unlock()
+	e.mutex.Lock()
+
+	// Grab 'now' ASAP!
+	now := time.Now()
+
+	lastImpulse := e.LastImpulse
+
+	// Create a temporal context
+	var ctx Context
+	ctx.ID = NextID()
+	ctx.Moment = now
+	ctx.Period = now.Sub(lastImpulse.Inception)
+	ctx.Beat = e.Beat
+	ctx.LastImpulse = e.LastImpulse
+
+	// Build the activation
+	var a Activation
+	a.ID = NextID()
+	a.Action = func(ctx Context) {
+		if async {
+			go action(ctx)
+		} else {
+			action(ctx)
+		}
+	}
+	a.Potential = potential
+
+	// Impulse the activation
+	var wg sync.WaitGroup
+	e.fire(ctx, &a, &wg)
+}
+
+// Spark begins driving impulses.
 func (e *Engine) Spark() {
 	if e.Active {
 		return
@@ -223,13 +225,13 @@ func (e *Engine) Spark() {
 		var ctx Context
 		ctx.ID = NextID()
 		ctx.Moment = now
-		ctx.Delta = now.Sub(lastNow)
+		ctx.Period = now.Sub(lastNow)
 		ctx.Beat = e.Beat
 		ctx.LastImpulse = e.LastImpulse
 
 		// Launch the wave of activations
 		for _, a := range activations {
-			e.impulse(ctx, a, &wg)
+			e.fire(ctx, a, &wg)
 		}
 		wg.Wait()
 		finishTime := time.Now()
@@ -241,7 +243,8 @@ func (e *Engine) Spark() {
 	}
 }
 
-func (e *Engine) impulse(ctx Context, activation *Activation, wg *sync.WaitGroup) {
+// fire is what activates each activation.
+func (e *Engine) fire(ctx Context, activation *Activation, wg *sync.WaitGroup) {
 	// Grab this activation's start ASAP!
 	start := time.Now()
 
@@ -255,7 +258,7 @@ func (e *Engine) impulse(ctx Context, activation *Activation, wg *sync.WaitGroup
 	go func() {
 		defer wg.Done()
 		defer func() {
-			// The activation had a failure of some kind
+			// Check if the activation had a failure of some kind
 			if r := recover(); r != nil {
 				// Mark it as not executing and log the issue
 				activation.executing = false

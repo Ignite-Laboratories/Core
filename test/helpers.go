@@ -15,7 +15,7 @@ func ShouldPanic(t *testing.T) {
 	}
 }
 
-// CompareValues fails the test if the two provided values do not compare as true.
+// CompareValues fails the test if the two provided values are not equal.
 func CompareValues[T comparable](a T, b T, t *testing.T) {
 	if a != b {
 		t.Errorf("Expected %v, got %v", a, b)
@@ -24,7 +24,7 @@ func CompareValues[T comparable](a T, b T, t *testing.T) {
 }
 
 // CompareSlices fails the test if the two slices are unequal in length, or if the
-// elements each do not compare as true for every index.
+// elements are not equal for every index.
 func CompareSlices[T comparable](a []T, b []T, t *testing.T) {
 	if len(a) != len(b) {
 		t.Errorf("Slices are not the same length")

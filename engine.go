@@ -20,13 +20,30 @@ type Engine struct {
 	// Resistance indicates how much to resist the next impulse, with 0 (default) providing no resistance.
 	Resistance int
 
-	// Beat provides the current number of impulses asynchronously executing activations.
+	// Beat provides the current count of impulses fired while performing asynchronous activations.
 	//
 	// It will loop to 0 whenever all activations are finished.
 	Beat int
 
 	activations map[uint64]*Activation
 	mutex       sync.Mutex
+}
+
+// NewEngine creates and configures a new neural impulse engine instance.
+func NewEngine() *Engine {
+	e := Engine{}
+
+	// Make the activation map
+	e.activations = make(map[uint64]*Activation)
+
+	// Set up impulse regulation
+	regulator := func(ctx Context) {
+		for i := 0; i < e.Resistance; i++ {
+		}
+	}
+	e.Block(regulator, func(ctx Context) bool { return true })
+
+	return &e
 }
 
 // addActivation provides a thread-safe way of adding activations to the internal map.
@@ -36,20 +53,17 @@ func (e *Engine) addActivation(a *Activation) {
 	e.activations[a.ID] = a
 }
 
-// Initialize must be called before the first Spark.
-//
-// It sets up both the resistance regulator and the internal activation map.
-func (e *Engine) Initialize() {
-	// Make the activation map
-	e.activations = make(map[uint64]*Activation)
-
-	// Set up temporal weight
-	regulator := func(ctx Context) {
-		for i := 0; i < e.Resistance; i++ {
-		}
+// CreateSystem instantiates a new System in either an asynchronous or blocking fashion using the provided functions.
+func (e *Engine) CreateSystem(async bool, loop Action, when Potential) System {
+	var s System
+	s.ID = NextID()
+	s.Engine = e
+	if async {
+		s.Activation = e.Loop(loop, when)
+	} else {
+		s.Activation = e.Block(loop, when)
 	}
-
-	e.Block(regulator, func(ctx Context) bool { return true })
+	return s
 }
 
 // Stop causes the impulse engine to cease firing neural activations.
@@ -57,8 +71,8 @@ func (e *Engine) Stop() {
 	e.Active = false
 }
 
-// Mute suppresses the identified activation until Unmute is called.
-func (e *Engine) Mute(id uint64) {
+// MuteByID suppresses the identified activation until Unmute is called.
+func (e *Engine) MuteByID(id uint64) {
 	defer e.mutex.Unlock()
 	e.mutex.Lock()
 	for _, a := range e.activations {
@@ -69,8 +83,8 @@ func (e *Engine) Mute(id uint64) {
 	}
 }
 
-// Unmute un-suppresses the identified activation.
-func (e *Engine) Unmute(id uint64) {
+// UnmuteByID un-suppresses the identified activation.
+func (e *Engine) UnmuteByID(id uint64) {
 	defer e.mutex.Unlock()
 	e.mutex.Lock()
 	for _, a := range e.activations {

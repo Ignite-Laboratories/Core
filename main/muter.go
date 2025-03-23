@@ -3,29 +3,25 @@ package main
 import (
 	"fmt"
 	"github.com/ignite-laboratories/core"
+	"github.com/ignite-laboratories/core/when"
 	"time"
 )
 
-type Muter struct {
-	Pacer
-
+type MutingSystem struct {
+	core.System
 	toMute *core.System
 }
 
-func NewMuter(systemToMute *core.System, duration time.Duration) *core.System {
-	sys := Muter{
+func NewMutingSystem(systemToMute *core.System, periodicity time.Duration) MutingSystem {
+	sys := MutingSystem{
 		toMute: systemToMute,
 	}
-	sys.ID = core.NextID()
-	sys.LoopFunc = sys.Loop
-	sys.WhenFunc = sys.Pace
-	sys.Duration = duration
-
-	return &sys.System
+	sys.System = core.Impulse.CreateSystem(true, sys.Loop, when.After.Period(&periodicity))
+	return sys
 }
 
-func (s *Muter) Loop(ctx core.Context) {
-	activation := s.toMute.GetActivation()
+func (s *MutingSystem) Loop(ctx core.Context) {
+	activation := s.toMute
 	activation.Muted = !activation.Muted
 	if activation.Muted {
 		fmt.Printf("Muted on %d\n", ctx.Beat)

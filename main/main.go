@@ -7,20 +7,27 @@ import (
 	"time"
 )
 
-var muter = NewMuter(pacer, time.Second*3)
-var pacer = NewPacer(time.Millisecond * 500)
+// Setup Systems
+var muter = NewMutingSystem(&basic.System, time.Second*3)
+var basic = NewBasicSystem(time.Millisecond * 500)
 
+// initialize
+func init() {
+	basic.Mute()
+}
+
+// Run
 func main() {
-	muter.Activate(true)
-	pacer.Activate(true)
-	pacer.Mute()
-	
 	core.Impulse.Loop(TrimResistance, when.Always)
 	core.Impulse.Stimulate(PrintBeat, when.Always)
 
 	core.Impulse.Resistance = 1024000000
 	core.Impulse.Spark()
 }
+
+/**
+Loops
+*/
 
 func TrimResistance(ctx core.Context) {
 	for core.Impulse.Beat < 22 {

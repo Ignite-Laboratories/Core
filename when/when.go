@@ -31,29 +31,29 @@ func Odd(ctx core.Context) bool {
 }
 
 // Modulo provides the following potential: "beat % value == 0"
-func Modulo(value int) core.Potential {
+func Modulo(value *int) core.Potential {
 	return func(ctx core.Context) bool {
-		return ctx.Beat%value == 0
+		return ctx.Beat%*value == 0
 	}
 }
 
 // Over provides the following potential: "beat > value"
-func Over(value int) core.Potential {
+func Over(value *int) core.Potential {
 	return func(ctx core.Context) bool {
-		return ctx.Beat > value
+		return ctx.Beat > *value
 	}
 }
 
 // On provides the following potential: "beat == value"
-func On(beat int) core.Potential {
+func On(beat *int) core.Potential {
 	return func(ctx core.Context) bool {
-		return ctx.Beat == beat
+		return ctx.Beat == *beat
 	}
 }
 
 // Under provides the following potential: "beat < value"
-func Under(value int) core.Potential {
+func Under(value *int) core.Potential {
 	return func(ctx core.Context) bool {
-		return ctx.Beat < value
+		return ctx.Beat < *value
 	}
 }

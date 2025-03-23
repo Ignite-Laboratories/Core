@@ -5,11 +5,6 @@ import (
 	"time"
 )
 
-func init() {
-	// Initialize the core neural impulse engine.
-	Impulse.Initialize()
-}
-
 // Action functions are provided temporal context when invoked.
 type Action func(ctx Context)
 
@@ -23,7 +18,7 @@ var Alive = true
 var Inception = time.Now()
 
 // Impulse is the core neural impulse engine.
-var Impulse Engine
+var Impulse = NewEngine()
 
 // ID is the operating system identifier - it defaults to 1.
 var ID uint64 = NextID()

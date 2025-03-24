@@ -12,14 +12,14 @@ var stimFreq = time.Millisecond * 500
 var muteFreq = time.Second * 3
 
 // Stimulate every half second
-var stim = core.Impulse.Loop(Stimulate, after.Period(&stimFreq))
+var stim = core.Impulse.Loop(Stimulate, after.Period(&stimFreq), false)
 
 func main() {
 	// Mute/Unmute the stimulation every three seconds
-	core.Impulse.Loop(Toggle, after.Period(&muteFreq))
+	core.Impulse.Loop(Toggle, after.Period(&muteFreq), false)
 
 	// Trim down the resistance cyclically
-	core.Impulse.Loop(TrimResistance, when.Always)
+	core.Impulse.Loop(TrimResistance, when.Always, false)
 
 	// Set the initial resistance high
 	core.Impulse.Resistance = 10000000

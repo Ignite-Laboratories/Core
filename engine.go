@@ -14,8 +14,8 @@ type Engine struct {
 	// Ignition provides the first impulse moment of this engine.
 	Ignition time.Time
 
-	// LastImpulse provides statistics regarding the last impulse.
-	LastImpulse runtime
+	// Last provides statistics regarding the last impulse.
+	Last runtime
 
 	// Resistance indicates how much to resist the next impulse, with 0 (default) providing no resistance.
 	Resistance int
@@ -162,7 +162,7 @@ func (e *Engine) Trigger(action Action, potential Potential, async bool) *Activa
 	// Grab 'now' ASAP!
 	now := time.Now()
 
-	lastImpulse := e.LastImpulse
+	lastImpulse := e.Last
 
 	// Create a temporal context
 	var ctx Context
@@ -170,7 +170,7 @@ func (e *Engine) Trigger(action Action, potential Potential, async bool) *Activa
 	ctx.Moment = now
 	ctx.Period = now.Sub(lastImpulse.Inception)
 	ctx.Beat = e.Beat
-	ctx.LastImpulse = e.LastImpulse
+	ctx.LastImpulse = e.Last
 
 	// Build the activation
 	var a Activation
@@ -226,10 +226,11 @@ func (e *Engine) Start() {
 		}
 
 		// Calculate the impulse stats
-		e.LastImpulse.Inception = lastNow
-		e.LastImpulse.Start = lastNow
-		e.LastImpulse.End = lastFinishTime
-		e.LastImpulse.RefractoryPeriod = now.Sub(lastFinishTime)
+		e.Last.Inception = lastNow
+		e.Last.Start = lastNow
+		e.Last.End = lastFinishTime
+		e.Last.Duration = e.Last.End.Sub(e.Last.Start)
+		e.Last.RefractoryPeriod = now.Sub(lastFinishTime)
 
 		// Build a temporal context
 		var ctx Context
@@ -237,7 +238,7 @@ func (e *Engine) Start() {
 		ctx.Moment = now
 		ctx.Period = now.Sub(lastNow)
 		ctx.Beat = e.Beat
-		ctx.LastImpulse = e.LastImpulse
+		ctx.LastImpulse = e.Last
 
 		// Launch the wave of activations
 		for _, a := range activations {

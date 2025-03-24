@@ -15,4 +15,7 @@ type runtime struct {
 
 	// End is the moment activation completed.
 	End time.Time
+
+	// Duration is the period between Start and End
+	Duration time.Duration
 }

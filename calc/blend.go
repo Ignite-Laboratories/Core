@@ -5,11 +5,11 @@ import (
 	"github.com/ignite-laboratories/core/condition"
 )
 
-// Blend represents the state of A and B that generated the resulting muxed Value.
-type Blend[TA core.Numeric, TB core.Numeric, TOut core.Numeric] struct {
-	Value TOut
-	A     core.Data[TA]
-	B     core.Data[TB]
+// Blend represents the state of A and B that generated the resulting blended Value.
+type Blend[TValue core.Numeric] struct {
+	Value TValue
+	A     core.Data[TValue]
+	B     core.Data[TValue]
 }
 
 // NewBlend creates a dimension that blends the point value of two input dimensions for every impulse that the potential returns true.
@@ -18,17 +18,17 @@ type Blend[TA core.Numeric, TB core.Numeric, TOut core.Numeric] struct {
 // This can adjust the "resolution" of output data =)
 //
 // Muted indicates if the stimulator of this dimension should be created muted.
-func NewBlend[TA core.Numeric, TB core.Numeric, TOut core.Numeric](engine *core.Engine, potential core.Potential, muted bool, blend core.Operate[TA, TB, TOut], a *core.Dimension[TA, any], b *core.Dimension[TB, any]) *core.Dimension[Blend[TA, TB, TOut], any] {
-	d := core.Dimension[Blend[TA, TB, TOut], any]{}
+func NewBlend[TValue core.Numeric](engine *core.Engine, potential core.Potential, muted bool, blend core.Operate[TValue], a *core.Dimension[TValue, any], b *core.Dimension[TValue, any]) *core.Dimension[Blend[TValue], any] {
+	d := core.Dimension[Blend[TValue], any]{}
 	d.ID = core.NextID()
 	d.Trimmer = engine.Loop(d.Trim, condition.Always, false)
 	d.Stimulator = engine.Stimulate(func(ctx core.Context) {
-		mux := Blend[TA, TB, TOut]{
+		mux := Blend[TValue]{
 			A: a.Current,
 			B: b.Current,
 		}
 		mux.Value = blend(mux.A.Point, mux.B.Point)
-		data := core.Data[Blend[TA, TB, TOut]]{
+		data := core.Data[Blend[TValue]]{
 			Context: ctx,
 			Point:   mux,
 		}

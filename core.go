@@ -62,3 +62,9 @@ func HertzToDuration(hz float64) time.Duration {
 	ns := s * 1e9
 	return time.Duration(ns)
 }
+
+// alwaysFire provides a potential that always returns true.
+func alwaysFire(ctx Context) bool {
+	// This is here because `core` cannot cyclically reference `condition`
+	return true
+}

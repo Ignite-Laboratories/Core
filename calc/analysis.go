@@ -12,8 +12,8 @@ import (
 // This can adjust "reactivity" to input data =)
 //
 // Muted indicates if the stimulator of this dimension should be created muted.
-func NewAnalysis[TIn any, TOut any, TCache any](engine *core.Engine, potential core.Potential, muted bool, integrate core.Integral[core.Data[TIn], TOut, TCache], target *core.Dimension[TIn, TCache]) *core.Dimension[TOut, TCache] {
-	d := core.Dimension[TOut, TCache]{}
+func NewAnalysis[TSource any, TValue any, TCache any](engine *core.Engine, potential core.Potential, muted bool, integrate core.Integral[core.Data[TSource], TValue, TCache], target *core.Dimension[TSource, TCache]) *core.Dimension[TValue, TCache] {
+	d := core.Dimension[TValue, TCache]{}
 	d.ID = core.NextID()
 	d.Trimmer = engine.Loop(d.Trim, condition.Always, false)
 
@@ -21,7 +21,7 @@ func NewAnalysis[TIn any, TOut any, TCache any](engine *core.Engine, potential c
 		// Get target timeline data
 		target.Mutex.Lock()
 		last := target.Current
-		var data []core.Data[TIn]
+		var data []core.Data[TSource]
 		copy(data, target.Timeline)
 		target.Mutex.Unlock()
 
@@ -39,7 +39,7 @@ func NewAnalysis[TIn any, TOut any, TCache any](engine *core.Engine, potential c
 		data = data[trimCount:]
 
 		// Perform integration
-		out := core.Data[TOut]{
+		out := core.Data[TValue]{
 			Context: ctx,
 			Point:   integrate(ctx, d.Cache, data),
 		}

@@ -189,8 +189,8 @@ func (e *Engine) Trigger(action Action, potential Potential, async bool) *Activa
 	return &a
 }
 
-// Start begins driving impulses.
-func (e *Engine) Start() {
+// Spark begins driving impulses.
+func (e *Engine) Spark() {
 	if e.Active {
 		return
 	}

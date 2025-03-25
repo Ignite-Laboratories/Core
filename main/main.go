@@ -25,7 +25,7 @@ func main() {
 	core.Impulse.Resistance = 10000000
 
 	// Make it so
-	core.Impulse.Start()
+	core.Impulse.Spark()
 }
 
 func Toggle(ctx core.Context) {

@@ -3,23 +3,21 @@ package main
 import (
 	"fmt"
 	"github.com/ignite-laboratories/core"
-	"github.com/ignite-laboratories/core/after"
-	"github.com/ignite-laboratories/core/when"
+	"github.com/ignite-laboratories/core/condition"
 	"time"
 )
 
-var stimFreq = time.Millisecond * 500
-var muteFreq = time.Second * 3
+var stimFreq = 16.0
+var muteFreq = 1.0
 
-// Stimulate every half second
-var stim = core.Impulse.Loop(Stimulate, after.Period(&stimFreq), false)
+var stim = core.Impulse.Loop(Stimulate, condition.Frequency(&stimFreq), false)
 
 func main() {
 	// Mute/Unmute the stimulation every three seconds
-	core.Impulse.Loop(Toggle, after.Period(&muteFreq), false)
+	core.Impulse.Loop(Toggle, condition.Frequency(&muteFreq), false)
 
 	// Trim down the resistance cyclically
-	core.Impulse.Loop(TrimResistance, when.Always, false)
+	core.Impulse.Loop(TrimResistance, condition.Always, false)
 
 	// Set the initial resistance high
 	core.Impulse.Resistance = 10000000

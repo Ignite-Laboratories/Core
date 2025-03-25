@@ -46,17 +46,20 @@ func (o *Dimension[T]) trim(ctx Context) {
 	}
 }
 
-// Mute mutes the stimulator of this dimension.
+// Mute suppresses the stimulator of this dimension.
 func (d *Dimension[T]) Mute() {
 	d.Stimulator.Muted = true
 }
 
-// Unmute unmutes the stimulator of this dimension.
+// Unmute un-suppresses the stimulator of this dimension.
 func (d *Dimension[T]) Unmute() {
 	d.Stimulator.Muted = false
 }
 
-// NewObservation creates a dimension that observes the target value across time, if the provided potential returns true.
+// NewObservation creates a dimension that records the target value across time, if the provided potential returns true.
+//
+// NOTE: The potential function gates the creation of timeline indexes!
+// This can adjust the "resolution" of output data =)
 //
 // Muted indicates if the stimulator of this dimension should be created muted.
 func NewObservation[T any](engine *Engine, target *T, potential Potential, muted bool) *Dimension[T] {
@@ -78,14 +81,17 @@ func NewObservation[T any](engine *Engine, target *T, potential Potential, muted
 
 // NewCalculation creates a dimension that performs a calculation for every impulse that the potential returns true.
 //
+// NOTE: The potential function gates the creation of timeline indexes!
+// This can adjust the "resolution" of output data =)
+//
 // Muted indicates if the stimulator of this dimension should be created muted.
-func NewCalculation[T any](engine *Engine, calculation CalculatePoint[T], potential Potential, muted bool) *Dimension[T] {
+func NewCalculation[T any](engine *Engine, calculate CalculatePoint[T], potential Potential, muted bool) *Dimension[T] {
 	d := Dimension[T]{}
 	d.ID = NextID()
 	d.Trimmer = engine.Loop(d.trim, alwaysFire, false)
 	d.Stimulator = engine.Stimulate(func(ctx Context) {
 		d.Mutex.Lock()
-		value := calculation(ctx)
+		value := calculate(ctx)
 		data := Data[T]{
 			Context: ctx,
 			Value:   value,
@@ -97,12 +103,14 @@ func NewCalculation[T any](engine *Engine, calculation CalculatePoint[T], potent
 	return &d
 }
 
-// NewAnalysis creates a new dimension that records the result of the 'analyze' function cyclically.
+// NewAnalysis creates a new dimension that records the result of the provided integral function cyclically.
+// The integral function is always called with the exact timeline data since the last analysis started.
 //
-// The analyze function is called with whatever timeline data is available on the target timeline since the last cycle of analysis.
+// NOTE: The potential function gates the creation of timeline indexes!
+// This can adjust the "resolution" of output data =)
 //
 // Muted indicates if the stimulator of this dimension should be created muted.
-func NewAnalysis[TIn any, TOut any](engine *Engine, target *Dimension[TIn], analyze CalculateSet[Data[TIn], TOut], potential Potential, muted bool) *Dimension[TOut] {
+func NewAnalysis[TIn any, TOut any](engine *Engine, target *Dimension[TIn], integrate Integral[Data[TIn], TOut], potential Potential, muted bool) *Dimension[TOut] {
 	d := Dimension[TOut]{}
 	d.ID = NextID()
 	d.Trimmer = engine.Loop(d.trim, alwaysFire, false)
@@ -128,10 +136,10 @@ func NewAnalysis[TIn any, TOut any](engine *Engine, target *Dimension[TIn], anal
 		}
 		data = data[trimCount:]
 
-		// Perform analysis
+		// Perform integration
 		out := Data[TOut]{
 			Context: ctx,
-			Value:   analyze(ctx, data),
+			Value:   integrate(ctx, data),
 		}
 
 		// Record the result

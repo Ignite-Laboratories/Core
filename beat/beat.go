@@ -1,22 +1,10 @@
-// Package when provides helpers for creating potential functions.
-package when
+// Package beat provides helper methods for creating beat-oriented potentials
+package beat
 
-import (
-	"github.com/ignite-laboratories/core"
-)
+import "github.com/ignite-laboratories/core"
 
-// Always provides a potential that always fires.
-func Always(ctx core.Context) bool {
-	return true
-}
-
-// Never provides a potential that never fires.
-func Never() bool {
-	return false
-}
-
-// Downbeats provides a potential that fires when the beat is 0.
-func Downbeats(ctx core.Context) bool {
+// Downbeat provides a potential that fires when the beat is 0.
+func Downbeat(ctx core.Context) bool {
 	return ctx.Beat == 0
 }
 

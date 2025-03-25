@@ -10,7 +10,9 @@ type Potential func(ctx Context) bool
 type CalculatePoint[T any] func(Context) T
 
 // Integral functions take in a set of contextual values and calculate a result.
-type Integral[TIn any, TOut any] func(Context, []TIn) TOut
+//
+// They are also provided with a cache pointer that can hold values between activations.
+type Integral[TIn any, TOut any, TCache any] func(Context, *TCache, []TIn) TOut
 
 // alwaysFire provides a potential that always returns true.
 func alwaysFire(ctx Context) bool {

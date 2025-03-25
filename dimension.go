@@ -6,14 +6,17 @@ import (
 )
 
 // Dimension is a way of observing a target value across time, limited to a window of observance.
-type Dimension[T any] struct {
+type Dimension[TValue any, TCache any] struct {
 	Entity
 
 	// Value is the current value of this dimension.
-	Value Data[T]
+	Value Data[TValue]
+
+	// Cache is a place where a looping stimulator can save information for the next activation of the loop.
+	Cache *TCache
 
 	// Timeline is the historical values of this dimension.
-	Timeline []Data[T]
+	Timeline []Data[TValue]
 
 	// Window is the duration to hold onto recorded values for.
 	Window time.Duration
@@ -29,7 +32,7 @@ type Dimension[T any] struct {
 }
 
 // trim removes anything on the timeline that is older than the dimension's window of observance.
-func (o *Dimension[T]) trim(ctx Context) {
+func (o *Dimension[TValue, TCache]) trim(ctx Context) {
 	o.Mutex.Lock()
 	var trimCount int
 	for i, v := range o.Timeline {
@@ -47,12 +50,12 @@ func (o *Dimension[T]) trim(ctx Context) {
 }
 
 // Mute suppresses the stimulator of this dimension.
-func (d *Dimension[T]) Mute() {
+func (d *Dimension[TValue, TCache]) Mute() {
 	d.Stimulator.Muted = true
 }
 
 // Unmute un-suppresses the stimulator of this dimension.
-func (d *Dimension[T]) Unmute() {
+func (d *Dimension[TValue, TCache]) Unmute() {
 	d.Stimulator.Muted = false
 }
 
@@ -62,13 +65,13 @@ func (d *Dimension[T]) Unmute() {
 // This can adjust the "resolution" of output data =)
 //
 // Muted indicates if the stimulator of this dimension should be created muted.
-func NewObservation[T any](engine *Engine, target *T, potential Potential, muted bool) *Dimension[T] {
-	d := Dimension[T]{}
+func NewObservation[TValue any](engine *Engine, target *TValue, potential Potential, muted bool) *Dimension[TValue, any] {
+	d := Dimension[TValue, any]{}
 	d.ID = NextID()
 	d.Trimmer = engine.Loop(d.trim, alwaysFire, false)
 	d.Stimulator = engine.Stimulate(func(ctx Context) {
 		d.Mutex.Lock()
-		data := Data[T]{
+		data := Data[TValue]{
 			Context: ctx,
 			Value:   *target,
 		}
@@ -85,14 +88,14 @@ func NewObservation[T any](engine *Engine, target *T, potential Potential, muted
 // This can adjust the "resolution" of output data =)
 //
 // Muted indicates if the stimulator of this dimension should be created muted.
-func NewCalculation[T any](engine *Engine, calculate CalculatePoint[T], potential Potential, muted bool) *Dimension[T] {
-	d := Dimension[T]{}
+func NewCalculation[TValue any](engine *Engine, calculate CalculatePoint[TValue], potential Potential, muted bool) *Dimension[TValue, any] {
+	d := Dimension[TValue, any]{}
 	d.ID = NextID()
 	d.Trimmer = engine.Loop(d.trim, alwaysFire, false)
 	d.Stimulator = engine.Stimulate(func(ctx Context) {
 		d.Mutex.Lock()
 		value := calculate(ctx)
-		data := Data[T]{
+		data := Data[TValue]{
 			Context: ctx,
 			Value:   value,
 		}
@@ -106,12 +109,12 @@ func NewCalculation[T any](engine *Engine, calculate CalculatePoint[T], potentia
 // NewAnalysis creates a new dimension that records the result of the provided integral function cyclically.
 // The integral function is always called with the exact timeline data since the last analysis started.
 //
-// NOTE: The potential function gates the creation of timeline indexes!
-// This can adjust the "resolution" of output data =)
+// NOTE: The potential function gates analysis.
+// This can adjust "reactivity" to input data =)
 //
 // Muted indicates if the stimulator of this dimension should be created muted.
-func NewAnalysis[TIn any, TOut any](engine *Engine, target *Dimension[TIn], integrate Integral[Data[TIn], TOut], potential Potential, muted bool) *Dimension[TOut] {
-	d := Dimension[TOut]{}
+func NewAnalysis[TIn any, TOut any, TCache any](engine *Engine, target *Dimension[TIn, TCache], integrate Integral[Data[TIn], TOut, TCache], potential Potential, muted bool) *Dimension[TOut, TCache] {
+	d := Dimension[TOut, TCache]{}
 	d.ID = NextID()
 	d.Trimmer = engine.Loop(d.trim, alwaysFire, false)
 
@@ -139,7 +142,7 @@ func NewAnalysis[TIn any, TOut any](engine *Engine, target *Dimension[TIn], inte
 		// Perform integration
 		out := Data[TOut]{
 			Context: ctx,
-			Value:   integrate(ctx, data),
+			Value:   integrate(ctx, d.Cache, data),
 		}
 
 		// Record the result

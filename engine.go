@@ -25,6 +25,9 @@ type Engine struct {
 	// It will loop to 0 whenever all activations are finished.
 	Beat int
 
+	// MaxFrequency is the maximum frequency of impulse.
+	MaxFrequency float64
+
 	activations map[uint64]*Activation
 	mutex       sync.Mutex
 }
@@ -207,6 +210,12 @@ func (e *Engine) Spark() {
 	for Alive && e.Active {
 		// Grab 'now' ASAP!
 		now := time.Now()
+		period := now.Sub(lastNow)
+
+		// Don't fire faster than the maximum operating frequency
+		if period < HertzToDuration(e.MaxFrequency) {
+			continue
+		}
 
 		// Get the current impulse wave of activations
 		e.mutex.Lock() // Lock synchronized data
@@ -236,7 +245,7 @@ func (e *Engine) Spark() {
 		var ctx Context
 		ctx.ID = NextID()
 		ctx.Moment = now
-		ctx.Period = now.Sub(lastNow)
+		ctx.Period = period
 		ctx.Beat = e.Beat
 		ctx.LastImpulse = e.Last
 

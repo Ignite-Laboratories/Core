@@ -8,22 +8,27 @@ import (
 )
 
 var stimFreq = 16.0
-var muteFreq = 1.0
+var muteFreq = 0.5
 
-var stim = core.Impulse.Loop(Stimulate, condition.Frequency(&stimFreq), false)
+var stim = core.Impulse.Loop(Stimulate, condition.Frequency(&stimFreq), true)
+
+// Make it so
+func init() {
+	go core.Impulse.Spark()
+	core.Impulse.MaxFrequency = 1
+}
 
 func main() {
 	// Mute/Unmute the stimulation every three seconds
 	core.Impulse.Loop(Toggle, condition.Frequency(&muteFreq), false)
 
 	// Trim down the resistance cyclically
-	core.Impulse.Loop(TrimResistance, condition.Always, false)
+	core.Impulse.Loop(AdjustFrequency, condition.Always, false)
 
 	// Set the initial resistance high
 	core.Impulse.Resistance = 10000000
 
-	// Make it so
-	core.Impulse.Spark()
+	core.WhileAlive()
 }
 
 func Toggle(ctx core.Context) {
@@ -39,8 +44,8 @@ func Stimulate(ctx core.Context) {
 	fmt.Printf("[%d] Stimulated\n", ctx.Beat)
 }
 
-func TrimResistance(ctx core.Context) {
-	time.Sleep(time.Millisecond * 5000)
-	fmt.Printf("Trimming resistance\n")
-	core.Impulse.Resistance /= 2
+func AdjustFrequency(ctx core.Context) {
+	time.Sleep(time.Second * 5)
+	fmt.Printf("[%d] Adjusting frequency\n", ctx.Beat)
+	core.Impulse.MaxFrequency += 1
 }

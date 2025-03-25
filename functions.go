@@ -12,14 +12,8 @@ type CalculatePoint[T any] func(Context) T
 // Integral functions take in a set of contextual values and calculate a result.
 type Integral[TIn any, TOut any] func(Context, []TIn) TOut
 
-// alwaysFire provides a potential that always fires.
+// alwaysFire provides a potential that always returns true.
 func alwaysFire(ctx Context) bool {
-	// This is here because 'core' cannot cyclically reference 'when'
+	// This is here because `core` cannot cyclically reference `condition`
 	return true
-}
-
-// neverFire provides a potential that never fires.
-func neverFire(ctx Context) bool {
-	// This is here because 'core' cannot cyclically reference 'when'
-	return false
 }

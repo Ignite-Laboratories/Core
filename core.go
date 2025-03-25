@@ -1,6 +1,7 @@
 package core
 
 import (
+	"math"
 	"sync/atomic"
 	"time"
 )
@@ -31,4 +32,33 @@ func Shutdown(period time.Duration) {
 		time.Sleep(period)
 		Alive = false
 	}()
+}
+
+// WhileAlive can be used to hold a main function open.
+func WhileAlive() {
+	for Alive {
+		// Give the host some breathing room
+		time.Sleep(time.Millisecond)
+	}
+}
+
+// DurationToHertz converts a time.Duration into Hertz.
+func DurationToHertz(d time.Duration) float64 {
+	if d < 0 {
+		d = 0
+	}
+	s := float64(d) / 1e9
+	hz := 1 / s
+	return hz
+}
+
+// HertzToDuration converts a Hertz value to a time.Duration.
+func HertzToDuration(hz float64) time.Duration {
+	if hz <= 0 {
+		// No division by zero
+		hz = math.SmallestNonzeroFloat64
+	}
+	s := 1 / hz
+	ns := s * 1e9
+	return time.Duration(ns)
 }

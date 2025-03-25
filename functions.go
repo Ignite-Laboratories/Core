@@ -14,6 +14,12 @@ type CalculatePoint[T any] func(Context) T
 // They are also provided with a cache pointer that can hold values between activations.
 type Integral[TIn any, TOut any, TCache any] func(Context, *TCache, []TIn) TOut
 
+// Operate functions take in two numeric values and output a result.
+type Operate[TA Numeric, TB Numeric, TOut Numeric] func(TA, TB) TOut
+
+// Blend functions take in many dissimilar-typed values and output a result.
+type Blend[TOut any] func(...any) TOut
+
 // alwaysFire provides a potential that always returns true.
 func alwaysFire(ctx Context) bool {
 	// This is here because `core` cannot cyclically reference `condition`

@@ -4,6 +4,6 @@ package core
 type Data[T any] struct {
 	Context
 
-	// Value is the recorded value of this contextual moment.
-	Value T
+	// Point is the recorded value of this contextual moment.
+	Point T
 }

@@ -6,23 +6,23 @@ import (
 )
 
 // Operation represents the state of A and B that generated the resulting Value.
-type Operation[TA core.Numeric, TB core.Numeric, TValue core.Numeric] struct {
+type Operation[TValue core.Numeric] struct {
 	Value TValue
-	A     core.Data[TA]
-	B     core.Data[TB]
+	A     core.Data[TValue]
+	B     core.Data[TValue]
 }
 
-func NewOperation[TA core.Numeric, TB core.Numeric, TValue core.Numeric](engine *core.Engine, potential core.Potential, muted bool, operator core.Operate[TA, TB, TValue], a *core.Dimension[TA, any], b *core.Dimension[TB, any]) *core.Dimension[Operation[TA, TB, TValue], any] {
-	d := core.Dimension[Operation[TA, TB, TValue], any]{}
+func NewOperation[TValue core.Numeric](engine *core.Engine, potential core.Potential, muted bool, operator core.Operate[TValue], a *core.Dimension[TValue, any], b *core.Dimension[TValue, any]) *core.Dimension[Operation[TValue], any] {
+	d := core.Dimension[Operation[TValue], any]{}
 	d.ID = core.NextID()
 	d.Trimmer = engine.Loop(d.Trim, condition.Always, false)
 	d.Stimulator = engine.Stimulate(func(ctx core.Context) {
-		operation := Operation[TA, TB, TValue]{
+		operation := Operation[TValue]{
 			A: a.Current,
 			B: b.Current,
 		}
 		operation.Value = operator(operation.A.Point, operation.B.Point)
-		data := core.Data[Operation[TA, TB, TValue]]{
+		data := core.Data[Operation[TValue]]{
 			Context: ctx,
 			Point:   operation,
 		}

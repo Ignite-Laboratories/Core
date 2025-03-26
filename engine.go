@@ -28,16 +28,16 @@ type Engine struct {
 	// MaxFrequency is the maximum frequency of impulse.
 	MaxFrequency float64
 
-	activations map[uint64]*Activation
-	mutex       sync.Mutex
+	neurons map[uint64]*Neuron
+	mutex   sync.Mutex
 }
 
 // NewEngine creates and configures a new neural impulse engine instance.
 func NewEngine() *Engine {
 	e := Engine{}
 
-	// Make the activation map
-	e.activations = make(map[uint64]*Activation)
+	// Make the neural map
+	e.neurons = make(map[uint64]*Neuron)
 
 	// Set up impulse regulation
 	regulator := func(ctx Context) {
@@ -49,11 +49,11 @@ func NewEngine() *Engine {
 	return &e
 }
 
-// addActivation provides a thread-safe way of adding activations to the internal map.
-func (e *Engine) addActivation(a *Activation) {
+// addNeuron provides a thread-safe way of adding neurons to the internal map.
+func (e *Engine) addNeuron(a *Neuron) {
 	defer e.mutex.Unlock()
 	e.mutex.Lock()
-	e.activations[a.ID] = a
+	e.neurons[a.ID] = a
 }
 
 // Stop causes the impulse engine to cease firing neural activations.
@@ -61,11 +61,11 @@ func (e *Engine) Stop() {
 	e.Active = false
 }
 
-// MuteByID suppresses the identified activation until Unmute is called.
+// MuteByID suppresses the identified neuron until Unmute is called.
 func (e *Engine) MuteByID(id uint64) {
 	defer e.mutex.Unlock()
 	e.mutex.Lock()
-	for _, a := range e.activations {
+	for _, a := range e.neurons {
 		if a.ID == id {
 			a.Muted = true
 			return
@@ -73,11 +73,11 @@ func (e *Engine) MuteByID(id uint64) {
 	}
 }
 
-// UnmuteByID un-suppresses the identified activation.
+// UnmuteByID un-suppresses the identified neuron.
 func (e *Engine) UnmuteByID(id uint64) {
 	defer e.mutex.Unlock()
 	e.mutex.Lock()
-	for _, a := range e.activations {
+	for _, a := range e.neurons {
 		if a.ID == id {
 			a.Muted = false
 			return
@@ -85,19 +85,19 @@ func (e *Engine) UnmuteByID(id uint64) {
 	}
 }
 
-// Remove deletes the identified activation from the internal activation map.
+// Remove deletes the identified neuron from the internal neural map.
 func (e *Engine) Remove(id uint64) {
 	defer e.mutex.Unlock()
 	e.mutex.Lock()
-	delete(e.activations, id)
+	delete(e.neurons, id)
 }
 
 // Range provides a slice of the current neural activations.
-func (e *Engine) Range() []*Activation {
+func (e *Engine) Range() []*Neuron {
 	defer e.mutex.Unlock()
 	e.mutex.Lock()
-	out := make([]*Activation, len(e.activations))
-	for _, a := range e.activations {
+	out := make([]*Neuron, len(e.neurons))
+	for _, a := range e.neurons {
 		out = append(out, a)
 	}
 	return out
@@ -105,9 +105,9 @@ func (e *Engine) Range() []*Activation {
 
 // Block activates the provided action on every impulse in a blocking fashion, if the potential returns true.
 //
-// If 'muted' is true, the activation is lies dormant until un-muted.
-func (e *Engine) Block(action Action, potential Potential, muted bool) *Activation {
-	var a Activation
+// If 'muted' is true, the neuron is lies dormant until un-muted.
+func (e *Engine) Block(action Action, potential Potential, muted bool) *Neuron {
+	var a Neuron
 	a.ID = NextID()
 	a.Action = func(ctx Context) {
 		a.executing = true
@@ -116,31 +116,31 @@ func (e *Engine) Block(action Action, potential Potential, muted bool) *Activati
 	}
 	a.Potential = potential
 	a.Muted = muted
-	e.addActivation(&a)
+	e.addNeuron(&a)
 	return &a
 }
 
 // Stimulate activates the provided action on every impulse in an asynchronous fashion, if the potential returns true.
 //
-// If 'muted' is true, the activation is lies dormant until un-muted.
-func (e *Engine) Stimulate(action Action, potential Potential, muted bool) *Activation {
+// If 'muted' is true, the neuron is lies dormant until un-muted.
+func (e *Engine) Stimulate(action Action, potential Potential, muted bool) *Neuron {
 	// NOTE: The trick here is that it never sets 'Executing' =)
-	var a Activation
+	var a Neuron
 	a.ID = NextID()
 	a.Action = func(ctx Context) {
 		go action(ctx)
 	}
 	a.Potential = potential
 	a.Muted = muted
-	e.addActivation(&a)
+	e.addNeuron(&a)
 	return &a
 }
 
 // Loop activates the provided action in an asynchronous fashion cyclically, if the potential returns true.
 //
-// If 'muted' is true, the activation is lies dormant until un-muted.
-func (e *Engine) Loop(action Action, potential Potential, muted bool) *Activation {
-	var a Activation
+// If 'muted' is true, the neuron is lies dormant until un-muted.
+func (e *Engine) Loop(action Action, potential Potential, muted bool) *Neuron {
+	var a Neuron
 	a.ID = NextID()
 	a.Action = func(ctx Context) {
 		a.executing = true
@@ -151,14 +151,14 @@ func (e *Engine) Loop(action Action, potential Potential, muted bool) *Activatio
 	}
 	a.Potential = potential
 	a.Muted = muted
-	e.addActivation(&a)
+	e.addNeuron(&a)
 	return &a
 }
 
 // Trigger activates the provided action, if the potential returns true.
 //
 // If 'async' is true, the action is called asynchronously - otherwise, it blocks the firing impulse.
-func (e *Engine) Trigger(action Action, potential Potential, async bool) *Activation {
+func (e *Engine) Trigger(action Action, potential Potential, async bool) *Neuron {
 	defer e.mutex.Unlock()
 	e.mutex.Lock()
 
@@ -175,8 +175,8 @@ func (e *Engine) Trigger(action Action, potential Potential, async bool) *Activa
 	ctx.Beat = e.Beat
 	ctx.LastImpulse = e.Last
 
-	// Build the activation
-	var a Activation
+	// Build the neuron
+	var a Neuron
 	a.ID = NextID()
 	a.Action = func(ctx Context) {
 		if async {
@@ -217,17 +217,17 @@ func (e *Engine) Spark() {
 			continue
 		}
 
-		// Get the current impulse wave of activations
-		e.mutex.Lock() // Lock synchronized data
-		activations := make([]*Activation, 0, len(e.activations))
+		// Get the current impulse wave of neurons
+		e.mutex.Lock()
+		neurons := make([]*Neuron, 0, len(e.neurons))
 		var hasExecution bool
-		for _, a := range e.activations {
-			activations = append(activations, a)
+		for _, a := range e.neurons {
+			neurons = append(neurons, a)
 			if a.executing {
 				hasExecution = true
 			}
 		}
-		e.mutex.Unlock() // Unlock
+		e.mutex.Unlock()
 
 		// If none have execution, loop the Beat back to 0
 		if !hasExecution {
@@ -249,8 +249,8 @@ func (e *Engine) Spark() {
 		ctx.Beat = e.Beat
 		ctx.LastImpulse = e.Last
 
-		// Launch the wave of activations
-		for _, a := range activations {
+		// Launch the wave of neurons
+		for _, a := range neurons {
 			e.fire(ctx, a, &wg)
 		}
 		wg.Wait()
@@ -263,13 +263,13 @@ func (e *Engine) Spark() {
 	}
 }
 
-// fire is what activates each activation.
-func (e *Engine) fire(ctx Context, activation *Activation, wg *sync.WaitGroup) {
-	// Grab this activation's start ASAP!
+// fire is what activates each neuron.
+func (e *Engine) fire(ctx Context, neuron *Neuron, wg *sync.WaitGroup) {
+	// Grab this neuron's start ASAP!
 	start := time.Now()
 
 	// Don't re-activate anything that's still executing or muted
-	if activation.executing || activation.Muted {
+	if neuron.executing || neuron.Muted {
 		return
 	}
 
@@ -278,34 +278,34 @@ func (e *Engine) fire(ctx Context, activation *Activation, wg *sync.WaitGroup) {
 	go func() {
 		defer wg.Done()
 		defer func() {
-			// Check if the activation had a failure of some kind
+			// Check if the neuron had a failure of some kind
 			if r := recover(); r != nil {
 				// Mark it as not executing and log the issue
-				activation.executing = false
-				activation.Last.End = time.Now()
-				log.Printf("[%d] Activation panic ", activation.ID)
+				neuron.executing = false
+				neuron.Last.End = time.Now()
+				log.Printf("[%d] Neural panic ", neuron.ID)
 			}
 		}()
 
 		// Test the potential first
-		ctx.LastActivation = activation.Last
-		if !activation.Potential(ctx) {
+		ctx.LastActivation = neuron.Last
+		if !neuron.Potential(ctx) {
 			return
 		}
 
 		// Calculate the refractory period
-		activation.Last.RefractoryPeriod = start.Sub(activation.Last.End)
+		neuron.Last.RefractoryPeriod = start.Sub(neuron.Last.End)
 
 		// Save off the runtime info
-		ctx.LastActivation = activation.Last
+		ctx.LastActivation = neuron.Last
 
-		// Fire the activation
-		activation.Action(ctx)
+		// Fire the neuron
+		neuron.Action(ctx)
 		end := time.Now()
 
 		// Update the runtime info
-		activation.Last.Inception = ctx.Moment
-		activation.Last.Start = start
-		activation.Last.End = end
+		neuron.Last.Inception = ctx.Moment
+		neuron.Last.Start = start
+		neuron.Last.End = end
 	}()
 }

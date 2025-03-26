@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-// Alive globally keeps activations looping until set to false - it's true by default.
+// Alive globally keeps neural activity firing until set to false - it's true by default.
 var Alive = true
 
 // Inception provides the moment this operating system was initialized.

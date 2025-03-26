@@ -24,11 +24,11 @@ type Dimension[TValue any, TCache any] struct {
 	// Mutex should be locked for any operations that need a momentary snapshot of the timeline.
 	Mutex sync.Mutex
 
-	// Stimulator is the activation that drives the function that populates this timeline.
-	Stimulator *Activation
+	// Stimulator is the neuron that drives the function that populates this timeline.
+	Stimulator *Neuron
 
-	// Trimmer is the activation that trims the timeline of entries beyond the window of observance.
-	Trimmer *Activation
+	// Trimmer is the neuron that trims the timeline of entries beyond the window of observance.
+	Trimmer *Neuron
 }
 
 // Trim removes anything on the timeline that is older than the dimension's window of observance.

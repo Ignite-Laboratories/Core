@@ -20,6 +20,6 @@ type Context struct {
 	// LastImpulse provides runtime information about the last impulse of the engine.
 	LastImpulse runtime
 
-	// LastActivation provides runtime information about the last activation.
+	// LastActivation provides runtime information about the last neural activation.
 	LastActivation runtime
 }

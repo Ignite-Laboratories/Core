@@ -35,18 +35,14 @@ type Dimension[TValue any, TCache any] struct {
 func (d *Dimension[TValue, TCache]) Trim(ctx Context) {
 	d.Mutex.Lock()
 	var trimCount int
-	for i, v := range d.Timeline {
+	for _, v := range d.Timeline {
 		if time.Now().Sub(v.Moment) < d.Window {
-			trimCount = i
 			break
 		}
+		trimCount++
 	}
 	d.Timeline = d.Timeline[trimCount:]
 	d.Mutex.Unlock()
-
-	for d.Stimulator.Muted {
-		// If the stimulator is muted, don't bother looping until it un-mutes
-	}
 }
 
 // Mute suppresses the stimulator of this dimension.

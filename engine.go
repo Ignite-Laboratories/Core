@@ -155,10 +155,10 @@ func (e *Engine) Loop(action Action, potential Potential, muted bool) *Neuron {
 	return &a
 }
 
-// Trigger activates the provided action, if the potential returns true.
+// Trigger fires the provided action one time, if the potential returns true.
 //
 // If 'async' is true, the action is called asynchronously - otherwise, it blocks the firing impulse.
-func (e *Engine) Trigger(action Action, potential Potential, async bool) *Neuron {
+func (e *Engine) Trigger(action Action, potential Potential, async bool) {
 	defer e.mutex.Unlock()
 	e.mutex.Lock()
 
@@ -167,7 +167,7 @@ func (e *Engine) Trigger(action Action, potential Potential, async bool) *Neuron
 
 	lastImpulse := e.Last
 
-	// Create a temporal context
+	// Create n temporal context
 	var ctx Context
 	ctx.ID = NextID()
 	ctx.Moment = now
@@ -176,20 +176,19 @@ func (e *Engine) Trigger(action Action, potential Potential, async bool) *Neuron
 	ctx.LastImpulse = e.Last
 
 	// Build the neuron
-	var a Neuron
-	a.ID = NextID()
-	a.Action = func(ctx Context) {
+	var n Neuron
+	n.ID = NextID()
+	n.Action = func(ctx Context) {
 		if async {
 			go action(ctx)
 		} else {
 			action(ctx)
 		}
-		e.Remove(a.ID)
+		e.Remove(n.ID)
 	}
-	a.Potential = potential
+	n.Potential = potential
 	var wg sync.WaitGroup
-	e.fire(ctx, &a, &wg)
-	return &a
+	e.fire(ctx, &n, &wg)
 }
 
 // Spark begins driving impulses.

@@ -17,5 +17,5 @@ type Neuron struct {
 	Potential Potential
 
 	// Last provides temporal runtime information for the last activation.
-	Last runtime
+	Last Runtime
 }

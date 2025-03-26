@@ -2,8 +2,8 @@ package core
 
 import "time"
 
-// runtime provides information about how long something took to run relative to its inception.
-type runtime struct {
+// Runtime provides information about how long something took to run relative to its inception.
+type Runtime struct {
 	// RefractoryPeriod is the amount of time between the end of the last activation and inception.
 	RefractoryPeriod time.Duration
 

@@ -32,19 +32,19 @@ type Dimension[TValue any, TCache any] struct {
 }
 
 // Trim removes anything on the timeline that is older than the dimension's window of observance.
-func (o *Dimension[TValue, TCache]) Trim(ctx Context) {
-	o.Mutex.Lock()
+func (d *Dimension[TValue, TCache]) Trim(ctx Context) {
+	d.Mutex.Lock()
 	var trimCount int
-	for i, v := range o.Timeline {
-		if time.Now().Sub(v.Moment) < o.Window {
+	for i, v := range d.Timeline {
+		if time.Now().Sub(v.Moment) < d.Window {
 			trimCount = i
 			break
 		}
 	}
-	o.Timeline = o.Timeline[trimCount:]
-	o.Mutex.Unlock()
+	d.Timeline = d.Timeline[trimCount:]
+	d.Mutex.Unlock()
 
-	for o.Stimulator.Muted {
+	for d.Stimulator.Muted {
 		// If the stimulator is muted, don't bother looping until it un-mutes
 	}
 }

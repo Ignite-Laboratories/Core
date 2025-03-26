@@ -15,6 +15,7 @@ import (
 func NewAnalysis[TSource any, TValue any, TCache any](engine *core.Engine, potential core.Potential, muted bool, integrate core.Integral[core.Data[TSource], TValue, TCache], target *core.Dimension[TSource, TCache]) *core.Dimension[TValue, TCache] {
 	d := core.Dimension[TValue, TCache]{}
 	d.ID = core.NextID()
+	d.Window = core.DefaultWindow
 	d.Trimmer = engine.Loop(d.Trim, condition.Always, false)
 
 	d.Stimulator = engine.Loop(func(ctx core.Context) {

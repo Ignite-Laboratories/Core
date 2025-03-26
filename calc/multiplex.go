@@ -14,6 +14,7 @@ import (
 func NewMultiplex[TValue core.Numeric](engine *core.Engine, potential core.Potential, muted bool, blend core.Blend[TValue], dimensions ...*core.Dimension[any, any]) *core.Dimension[TValue, any] {
 	d := core.Dimension[TValue, any]{}
 	d.ID = core.NextID()
+	d.Window = core.DefaultWindow
 	d.Trimmer = engine.Loop(d.Trim, condition.Always, false)
 	d.Stimulator = engine.Stimulate(func(ctx core.Context) {
 		values := make([]any, len(dimensions))

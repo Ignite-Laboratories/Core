@@ -18,8 +18,8 @@ type Context struct {
 	Period time.Duration
 
 	// LastImpulse provides runtime information about the last impulse of the engine.
-	LastImpulse runtime
+	LastImpulse Runtime
 
 	// LastActivation provides runtime information about the last neural activation.
-	LastActivation runtime
+	LastActivation Runtime
 }

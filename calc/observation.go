@@ -14,6 +14,7 @@ import (
 func NewObservation[TValue any](engine *core.Engine, potential core.Potential, muted bool, target *TValue) *core.Dimension[TValue, any] {
 	d := core.Dimension[TValue, any]{}
 	d.ID = core.NextID()
+	d.Window = core.DefaultWindow
 	d.Trimmer = engine.Loop(d.Trim, condition.Always, false)
 	d.Stimulator = engine.Stimulate(func(ctx core.Context) {
 		data := core.Data[TValue]{

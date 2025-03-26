@@ -18,6 +18,9 @@ var Impulse = NewEngine()
 // ID is the operating system identifier - it defaults to 1.
 var ID uint64 = NextID()
 
+// DefaultWindow is the default dimensional window of observance - 2 seconds.
+var DefaultWindow = 2 * time.Second
+
 // currentId holds the last provided identifier.
 var currentId uint64
 

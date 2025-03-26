@@ -15,6 +15,7 @@ type Operation[TValue core.Numeric] struct {
 func NewOperation[TValue core.Numeric](engine *core.Engine, potential core.Potential, muted bool, operator core.Operate[TValue], a *core.Dimension[TValue, any], b *core.Dimension[TValue, any]) *core.Dimension[Operation[TValue], any] {
 	d := core.Dimension[Operation[TValue], any]{}
 	d.ID = core.NextID()
+	d.Window = core.DefaultWindow
 	d.Trimmer = engine.Loop(d.Trim, condition.Always, false)
 	d.Stimulator = engine.Stimulate(func(ctx core.Context) {
 		operation := Operation[TValue]{

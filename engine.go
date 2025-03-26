@@ -15,7 +15,7 @@ type Engine struct {
 	Ignition time.Time
 
 	// Last provides statistics regarding the last impulse.
-	Last runtime
+	Last Runtime
 
 	// Resistance indicates how much to resist the next impulse, with 0 (default) providing no resistance.
 	Resistance int
@@ -249,8 +249,8 @@ func (e *Engine) Spark() {
 		ctx.LastImpulse = e.Last
 
 		// Launch the wave of neurons
-		for _, a := range neurons {
-			e.fire(ctx, a, &wg)
+		for _, n := range neurons {
+			e.fire(ctx, n, &wg)
 		}
 		wg.Wait()
 		finishTime := time.Now()

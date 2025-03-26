@@ -21,6 +21,7 @@ type Blend[TValue core.Numeric] struct {
 func NewBlend[TValue core.Numeric](engine *core.Engine, potential core.Potential, muted bool, blend core.Operate[TValue], a *core.Dimension[TValue, any], b *core.Dimension[TValue, any]) *core.Dimension[Blend[TValue], any] {
 	d := core.Dimension[Blend[TValue], any]{}
 	d.ID = core.NextID()
+	d.Window = core.DefaultWindow
 	d.Trimmer = engine.Loop(d.Trim, condition.Always, false)
 	d.Stimulator = engine.Stimulate(func(ctx core.Context) {
 		mux := Blend[TValue]{

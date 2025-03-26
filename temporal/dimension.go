@@ -1,13 +1,14 @@
-package core
+package temporal
 
 import (
+	"github.com/ignite-laboratories/core"
 	"sync"
 	"time"
 )
 
 // Dimension is a way of observing a target value across time, limited to a window of observance.
 type Dimension[TValue any, TCache any] struct {
-	Entity
+	core.Entity
 
 	// Current is the currently held value of this dimension.
 	Current Data[TValue]
@@ -25,14 +26,14 @@ type Dimension[TValue any, TCache any] struct {
 	Mutex sync.Mutex
 
 	// Stimulator is the neuron that drives the function that populates this timeline.
-	Stimulator *Neuron
+	Stimulator *core.Neuron
 
 	// Trimmer is the neuron that trims the timeline of entries beyond the window of observance.
-	Trimmer *Neuron
+	Trimmer *core.Neuron
 }
 
 // Trim removes anything on the timeline that is older than the dimension's window of observance.
-func (d *Dimension[TValue, TCache]) Trim(ctx Context) {
+func (d *Dimension[TValue, TCache]) Trim(ctx core.Context) {
 	d.Mutex.Lock()
 	var trimCount int
 	for _, v := range d.Timeline {

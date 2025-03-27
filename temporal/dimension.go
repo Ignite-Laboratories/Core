@@ -30,6 +30,8 @@ type Dimension[TValue any, TCache any] struct {
 
 	// Trimmer is the neuron that trims the timeline of entries beyond the window of observance.
 	Trimmer *core.Neuron
+
+	lastCycle time.Time
 }
 
 // Trim removes anything on the timeline that is older than the dimension's window of observance.

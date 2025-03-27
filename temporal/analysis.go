@@ -39,8 +39,9 @@ func NewAnalysis[TSource any, TValue any, TCache any](engine *core.Engine, poten
 		data = data[trimCount:]
 
 		// Save off the last moment for the next cycle
+		lastCycle := d.lastCycle
 		if len(data) > 0 {
-			d.lastCycle = data[len(data)-1].Moment
+			lastCycle = data[len(data)-1].Moment
 		}
 
 		// Perform integration
@@ -51,6 +52,7 @@ func NewAnalysis[TSource any, TValue any, TCache any](engine *core.Engine, poten
 
 		// Record the result
 		d.Mutex.Lock()
+		d.lastCycle = lastCycle
 		d.Timeline = append(d.Timeline, out)
 		d.Current = out
 		d.Mutex.Unlock()

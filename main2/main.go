@@ -14,11 +14,10 @@ type Coordinates struct {
 	Y int
 }
 
-var sampleFreq = 16.0
-var resonance = 4.0
+var sampleFreq = 1024.0
 
 var mouser = temporal.NewCalculation[Coordinates](core.Impulse, when.Frequency(&sampleFreq), false, GetCoordinates)
-var analyzer = temporal.NewAnalysis[Coordinates, any, time.Time](core.Impulse, when.ResonantWith(&sampleFreq, &resonance), false, PrintCoordinates, mouser)
+var analyzer = temporal.NewAnalysis[Coordinates, any, time.Time](core.Impulse, when.EighthSpeed(&sampleFreq), false, PrintCoordinates, mouser)
 
 func main() {
 	core.Impulse.Spark()

@@ -12,14 +12,30 @@ func Frequency(hertz *float64) core.Potential {
 	return Duration(&d)
 }
 
-// ResonantWith provides a potential that activates at a sympathetic frequency to the provided source.
-//
-// A sympathetic frequency is a multiple of the source - thus, source / sympathetic.
+// Resonant provides a potential that activates at a sympathetic frequency to the provided source.
 //
 // If you would like something to resonate at half the rate of the source frequency, provide a sympathetic value of 2.0
-func ResonantWith(source *float64, sympathetic *float64) core.Potential {
+func Resonant(source *float64, sympathetic *float64) core.Potential {
 	resonance := *source / *sympathetic
 	return Frequency(&resonance)
+}
+
+// HalfSpeed provides a potential that activates at half the rate of the source frequency.
+func HalfSpeed(hertz *float64) core.Potential {
+	half := 2.0
+	return Resonant(hertz, &half)
+}
+
+// QuarterSpeed provides a potential that activates at half the rate of the source frequency.
+func QuarterSpeed(hertz *float64) core.Potential {
+	half := 4.0
+	return Resonant(hertz, &half)
+}
+
+// EighthSpeed provides a potential that activates at half the rate of the source frequency.
+func EighthSpeed(hertz *float64) core.Potential {
+	half := 8.0
+	return Resonant(hertz, &half)
 }
 
 // Duration provides the following potential:

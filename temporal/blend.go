@@ -2,7 +2,7 @@ package temporal
 
 import (
 	"github.com/ignite-laboratories/core"
-	"github.com/ignite-laboratories/core/condition"
+	"github.com/ignite-laboratories/core/when"
 )
 
 // Blend represents the state of A and B that generated the resulting blended Value.
@@ -22,7 +22,7 @@ func NewBlend[TValue core.Numeric](engine *core.Engine, potential core.Potential
 	d := Dimension[Blend[TValue], any]{}
 	d.ID = core.NextID()
 	d.Window = core.DefaultWindow
-	d.Trimmer = engine.Loop(d.Trim, condition.Always, false)
+	d.Trimmer = engine.Loop(d.Trim, when.Always, false)
 	d.Stimulator = engine.Stimulate(func(ctx core.Context) {
 		mux := Blend[TValue]{
 			A: a.Current,

@@ -2,7 +2,7 @@ package temporal
 
 import (
 	"github.com/ignite-laboratories/core"
-	"github.com/ignite-laboratories/core/condition"
+	"github.com/ignite-laboratories/core/when"
 )
 
 // Operation represents the state of A and B that generated the resulting Value.
@@ -16,7 +16,7 @@ func NewOperation[TValue core.Numeric](engine *core.Engine, potential core.Poten
 	d := Dimension[Operation[TValue], any]{}
 	d.ID = core.NextID()
 	d.Window = core.DefaultWindow
-	d.Trimmer = engine.Loop(d.Trim, condition.Always, false)
+	d.Trimmer = engine.Loop(d.Trim, when.Always, false)
 	d.Stimulator = engine.Stimulate(func(ctx core.Context) {
 		operation := Operation[TValue]{
 			A: a.Current,

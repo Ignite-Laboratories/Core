@@ -2,7 +2,7 @@ package temporal
 
 import (
 	"github.com/ignite-laboratories/core"
-	"github.com/ignite-laboratories/core/condition"
+	"github.com/ignite-laboratories/core/when"
 )
 
 // NewAnalysis creates a new dimension that records the result of the provided integral function cyclically.
@@ -12,11 +12,12 @@ import (
 // This can adjust "reactivity" to input data =)
 //
 // Muted indicates if the stimulator of this dimension should be created muted.
-func NewAnalysis[TSource any, TValue any, TCache any](engine *core.Engine, potential core.Potential, muted bool, integrate core.Integral[Data[TSource], TValue, TCache], target *Dimension[TSource, TCache]) *Dimension[TValue, TCache] {
+func NewAnalysis[TSource any, TValue any, TCache any](engine *core.Engine, potential core.Potential, muted bool, integrate core.Integral[Data[TSource], TValue, TCache], target *Dimension[TSource, any]) *Dimension[TValue, TCache] {
 	d := Dimension[TValue, TCache]{}
 	d.ID = core.NextID()
 	d.Window = core.DefaultWindow
-	d.Trimmer = engine.Loop(d.Trim, condition.Always, false)
+	d.Trimmer = engine.Loop(d.Trim, when.Always, false)
+	d.lastCycle = core.Inception
 
 	d.Stimulator = engine.Loop(func(ctx core.Context) {
 		// Get target timeline data
@@ -32,9 +33,6 @@ func NewAnalysis[TSource any, TValue any, TCache any](engine *core.Engine, poten
 				break
 			}
 			trimCount++
-		}
-		if trimCount < 0 {
-			trimCount = 0
 		}
 		data = data[trimCount:]
 

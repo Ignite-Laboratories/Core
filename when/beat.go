@@ -1,27 +1,38 @@
-// Package beat provides helper methods for creating beat-oriented potentials
-package beat
+package when
 
 import "github.com/ignite-laboratories/core"
 
+type beat struct{}
+
+// Beat provides a set of helper functions for creating beat oriented potentials.
+var Beat beat = beat{}
+
+// Frequency provides a potential that fires on a frequency offset by the provided beat number.
+func (b beat) Frequency(beat *int, hertz *float64) core.Potential {
+	return func(ctx core.Context) bool {
+		return b.On(beat)(ctx) && Frequency(hertz)(ctx)
+	}
+}
+
 // Downbeat provides a potential that fires when the beat is 0.
-func Downbeat(ctx core.Context) bool {
+func (b beat) Downbeat(ctx core.Context) bool {
 	return ctx.Beat == 0
 }
 
 // Even provides a potential that fires when the beat is even.
-func Even(ctx core.Context) bool {
+func (b beat) Even(ctx core.Context) bool {
 	return ctx.Beat%2 == 0
 }
 
 // Odd provides a potential that returns true when the beat is odd.
-func Odd(ctx core.Context) bool {
+func (b beat) Odd(ctx core.Context) bool {
 	return ctx.Beat%2 != 0
 }
 
 // Modulo provides the following potential:
 //
 //	beat % value == 0
-func Modulo(value *int) core.Potential {
+func (b beat) Modulo(value *int) core.Potential {
 	return func(ctx core.Context) bool {
 		return ctx.Beat%*value == 0
 	}
@@ -30,7 +41,7 @@ func Modulo(value *int) core.Potential {
 // Over provides the following potential:
 //
 //	beat > value
-func Over(value *int) core.Potential {
+func (b beat) Over(value *int) core.Potential {
 	return func(ctx core.Context) bool {
 		return ctx.Beat > *value
 	}
@@ -39,7 +50,7 @@ func Over(value *int) core.Potential {
 // On provides the following potential:
 //
 //	beat == value
-func On(beat *int) core.Potential {
+func (b beat) On(beat *int) core.Potential {
 	return func(ctx core.Context) bool {
 		return ctx.Beat == *beat
 	}
@@ -48,7 +59,7 @@ func On(beat *int) core.Potential {
 // Under provides the following potential:
 //
 //	beat < value
-func Under(value *int) core.Potential {
+func (b beat) Under(value *int) core.Potential {
 	return func(ctx core.Context) bool {
 		return ctx.Beat < *value
 	}

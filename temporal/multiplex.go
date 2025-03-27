@@ -2,7 +2,7 @@ package temporal
 
 import (
 	"github.com/ignite-laboratories/core"
-	"github.com/ignite-laboratories/core/condition"
+	"github.com/ignite-laboratories/core/when"
 )
 
 // NewMultiplex creates a dimension that's a blend of the point value of many input dimensions for every impulse that the potential returns true.
@@ -15,7 +15,7 @@ func NewMultiplex[TValue core.Numeric](engine *core.Engine, potential core.Poten
 	d := Dimension[TValue, any]{}
 	d.ID = core.NextID()
 	d.Window = core.DefaultWindow
-	d.Trimmer = engine.Loop(d.Trim, condition.Always, false)
+	d.Trimmer = engine.Loop(d.Trim, when.Always, false)
 	d.Stimulator = engine.Stimulate(func(ctx core.Context) {
 		values := make([]any, len(dimensions))
 		for i, otherD := range dimensions {

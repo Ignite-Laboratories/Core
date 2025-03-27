@@ -1,5 +1,5 @@
-// Package condition provides a set of helper functions for creating conditional potentials
-package condition
+// Package when provides a set of helper functions for creating conditional potentials
+package when
 
 import (
 	"github.com/ignite-laboratories/core"
@@ -10,6 +10,16 @@ import (
 func Frequency(hertz *float64) core.Potential {
 	d := core.HertzToDuration(*hertz)
 	return Duration(&d)
+}
+
+// ResonantWith provides a potential that activates at a sympathetic frequency to the provided source.
+//
+// A sympathetic frequency is a multiple of the source - thus, source / sympathetic.
+//
+// If you would like something to resonate at half the rate of the source frequency, provide a sympathetic value of 2.0
+func ResonantWith(source *float64, sympathetic *float64) core.Potential {
+	resonance := *source / *sympathetic
+	return Frequency(&resonance)
 }
 
 // Duration provides the following potential:

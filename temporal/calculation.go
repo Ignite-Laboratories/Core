@@ -2,7 +2,7 @@ package temporal
 
 import (
 	"github.com/ignite-laboratories/core"
-	"github.com/ignite-laboratories/core/condition"
+	"github.com/ignite-laboratories/core/when"
 )
 
 // NewCalculation creates a dimension that performs a calculation for every impulse that the potential returns true.
@@ -15,7 +15,7 @@ func NewCalculation[TValue any](engine *core.Engine, potential core.Potential, m
 	d := Dimension[TValue, any]{}
 	d.ID = core.NextID()
 	d.Window = core.DefaultWindow
-	d.Trimmer = engine.Loop(d.Trim, condition.Always, false)
+	d.Trimmer = engine.Loop(d.Trim, when.Always, false)
 	d.Stimulator = engine.Stimulate(func(ctx core.Context) {
 		value := calculate(ctx)
 		data := Data[TValue]{

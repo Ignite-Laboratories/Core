@@ -2,7 +2,7 @@ package temporal
 
 import (
 	"github.com/ignite-laboratories/core"
-	"github.com/ignite-laboratories/core/condition"
+	"github.com/ignite-laboratories/core/when"
 )
 
 // NewObservation creates a dimension that records the target value across time, if the provided potential returns true.
@@ -15,7 +15,7 @@ func NewObservation[TValue any](engine *core.Engine, potential core.Potential, m
 	d := Dimension[TValue, any]{}
 	d.ID = core.NextID()
 	d.Window = core.DefaultWindow
-	d.Trimmer = engine.Loop(d.Trim, condition.Always, false)
+	d.Trimmer = engine.Loop(d.Trim, when.Always, false)
 	d.Stimulator = engine.Stimulate(func(ctx core.Context) {
 		data := Data[TValue]{
 			Context: ctx,

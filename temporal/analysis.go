@@ -22,7 +22,7 @@ func NewAnalysis[TSource any, TValue any, TCache any](engine *core.Engine, poten
 		// Get target timeline data
 		target.Mutex.Lock()
 		last := target.Current
-		var data []Data[TSource]
+		data := make([]Data[TSource], len(target.Timeline))
 		copy(data, target.Timeline)
 		target.Mutex.Unlock()
 

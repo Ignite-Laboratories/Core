@@ -3,6 +3,7 @@ package temporal
 import (
 	"github.com/ignite-laboratories/core"
 	"github.com/ignite-laboratories/core/condition"
+	"time"
 )
 
 // NewAnalysis creates a new dimension that records the result of the provided integral function cyclically.
@@ -18,10 +19,11 @@ func NewAnalysis[TSource any, TValue any, TCache any](engine *core.Engine, poten
 	d.Window = core.DefaultWindow
 	d.Trimmer = engine.Loop(d.Trim, condition.Always, false)
 
+	lastMoment := time.Now()
+
 	d.Stimulator = engine.Loop(func(ctx core.Context) {
 		// Get target timeline data
 		target.Mutex.Lock()
-		last := target.Current
 		data := make([]Data[TSource], len(target.Timeline))
 		copy(data, target.Timeline)
 		target.Mutex.Unlock()
@@ -29,7 +31,7 @@ func NewAnalysis[TSource any, TValue any, TCache any](engine *core.Engine, poten
 		// Trim any indices that were handled by the last analysis
 		var trimCount int
 		for _, v := range data {
-			if v.Moment.After(last.Moment) {
+			if v.Moment.After(lastMoment) {
 				break
 			}
 			trimCount++
@@ -38,6 +40,9 @@ func NewAnalysis[TSource any, TValue any, TCache any](engine *core.Engine, poten
 			trimCount = 0
 		}
 		data = data[trimCount:]
+		if len(data) > 0 {
+			lastMoment = data[len(data)-1].Moment
+		}
 
 		// Perform integration
 		out := Data[TValue]{

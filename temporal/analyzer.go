@@ -2,17 +2,18 @@ package temporal
 
 import (
 	"github.com/ignite-laboratories/core"
+	"github.com/ignite-laboratories/core/std"
 	"github.com/ignite-laboratories/core/when"
 )
 
-// NewAnalysis creates a new dimension that records the result of the provided integral function cyclically.
+// Analyzer creates a new dimension that records the result of the provided integral function cyclically.
 // The integral function is always called with the exact timeline data since the last analysis started.
 //
 // NOTE: The potential function gates analysis.
 // This can adjust "reactivity" to input data =)
 //
 // Muted indicates if the stimulator of this dimension should be created muted.
-func NewAnalysis[TSource any, TValue any, TCache any](engine *core.Engine, potential core.Potential, muted bool, integrate core.Integral[Data[TSource], TValue, TCache], target *Dimension[TSource, any]) *Dimension[TValue, TCache] {
+func Analyzer[TSource any, TValue any, TCache any](engine *core.Engine, potential core.Potential, muted bool, integrate core.Integral[std.Data[TSource], TValue, TCache], target *Dimension[TSource, any]) *Dimension[TValue, TCache] {
 	d := Dimension[TValue, TCache]{}
 	d.ID = core.NextID()
 	d.Window = core.DefaultWindow
@@ -22,7 +23,7 @@ func NewAnalysis[TSource any, TValue any, TCache any](engine *core.Engine, poten
 	d.Stimulator = engine.Loop(func(ctx core.Context) {
 		// Get target timeline data
 		target.Mutex.Lock()
-		data := make([]Data[TSource], len(target.Timeline))
+		data := make([]std.Data[TSource], len(target.Timeline))
 		copy(data, target.Timeline)
 		target.Mutex.Unlock()
 
@@ -43,17 +44,15 @@ func NewAnalysis[TSource any, TValue any, TCache any](engine *core.Engine, poten
 		}
 
 		// Perform integration
-		out := Data[TValue]{
+		point := integrate(ctx, d.Cache, data)
+		out := std.Data[TValue]{
 			Context: ctx,
-			Point:   integrate(ctx, d.Cache, data),
+			Point:   point,
 		}
 
 		// Record the result
-		d.Mutex.Lock()
 		d.lastCycle = lastCycle
-		d.Timeline = append(d.Timeline, out)
-		d.Current = out
-		d.Mutex.Unlock()
+		d.update(out)
 	}, potential, muted)
 	return &d
 }

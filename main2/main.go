@@ -3,39 +3,34 @@ package main
 import (
 	"fmt"
 	"github.com/ignite-laboratories/core"
-	"github.com/ignite-laboratories/core/temporal"
-	"github.com/ignite-laboratories/core/when"
-	"github.com/ignite-laboratories/host"
-	"time"
+	"github.com/ignite-laboratories/core/std"
+	"github.com/ignite-laboratories/host/mouse"
 )
 
-type Coordinates struct {
-	X int
-	Y int
+func init() {
+	//temporal.Analyzer[std.XY[int], any, any](core.Impulse, when.EighthSpeed(&mouse.SampleRate), false, Print, mouse.Coordinates)
+	mouse.Coordinates.OnChange = Feedback
+	mouse.Coordinates.Unmute()
 }
-
-var sampleFreq = 1024.0
-
-var mouser = temporal.NewCalculation[Coordinates](core.Impulse, when.Frequency(&sampleFreq), false, GetCoordinates)
-var analyzer = temporal.NewAnalysis[Coordinates, any, time.Time](core.Impulse, when.EighthSpeed(&sampleFreq), false, PrintCoordinates, mouser)
 
 func main() {
 	core.Impulse.Spark()
 }
 
-var last = core.Inception
+func Feedback(oldVal std.Data[std.XY[int]], newVal std.Data[std.XY[int]]) {
+	if newVal.Point.X > 1024 {
+		mouse.SampleRate = 2048.0
+	} else {
+		mouse.SampleRate = 2.0
+	}
+	fmt.Println(newVal.Point)
+}
 
-func PrintCoordinates(ctx core.Context, cache *time.Time, data []temporal.Data[Coordinates]) any {
-	points := make([]Coordinates, len(data))
+func Print(ctx core.Context, cache *any, data []std.Data[std.XY[int]]) any {
+	points := make([]std.XY[int], len(data))
 	for i, v := range data {
 		points[i] = v.Point
 	}
-	fmt.Println(points)
-	time.Sleep(100 * time.Millisecond)
+	fmt.Printf("[%d] %v\n", ctx.Beat, points)
 	return nil
-}
-
-func GetCoordinates(ctx core.Context) Coordinates {
-	x, y, _ := host.Mouse.GetCoordinates()
-	return Coordinates{x, y}
 }

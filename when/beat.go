@@ -1,6 +1,8 @@
 package when
 
-import "github.com/ignite-laboratories/core"
+import (
+	"github.com/ignite-laboratories/core"
+)
 
 type beat struct{}
 

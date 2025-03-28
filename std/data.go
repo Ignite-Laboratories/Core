@@ -1,6 +1,8 @@
-package temporal
+package std
 
-import "github.com/ignite-laboratories/core"
+import (
+	"github.com/ignite-laboratories/core"
+)
 
 // Data is a contextual point value in time.
 type Data[T any] struct {

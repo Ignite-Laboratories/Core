@@ -12,17 +12,27 @@ import (
 // This can adjust the "resolution" of output data =)
 //
 // Muted indicates if the stimulator of this dimension should be created muted.
-func Observer[TValue any](engine *core.Engine, potential core.Potential, muted bool, target *TValue) *Dimension[TValue, any] {
+//
+// Looping indicates if the stimulator of this dimension should activate impulsively, or as a loop.
+func Observer[TValue any](engine *core.Engine, potential core.Potential, muted bool, looping bool, target std.Target[TValue]) *Dimension[TValue, any] {
 	d := Dimension[TValue, any]{}
 	d.ID = core.NextID()
 	d.Window = core.DefaultWindow
 	d.Trimmer = engine.Loop(d.Trim, when.Always, false)
-	d.Stimulator = engine.Stimulate(func(ctx core.Context) {
+	f := func(ctx core.Context) {
 		data := std.Data[TValue]{
 			Context: ctx,
-			Point:   *target,
+			Point:   *target(),
 		}
-		d.update(data)
-	}, potential, muted)
+		d.Mutex.Lock()
+		d.Timeline = append(d.Timeline, data)
+		d.Current = &data
+		d.Mutex.Unlock()
+	}
+	if looping {
+		d.Stimulator = engine.Loop(f, potential, muted)
+	} else {
+		d.Stimulator = engine.Stimulate(f, potential, muted)
+	}
 	return &d
 }

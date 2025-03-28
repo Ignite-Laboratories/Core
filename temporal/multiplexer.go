@@ -12,12 +12,14 @@ import (
 // This can adjust the "resolution" of output data =)
 //
 // Muted indicates if the stimulator of this dimension should be created muted.
-func Multiplexer[TValue core.Numeric](engine *core.Engine, potential core.Potential, muted bool, blend core.Blend[TValue], dimensions ...*Dimension[any, any]) *Dimension[TValue, any] {
+//
+// Looping indicates if the stimulator of this dimension should activate impulsively, or as a loop.
+func Multiplexer[TValue core.Numeric](engine *core.Engine, potential core.Potential, muted bool, looping bool, blend core.Blend[TValue], dimensions ...*Dimension[any, any]) *Dimension[TValue, any] {
 	d := Dimension[TValue, any]{}
 	d.ID = core.NextID()
 	d.Window = core.DefaultWindow
 	d.Trimmer = engine.Loop(d.Trim, when.Always, false)
-	d.Stimulator = engine.Stimulate(func(ctx core.Context) {
+	f := func(ctx core.Context) {
 		values := make([]any, len(dimensions))
 		for i, otherD := range dimensions {
 			values[i] = otherD.Current
@@ -26,7 +28,15 @@ func Multiplexer[TValue core.Numeric](engine *core.Engine, potential core.Potent
 			Context: ctx,
 			Point:   blend(values),
 		}
-		d.update(data)
-	}, potential, muted)
+		d.Mutex.Lock()
+		d.Timeline = append(d.Timeline, data)
+		d.Current = &data
+		d.Mutex.Unlock()
+	}
+	if looping {
+		d.Stimulator = engine.Loop(f, potential, muted)
+	} else {
+		d.Stimulator = engine.Stimulate(f, potential, muted)
+	}
 	return &d
 }

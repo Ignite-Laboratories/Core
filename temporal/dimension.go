@@ -12,15 +12,13 @@ type Dimension[TValue any, TCache any] struct {
 	core.Entity
 
 	// Current is the currently held value of this dimension.
-	Current std.Data[TValue]
+	Current *std.Data[TValue]
 
 	// Cache is a place where a looping stimulator can save information for the next activation of the loop.
 	Cache *TCache
 
 	// Timeline is the historical values of this dimension.
 	Timeline []std.Data[TValue]
-
-	OnChange Change[TValue]
 
 	// Window is the duration to hold onto recorded values for.
 	Window time.Duration
@@ -37,17 +35,6 @@ type Dimension[TValue any, TCache any] struct {
 	lastCycle time.Time
 }
 
-func (d *Dimension[TValue, TCache]) update(data std.Data[TValue]) {
-	d.Mutex.Lock()
-	old := d.Current
-	d.Timeline = append(d.Timeline, data)
-	d.Current = data
-	if d.OnChange != nil {
-		d.OnChange(old, d.Current)
-	}
-	d.Mutex.Unlock()
-}
-
 // Trim removes anything on the timeline that is older than the dimension's window of observance.
 func (d *Dimension[TValue, TCache]) Trim(ctx core.Context) {
 	d.Mutex.Lock()
@@ -60,6 +47,12 @@ func (d *Dimension[TValue, TCache]) Trim(ctx core.Context) {
 	}
 	d.Timeline = d.Timeline[trimCount:]
 	d.Mutex.Unlock()
+}
+
+// Destroy removes this dimension's neurons from the engine entirely.
+func (d *Dimension[TValue, TCache]) Destroy() {
+	d.Stimulator.Destroy()
+	d.Trimmer.Destroy()
 }
 
 // Mute suppresses the stimulator of this dimension.

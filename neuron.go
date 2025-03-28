@@ -18,4 +18,18 @@ type Neuron struct {
 
 	// Last provides temporal runtime information for the last activation.
 	Last Runtime
+
+	engine *Engine
+}
+
+// Trigger fires the provided action one time, if the potential returns true.
+//
+// If 'async' is true, the action is called asynchronously - otherwise, it blocks the firing impulse.
+func (n *Neuron) Trigger(async bool) {
+	n.engine.Trigger(n.Action, n.Potential, async)
+}
+
+// Destroy removes this neuron from the engine entirely.
+func (n *Neuron) Destroy() {
+	n.engine.Remove(n.ID)
 }

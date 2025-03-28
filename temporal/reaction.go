@@ -6,14 +6,7 @@ import (
 	"github.com/ignite-laboratories/core/when"
 )
 
-// Blend represents the state of A and B that generated the resulting blended Value.
-type Blend[TValue core.Numeric] struct {
-	Value TValue
-	A     std.Data[TValue]
-	B     std.Data[TValue]
-}
-
-// Blender creates a dimension that blends the point value of two input dimensions for every impulse that the potential returns true.
+// Reaction creates a dimension that calls the reaction function if the provided potential returns true.
 //
 // NOTE: The potential function gates the creation of timeline indexes!
 // This can adjust the "resolution" of output data =)
@@ -21,24 +14,24 @@ type Blend[TValue core.Numeric] struct {
 // Muted indicates if the stimulator of this dimension should be created muted.
 //
 // Looping indicates if the stimulator of this dimension should activate impulsively, or as a loop.
-func Blender[TValue core.Numeric](engine *core.Engine, potential core.Potential, muted bool, looping bool, blend core.Operate[TValue], a *Dimension[TValue, any], b *Dimension[TValue, any]) *Dimension[Blend[TValue], any] {
-	d := Dimension[Blend[TValue], any]{}
+func Reaction[TValue any](engine *core.Engine, potential core.Potential, muted bool, looping bool, target std.Target[TValue], change Change[TValue]) *Dimension[TValue, any] {
+	d := Dimension[TValue, any]{}
 	d.ID = core.NextID()
 	d.Window = core.DefaultWindow
 	d.Trimmer = engine.Loop(d.Trim, when.Always, false)
 	f := func(ctx core.Context) {
-		mux := Blend[TValue]{
-			A: *a.Current,
-			B: *b.Current,
-		}
-		mux.Value = blend(mux.A.Point, mux.B.Point)
-		data := std.Data[Blend[TValue]]{
+		data := std.Data[TValue]{
 			Context: ctx,
-			Point:   mux,
+			Point:   *target(),
 		}
 		d.Mutex.Lock()
+		var old *std.Data[TValue]
+		if d.Current != nil {
+			old = d.Current
+		}
 		d.Timeline = append(d.Timeline, data)
 		d.Current = &data
+		change(old, d.Current)
 		d.Mutex.Unlock()
 	}
 	if looping {

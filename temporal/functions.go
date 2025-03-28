@@ -16,4 +16,4 @@ func Delta[TValue core.Numeric](a TValue, b TValue) TValue {
 }
 
 // Change functions are called when a dimension's current point value changes.
-type Change[TValue any] func(oldVal std.Data[TValue], newVal std.Data[TValue])
+type Change[TValue any] func(oldVal *std.Data[TValue], newVal *std.Data[TValue])

@@ -5,11 +5,13 @@ import (
 	"github.com/ignite-laboratories/core"
 	"github.com/ignite-laboratories/core/std"
 	"github.com/ignite-laboratories/host/mouse"
+	"math"
 )
 
 func init() {
 	//temporal.Analyzer[std.XY[int], any, any](core.Impulse, when.EighthSpeed(&mouse.SampleRate), false, Print, mouse.Coordinates)
-	mouse.Coordinates.OnChange = Feedback
+	mouse.Reaction(std.HardRef(2048.0).Ref, Velocity)
+	mouse.Reaction(&mouse.SampleRate, Feedback)
 	mouse.Coordinates.Unmute()
 }
 
@@ -17,7 +19,18 @@ func main() {
 	core.Impulse.Spark()
 }
 
-func Feedback(oldVal std.Data[std.XY[int]], newVal std.Data[std.XY[int]]) {
+func Velocity(oldVal *std.Data[std.XY[int]], newVal *std.Data[std.XY[int]]) {
+	if oldVal == nil {
+		return
+	}
+	delta := newVal.Point.X - oldVal.Point.X
+	deltaAbs := math.Abs(float64(delta))
+	if deltaAbs > 100 {
+		fmt.Println("Slow down!")
+	}
+}
+
+func Feedback(oldVal *std.Data[std.XY[int]], newVal *std.Data[std.XY[int]]) {
 	if newVal.Point.X > 1024 {
 		mouse.SampleRate = 2048.0
 	} else {

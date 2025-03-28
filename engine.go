@@ -109,6 +109,7 @@ func (e *Engine) Range() []*Neuron {
 func (e *Engine) Block(action Action, potential Potential, muted bool) *Neuron {
 	var a Neuron
 	a.ID = NextID()
+	a.engine = e
 	a.Action = func(ctx Context) {
 		a.executing = true
 		action(ctx)
@@ -127,6 +128,7 @@ func (e *Engine) Stimulate(action Action, potential Potential, muted bool) *Neur
 	// NOTE: The trick here is that it never sets 'Executing' =)
 	var a Neuron
 	a.ID = NextID()
+	a.engine = e
 	a.Action = func(ctx Context) {
 		go action(ctx)
 	}
@@ -142,6 +144,7 @@ func (e *Engine) Stimulate(action Action, potential Potential, muted bool) *Neur
 func (e *Engine) Loop(action Action, potential Potential, muted bool) *Neuron {
 	var a Neuron
 	a.ID = NextID()
+	a.engine = e
 	a.Action = func(ctx Context) {
 		a.executing = true
 		go func() {
@@ -178,6 +181,7 @@ func (e *Engine) Trigger(action Action, potential Potential, async bool) {
 	// Build the neuron
 	var n Neuron
 	n.ID = NextID()
+	n.engine = e
 	n.Action = func(ctx Context) {
 		if async {
 			go action(ctx)

@@ -12,9 +12,7 @@ import (
 // This can adjust the "resolution" of output data =)
 //
 // Muted indicates if the stimulator of this dimension should be created muted.
-//
-// Looping indicates if the stimulator of this dimension should activate impulsively, or as a loop.
-func Differential[TValue any](engine *core.Engine, potential core.Potential, muted bool, looping bool, calculate core.CalculatePoint[TValue]) *Dimension[TValue, any] {
+func Differential[TValue any](engine *core.Engine, potential core.Potential, muted bool, calculate core.CalculatePoint[TValue]) *Dimension[TValue, any] {
 	d := Dimension[TValue, any]{}
 	d.ID = core.NextID()
 	d.Window = core.DefaultWindow
@@ -30,10 +28,6 @@ func Differential[TValue any](engine *core.Engine, potential core.Potential, mut
 		d.Current = &data
 		d.Mutex.Unlock()
 	}
-	if looping {
-		d.Stimulator = engine.Loop(f, potential, muted)
-	} else {
-		d.Stimulator = engine.Stimulate(f, potential, muted)
-	}
+	d.Stimulator = engine.Stimulate(f, potential, muted)
 	return &d
 }

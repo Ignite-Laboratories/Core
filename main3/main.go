@@ -8,9 +8,14 @@ import (
 	"math"
 )
 
-func main() {
+func init() {
+	//mouse.Coordinates.Unmute()
+	//temporal.Analyzer[std.XY[int], any, any](core.Impulse, when.EighthSpeed(&mouse.SampleRate), false, Print, mouse.Coordinates)
 	mouse.Reaction(std.HardRef(2048.0).Ref, Velocity)
 	mouse.Reaction(&mouse.SampleRate, Feedback)
+}
+
+func main() {
 	core.Impulse.Spark()
 }
 
@@ -32,4 +37,13 @@ func Feedback(ctx core.Context, old *std.Data[std.XY[int]], current *std.Data[st
 		mouse.SampleRate = 2.0
 	}
 	fmt.Println(current.Point)
+}
+
+func Print(ctx core.Context, cache *any, data []std.Data[std.XY[int]]) any {
+	points := make([]std.XY[int], len(data))
+	for i, v := range data {
+		points[i] = v.Point
+	}
+	fmt.Printf("[%d] %v\n", ctx.Beat, points)
+	return nil
 }

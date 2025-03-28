@@ -14,7 +14,7 @@ import (
 // Muted indicates if the stimulator of this dimension should be created muted.
 //
 // Looping indicates if the stimulator of this dimension should activate impulsively, or as a loop.
-func Reaction[TValue any](engine *core.Engine, potential core.Potential, muted bool, looping bool, target std.Target[TValue], change Change[TValue]) *Dimension[TValue, any] {
+func Reaction[TValue any](engine *core.Engine, potential core.Potential, muted bool, target std.Target[TValue], change Change[TValue]) *Dimension[TValue, any] {
 	d := Dimension[TValue, any]{}
 	d.ID = core.NextID()
 	d.Window = core.DefaultWindow
@@ -31,13 +31,9 @@ func Reaction[TValue any](engine *core.Engine, potential core.Potential, muted b
 		}
 		d.Timeline = append(d.Timeline, data)
 		d.Current = &data
-		change(old, d.Current)
+		change(ctx, old, d.Current)
 		d.Mutex.Unlock()
 	}
-	if looping {
-		d.Stimulator = engine.Loop(f, potential, muted)
-	} else {
-		d.Stimulator = engine.Stimulate(f, potential, muted)
-	}
+	d.Stimulator = engine.Stimulate(f, potential, muted)
 	return &d
 }

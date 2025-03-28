@@ -14,8 +14,10 @@ import (
 //
 // Muted indicates if the stimulator of this dimension should be created muted.
 //
-// Looping indicates if the stimulator of this dimension should activate impulsively, or as a loop.
-func Integration[TSource any, TValue any, TCache any](engine *core.Engine, potential core.Potential, muted bool, looping bool, integrate core.Integral[std.Data[TSource], TValue, TCache], target *Dimension[TSource, any]) *Dimension[TValue, TCache] {
+// Impulsive indicates if the stimulator of this dimension should activate impulsively, or as a loop.
+//
+// If it activates impulsively this will ensure the results are placed accurately on the timeline.
+func Integration[TSource any, TValue any, TCache any](engine *core.Engine, potential core.Potential, muted bool, impulsive bool, integrate core.Integral[std.Data[TSource], TValue, TCache], target *Dimension[TSource, any]) *Dimension[TValue, TCache] {
 	d := Dimension[TValue, TCache]{}
 	d.ID = core.NextID()
 	d.Window = core.DefaultWindow
@@ -55,22 +57,20 @@ func Integration[TSource any, TValue any, TCache any](engine *core.Engine, poten
 		// Record the result
 		d.Mutex.Lock()
 		d.lastCycle = lastCycle
-		if looping {
+		if !impulsive {
 			// Integration execution is logically ordered - just append
 			d.Timeline = append(d.Timeline, out)
 			d.Current = &out
 		} else {
 			// Integration execution is chaotically ordered - inject appropriately
 			var left []std.Data[TValue]
-			var right []std.Data[TValue]
-			var index = 0
-			for _, v := range d.Timeline {
-				if v.Moment.After(lastCycle) {
-					left = d.Timeline[:index]
-					right = d.Timeline[index:]
+			right := d.Timeline
+			for i := len(d.Timeline) - 1; i >= 0; i-- {
+				if out.Moment.After(d.Timeline[i].Moment) {
+					left = d.Timeline[:i]
+					right = d.Timeline[i:]
 					break
 				}
-				index++
 			}
 			d.Timeline = left
 			d.Timeline = append(d.Timeline, out)
@@ -82,7 +82,7 @@ func Integration[TSource any, TValue any, TCache any](engine *core.Engine, poten
 		d.Mutex.Unlock()
 	}
 
-	if looping {
+	if impulsive {
 		d.Stimulator = engine.Loop(f, potential, muted)
 	} else {
 		d.Stimulator = engine.Stimulate(f, potential, muted)

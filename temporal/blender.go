@@ -19,9 +19,7 @@ type Blend[TValue core.Numeric] struct {
 // This can adjust the "resolution" of output data =)
 //
 // Muted indicates if the stimulator of this dimension should be created muted.
-//
-// Looping indicates if the stimulator of this dimension should activate impulsively, or as a loop.
-func Blender[TValue core.Numeric](engine *core.Engine, potential core.Potential, muted bool, looping bool, blend core.Operate[TValue], a *Dimension[TValue, any], b *Dimension[TValue, any]) *Dimension[Blend[TValue], any] {
+func Blender[TValue core.Numeric](engine *core.Engine, potential core.Potential, muted bool, blend core.Operate[TValue], a *Dimension[TValue, any], b *Dimension[TValue, any]) *Dimension[Blend[TValue], any] {
 	d := Dimension[Blend[TValue], any]{}
 	d.ID = core.NextID()
 	d.Window = core.DefaultWindow
@@ -41,10 +39,6 @@ func Blender[TValue core.Numeric](engine *core.Engine, potential core.Potential,
 		d.Current = &data
 		d.Mutex.Unlock()
 	}
-	if looping {
-		d.Stimulator = engine.Loop(f, potential, muted)
-	} else {
-		d.Stimulator = engine.Stimulate(f, potential, muted)
-	}
+	d.Stimulator = engine.Stimulate(f, potential, muted)
 	return &d
 }

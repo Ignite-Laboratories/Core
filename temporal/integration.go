@@ -23,6 +23,7 @@ func Integration[TSource any, TValue any, TCache any](engine *core.Engine, poten
 	d.Window = core.DefaultWindow
 	d.Trimmer = engine.Loop(d.Trim, when.Always, false)
 	d.lastCycle = core.Inception
+	d.Cache = new(TCache)
 
 	f := func(ctx core.Context) {
 		// Get target timeline data

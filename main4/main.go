@@ -6,18 +6,32 @@ import (
 	"github.com/ignite-laboratories/core/std"
 	"github.com/ignite-laboratories/core/temporal"
 	"github.com/ignite-laboratories/core/when"
-	"github.com/ignite-laboratories/host/mouse"
 )
 
 func main() {
-	temporal.Calculation(core.Impulse, when.Frequency(&mouse.SampleRate), false, CalcCoords)
+	var incrementer = temporal.Calculation(core.Impulse, when.Always, false, increment)
+	temporal.Integration(core.Impulse, when.Frequency(std.HardRef(1.0).Ref), false, false, printTimeline, incrementer)
+	core.Impulse.MaxFrequency = 4
 	core.Impulse.Spark()
 }
 
-func CalcCoords(ctx core.Context) std.XY[int] {
-	coords := mouse.SampleCoordinates()
-	if coords.X < 1024 {
-		fmt.Println(coords)
+var value = 0
+
+func increment(ctx core.Context) int {
+	value++
+	return value
+}
+
+func printTimeline(ctx core.Context, cache *int, data []std.Data[int]) int {
+	total := 0
+	values := make([]int, len(data))
+	for i, v := range data {
+		values[i] = v.Point
+		total += v.Point
 	}
-	return *coords
+	*cache += total
+
+	// Print the stats
+	fmt.Printf("%v - %d - %d\n", values, total, *cache)
+	return total
 }

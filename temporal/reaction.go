@@ -14,7 +14,7 @@ import (
 // Muted indicates if the stimulator of this dimension should be created muted.
 //
 // Looping indicates if the stimulator of this dimension should activate impulsively, or as a loop.
-func Reaction[TValue any](engine *core.Engine, potential core.Potential, muted bool, target std.Target[TValue], change Change[TValue]) *Dimension[TValue, any] {
+func Reaction[TValue any](engine *core.Engine, potential core.Potential, muted bool, target std.TargetFunc[TValue], change Change[TValue]) *Dimension[TValue, any] {
 	d := Dimension[TValue, any]{}
 	d.ID = core.NextID()
 	d.Window = core.DefaultWindow

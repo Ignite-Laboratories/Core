@@ -1,4 +1,8 @@
 package std
 
-// Target functions return a pointer to a value.
-type Target[TValue any] func() *TValue
+// TargetFunc functions return a pointer to a value.
+type TargetFunc[TValue any] func() *TValue
+
+func Target[TValue any](val *TValue) *TValue {
+	return val
+}

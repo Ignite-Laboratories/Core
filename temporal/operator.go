@@ -13,7 +13,7 @@ type Operation[TValue core.Numeric] struct {
 	B     std.Data[TValue]
 }
 
-func Operator[TValue core.Numeric](engine *core.Engine, potential core.Potential, muted bool, operator core.Operate[TValue], a *Dimension[TValue, any], b *Dimension[TValue, any]) *Dimension[Operation[TValue], any] {
+func Operator[TValue core.Numeric](engine *core.Engine, potential core.Potential, muted bool, operator Operate[TValue], a *Dimension[TValue, any], b *Dimension[TValue, any]) *Dimension[Operation[TValue], any] {
 	d := Dimension[Operation[TValue], any]{}
 	d.ID = core.NextID()
 	d.Window = core.DefaultWindow

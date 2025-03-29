@@ -31,7 +31,10 @@ func Reaction[TValue any](engine *core.Engine, potential core.Potential, muted b
 		}
 		d.Timeline = append(d.Timeline, data)
 		d.Current = &data
-		change(ctx, old, d.Current)
+		// Don't 'react' to the first impulse
+		if old != nil {
+			change(ctx, *old, *d.Current)
+		}
 		d.Mutex.Unlock()
 	}
 	d.Stimulator = engine.Stimulate(f, potential, muted)

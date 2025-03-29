@@ -12,7 +12,7 @@ import (
 // This can adjust the "resolution" of output data =)
 //
 // Muted indicates if the stimulator of this dimension should be created muted.
-func Multiplexer[TValue core.Numeric](engine *core.Engine, potential core.Potential, muted bool, blend core.Blend[TValue], dimensions ...*Dimension[any, any]) *Dimension[TValue, any] {
+func Multiplexer[TValue core.Numeric](engine *core.Engine, potential core.Potential, muted bool, blend Blend[TValue], dimensions ...*Dimension[any, any]) *Dimension[TValue, any] {
 	d := Dimension[TValue, any]{}
 	d.ID = core.NextID()
 	d.Window = core.DefaultWindow

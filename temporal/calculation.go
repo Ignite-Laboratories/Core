@@ -6,13 +6,13 @@ import (
 	"github.com/ignite-laboratories/core/when"
 )
 
-// Differential creates a dimension that performs a calculation for every impulse that the potential returns true.
+// Calculation creates a dimension that performs a point calculation for every impulse that the potential returns true.
 //
 // NOTE: The potential function gates the creation of timeline indexes!
 // This can adjust the "resolution" of output data =)
 //
 // Muted indicates if the stimulator of this dimension should be created muted.
-func Differential[TValue any](engine *core.Engine, potential core.Potential, muted bool, calculate core.CalculatePoint[TValue]) *Dimension[TValue, any] {
+func Calculation[TValue any](engine *core.Engine, potential core.Potential, muted bool, calculate PointCalculation[TValue]) *Dimension[TValue, any] {
 	d := Dimension[TValue, any]{}
 	d.ID = core.NextID()
 	d.Window = core.DefaultWindow

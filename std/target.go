@@ -1,5 +1,7 @@
 package std
 
+import "github.com/ignite-laboratories/core"
+
 // TargetFunc functions return a pointer to a value.
 type TargetFunc[TValue any] func() *TValue
 
@@ -7,5 +9,12 @@ type TargetFunc[TValue any] func() *TValue
 func Target[TValue any](val *TValue) TargetFunc[TValue] {
 	return func() *TValue {
 		return val
+	}
+}
+
+// PotentialTarget functions provide a potential from a boolean reference.
+func PotentialTarget(value *bool) core.Potential {
+	return func(ctx core.Context) bool {
+		return *value
 	}
 }

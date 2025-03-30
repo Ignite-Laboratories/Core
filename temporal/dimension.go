@@ -32,6 +32,10 @@ type Dimension[TValue any, TCache any] struct {
 	// Trimmer is the neuron that trims the timeline of entries beyond the window of observance.
 	Trimmer *core.Neuron
 
+	// Destroyed indicates if this dimension has been destroyed.
+	Destroyed bool
+
+	// lastCycle is used by integration to located timeline indexes.
 	lastCycle time.Time
 }
 
@@ -53,6 +57,7 @@ func (d *Dimension[TValue, TCache]) Trim(ctx core.Context) {
 func (d *Dimension[TValue, TCache]) Destroy() {
 	d.Stimulator.Destroy()
 	d.Trimmer.Destroy()
+	d.Destroyed = true
 }
 
 // Mute suppresses the stimulator of this dimension.

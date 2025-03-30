@@ -28,8 +28,9 @@ type Engine struct {
 	// MaxFrequency is the maximum frequency of impulse.
 	MaxFrequency float64
 
-	neurons map[uint64]*Neuron
-	mutex   sync.Mutex
+	stopPotential Potential
+	neurons       map[uint64]*Neuron
+	mutex         sync.Mutex
 }
 
 // NewEngine creates and configures a new neural impulse engine instance.
@@ -59,6 +60,11 @@ func (e *Engine) addNeuron(a *Neuron) {
 // Stop causes the impulse engine to cease firing neural activations.
 func (e *Engine) Stop() {
 	e.Active = false
+}
+
+// StopWhen causes the impulse engine to cease firing neural activations when the provided potential returns true.
+func (e *Engine) StopWhen(potential Potential) {
+	e.stopPotential = potential
 }
 
 // MuteByID suppresses the identified neuron until Unmute is called.
@@ -251,6 +257,13 @@ func (e *Engine) Spark() {
 		ctx.Period = period
 		ctx.Beat = e.Beat
 		ctx.LastImpulse = e.Last
+
+		// Check if the engine's stopping potential has been set...
+		if e.stopPotential != nil && e.stopPotential(ctx) {
+			// ...If so, end execution
+			e.Active = false
+			break
+		}
 
 		// Launch the wave of neurons
 		for _, n := range neurons {

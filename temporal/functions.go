@@ -31,3 +31,6 @@ type Blend[TOut any] func(...any) TOut
 
 // Operate functions take in two numeric values and output a result.
 type Operate[TValue core.Numeric] func(TValue, TValue) TValue
+
+// Comparator functions should return true if the two provided values are "equal."
+type Comparator[TValue any] func(a TValue, b TValue) bool

@@ -9,11 +9,7 @@ import (
 
 // DedicatedLoop is a special kind of Loop - it guarantees the target action is always
 // called from the same host thread using runtime.LockOSThread()
-//
-// As the need for dedicated loops often stems from working with C, a cleanup method can be provided
-// which will get called when the dimension has been destroyed.  If you have no cleanup to do, you can
-// utilize core.DoNothing as a placeholder.
-func DedicatedLoop(engine *core.Engine, potential core.Potential, muted bool, target core.Action, cleanup func()) *Dimension[core.Runtime, chan core.Context] {
+func DedicatedLoop(engine *core.Engine, potential core.Potential, muted bool, target core.Action) *Dimension[core.Runtime, chan core.Context] {
 	d := Dimension[core.Runtime, chan core.Context]{}
 	d.ID = core.NextID()
 	d.Window = core.DefaultWindow
@@ -36,10 +32,6 @@ func DedicatedLoop(engine *core.Engine, potential core.Potential, muted bool, ta
 		runtime.LockOSThread()
 		defer runtime.UnlockOSThread()
 		for ctx := range *d.Cache {
-			if d.Destroyed {
-				cleanup()
-				break
-			}
 			target(ctx)
 		}
 	}()

@@ -12,8 +12,8 @@ func Target[TValue any](val *TValue) TargetFunc[TValue] {
 	}
 }
 
-// PotentialTarget functions provide a potential from a boolean reference.
-func PotentialTarget(value *bool) core.Potential {
+// BooleanTarget functions provide a potential from a boolean reference.
+func BooleanTarget(value *bool) core.Potential {
 	return func(ctx core.Context) bool {
 		return *value
 	}

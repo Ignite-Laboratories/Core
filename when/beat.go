@@ -9,13 +9,6 @@ type beat struct{}
 // Beat provides a set of helper functions for creating beat oriented potentials.
 var Beat beat = beat{}
 
-// Frequency provides a potential that fires on a frequency offset by the provided beat number.
-func (b beat) Frequency(beat *int, hertz *float64) core.Potential {
-	return func(ctx core.Context) bool {
-		return b.On(beat)(ctx) && Frequency(hertz)(ctx)
-	}
-}
-
 // Downbeat provides a potential that fires when the beat is 0.
 func (b beat) Downbeat(ctx core.Context) bool {
 	return ctx.Beat == 0

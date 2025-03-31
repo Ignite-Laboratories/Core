@@ -28,6 +28,9 @@ type Engine struct {
 	// MaxFrequency is the maximum frequency of impulse.
 	MaxFrequency float64
 
+	// OnStop is called whenever the engine stops, if it's provided.
+	OnStop func()
+
 	stopPotential Potential
 	neurons       map[uint64]*Neuron
 	mutex         sync.Mutex
@@ -60,6 +63,9 @@ func (e *Engine) addNeuron(a *Neuron) {
 // Stop causes the impulse engine to cease firing neural activations.
 func (e *Engine) Stop() {
 	e.Active = false
+	if e.OnStop != nil {
+		e.OnStop()
+	}
 }
 
 // StopWhen causes the impulse engine to cease firing neural activations when the provided potential returns true.
@@ -261,7 +267,7 @@ func (e *Engine) Spark() {
 		// Check if the engine's stopping potential has been set...
 		if e.stopPotential != nil && e.stopPotential(ctx) {
 			// ...If so, end execution
-			e.Active = false
+			e.Stop()
 			break
 		}
 

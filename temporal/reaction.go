@@ -12,9 +12,7 @@ import (
 // This can adjust the "resolution" of output data =)
 //
 // Muted indicates if the stimulator of this dimension should be created muted.
-//
-// Looping indicates if the stimulator of this dimension should activate impulsively, or as a loop.
-func Reaction[TValue any](engine *core.Engine, potential core.Potential, muted bool, target std.TargetFunc[TValue], change Change[TValue]) *Dimension[TValue, any] {
+func Reaction[TValue any](engine *core.Engine, potential core.Potential, muted bool, target std.TargetFunc[TValue], reaction Change[TValue]) *Dimension[TValue, any] {
 	d := Dimension[TValue, any]{}
 	d.ID = core.NextID()
 	d.Window = core.DefaultWindow
@@ -33,7 +31,7 @@ func Reaction[TValue any](engine *core.Engine, potential core.Potential, muted b
 		d.Current = &data
 		// Don't 'react' to the first impulse
 		if old != nil {
-			change(ctx, *old, *d.Current)
+			reaction(ctx, *old, *d.Current)
 		}
 		d.Mutex.Unlock()
 	}

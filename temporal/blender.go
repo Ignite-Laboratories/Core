@@ -6,7 +6,7 @@ import (
 	"github.com/ignite-laboratories/core/when"
 )
 
-// Blend represents the state of A and B that generated the resulting blended Value.
+// Blending represents the state of A and B that generated the resulting blended Value.
 type Blending[TValue core.Numeric] struct {
 	Value TValue
 	A     std.Data[TValue]

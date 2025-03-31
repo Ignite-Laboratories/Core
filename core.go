@@ -1,10 +1,21 @@
 package core
 
 import (
+	"fmt"
 	"math"
 	"sync/atomic"
 	"time"
 )
+
+func init() {
+	fmt.Println("      JanOS")
+	fmt.Println("Ignite Laboratories")
+	fmt.Println("-------------------")
+	fmt.Println("init - [core]")
+	Impulse.Name = "Core Impulse Engine"
+
+	Verbose = true
+}
 
 // Alive globally keeps neural activity firing until set to false - it's true by default.
 var Alive = true
@@ -20,6 +31,8 @@ var ID uint64 = NextID()
 
 // DefaultWindow is the default dimensional window of observance - 2 seconds.
 var DefaultWindow = 2 * time.Second
+
+var Verbose bool
 
 // currentId holds the last provided identifier.
 var currentId uint64

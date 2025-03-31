@@ -1,6 +1,7 @@
 package core
 
 import (
+	"fmt"
 	"log"
 	"sync"
 	"time"
@@ -8,6 +9,8 @@ import (
 
 // Engine is a neural impulse driver.
 type Engine struct {
+	Entity
+
 	// Active indicates if the engine is currently firing activations or not.
 	Active bool
 
@@ -39,6 +42,7 @@ type Engine struct {
 // NewEngine creates and configures a new neural impulse engine instance.
 func NewEngine() *Engine {
 	e := Engine{}
+	e.ID = NextID()
 
 	// Make the neural map
 	e.neurons = make(map[uint64]*Neuron)
@@ -62,6 +66,9 @@ func (e *Engine) addNeuron(a *Neuron) {
 
 // Stop causes the impulse engine to cease firing neural activations.
 func (e *Engine) Stop() {
+	if Verbose {
+		fmt.Printf("Stopping Impulse Engine - [%d] %v\n", e.ID, e.Name)
+	}
 	e.Active = false
 	if e.OnStop != nil {
 		e.OnStop()
@@ -213,6 +220,10 @@ func (e *Engine) Spark() {
 		return
 	}
 	e.Active = true
+
+	if Verbose {
+		fmt.Printf("Sparking Impulse Engine - [%d] %v\n", e.ID, e.Name)
+	}
 
 	// Set up a wait group for blocking operations
 	var wg sync.WaitGroup

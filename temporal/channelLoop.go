@@ -6,28 +6,28 @@ import (
 	"github.com/ignite-laboratories/core/when"
 )
 
-// Loop creates an dimension that calls a function in a looping fashion while
-// observing its own runtime information, if the provided potential returns true.
+// ChannelLoop doesn't trigger anything, rather it sends the context through a channel assigned to the dimension's Cache.
 //
-// NOTE: The potential function gates the creation of timeline indexes!
-//
-// Muted indicates if the stimulator of this dimension should be created muted.
-func Loop(engine *core.Engine, potential core.Potential, muted bool, target core.Action) *Dimension[core.Runtime, any] {
-	d := Dimension[core.Runtime, any]{}
+// You must read these messages and handle them for the activation to complete.
+func ChannelLoop(engine *core.Engine, potential core.Potential, muted bool) *Dimension[core.Runtime, chan std.ChannelAction] {
+	d := Dimension[core.Runtime, chan std.ChannelAction]{}
 	d.ID = core.NextID()
 	d.Window = core.DefaultWindow
 	d.Trimmer = engine.Loop(d.Trim, when.Always, false)
+	c := make(chan std.ChannelAction)
+	d.Cache = &c
 	f := func(ctx core.Context) {
 		data := std.Data[core.Runtime]{
 			Context: ctx,
 			Point:   d.Stimulator.Last,
 		}
-		target(ctx)
+		*d.Cache <- std.ChannelAction{Context: ctx}
 		d.Mutex.Lock()
 		d.Timeline = append(d.Timeline, data)
 		d.Current = &data
 		d.Mutex.Unlock()
 	}
+
 	d.Stimulator = engine.Loop(f, potential, muted)
 	return &d
 }

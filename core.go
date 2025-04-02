@@ -53,7 +53,7 @@ func Shutdown(period time.Duration) {
 // WhileAlive can be used to hold a main function open.
 func WhileAlive() {
 	for Alive {
-		// Give the host some breathing room
+		// Give the host some breathing room.
 		time.Sleep(time.Millisecond)
 	}
 }

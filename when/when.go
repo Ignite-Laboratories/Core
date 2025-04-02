@@ -9,7 +9,7 @@ import (
 func Frequency(hertz *float64) core.Potential {
 	return func(ctx core.Context) bool {
 		d := core.HertzToDuration(*hertz)
-		return time.Now().Sub(ctx.LastActivation.Inception) > d
+		return ctx.Moment.Sub(ctx.LastActivation.Inception) > d
 	}
 }
 
@@ -20,7 +20,7 @@ func Resonant(source *float64, subdivision *float64) core.Potential {
 	return func(ctx core.Context) bool {
 		resonance := *source / *subdivision
 		d := core.HertzToDuration(resonance)
-		return time.Now().Sub(ctx.LastActivation.Inception) > d
+		return ctx.Moment.Sub(ctx.LastActivation.Inception) > d
 	}
 }
 

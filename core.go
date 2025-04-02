@@ -11,7 +11,7 @@ func init() {
 	fmt.Println("      JanOS")
 	fmt.Println("Ignite Laboratories")
 	fmt.Println("-------------------")
-	fmt.Println("init - [core]")
+	fmt.Println("[core]")
 	Impulse.Name = "Core Impulse Engine"
 
 	Verbose = true

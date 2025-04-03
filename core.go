@@ -11,9 +11,8 @@ func init() {
 	fmt.Println("      JanOS")
 	fmt.Println("Ignite Laboratories")
 	fmt.Println("-------------------")
-	fmt.Println("[core]")
-	Impulse.Name = "Core Impulse Engine"
 
+	Impulse.Name = "Core Impulse Engine"
 	Verbose = true
 }
 
@@ -46,8 +45,13 @@ func NextID() uint64 {
 func Shutdown(period time.Duration) {
 	go func() {
 		time.Sleep(period)
-		Alive = false
+		ShutdownNow()
 	}()
+}
+
+// ShutdownNow immediately sets Alive to false.
+func ShutdownNow() {
+	Alive = false
 }
 
 // WhileAlive can be used to hold a main function open.

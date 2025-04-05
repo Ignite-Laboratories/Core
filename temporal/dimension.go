@@ -39,6 +39,30 @@ type Dimension[TValue any, TCache any] struct {
 	lastCycle time.Time
 }
 
+// GetPastValue retrieves the value of a specific moment in time from the timeline.
+func (d *Dimension[TValue, TCache]) GetPastValue(moment time.Time) *std.Data[TValue] {
+	d.Mutex.Lock()
+	defer d.Mutex.Unlock()
+	for _, v := range d.Timeline {
+		if v.Moment == moment {
+			return &v
+		}
+	}
+	return nil
+}
+
+// GetBeatValue retrieves the value of a specific beat from the timeline.
+func (d *Dimension[TValue, TCache]) GetBeatValue(beat int) *std.Data[TValue] {
+	d.Mutex.Lock()
+	defer d.Mutex.Unlock()
+	for _, v := range d.Timeline {
+		if v.Beat == beat {
+			return &v
+		}
+	}
+	return nil
+}
+
 // Trim removes anything on the timeline that is older than the dimension's window of observance.
 func (d *Dimension[TValue, TCache]) Trim(ctx core.Context) {
 	d.Mutex.Lock()

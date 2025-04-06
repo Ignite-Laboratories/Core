@@ -52,6 +52,8 @@ func Shutdown(period time.Duration) {
 // ShutdownNow immediately sets Alive to false.
 func ShutdownNow() {
 	Alive = false
+	// Give the threads a brief moment to clean themselves up.
+	time.Sleep(time.Millisecond * 500)
 }
 
 // WhileAlive can be used to hold a main function open.

@@ -13,11 +13,17 @@ type Neuron struct {
 	// Action is what this neuron does.
 	Action Action
 
+	// Destroyed indicates if this neuron has been destroyed and can be used to make cleanup decisions.
+	Destroyed bool
+
 	// Potential must return true when called for activation to occur.
 	Potential Potential
 
 	// Last provides temporal runtime information for the last activation.
 	Last Runtime
+
+	// ActivationCount provides the number of times this neuron has been activated.
+	ActivationCount uint64
 
 	engine *Engine
 }
@@ -31,5 +37,6 @@ func (n *Neuron) Trigger(async bool) {
 
 // Destroy removes this neuron from the engine entirely.
 func (n *Neuron) Destroy() {
-	n.engine.Remove(n.ID)
+	n.Destroyed = true
+	n.engine.remove(n.ID)
 }

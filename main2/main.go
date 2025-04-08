@@ -16,8 +16,8 @@ func main() {
 	core.Impulse.Spark()
 }
 
-func Velocity(ctx core.Context, old std.Data[std.XY[int]], current std.Data[std.XY[int]]) {
-	delta := current.Point.X - old.Point.X
+func Velocity(ctx core.Context, old std.Data[std.MouseState], current std.Data[std.MouseState]) {
+	delta := current.Point.Position.X - old.Point.Position.X
 	deltaAbs := math.Abs(float64(delta))
 	if deltaAbs > 100 {
 		fmt.Println("Slow down!")

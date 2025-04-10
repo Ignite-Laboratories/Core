@@ -18,24 +18,23 @@ import "sync"
 //	std.SynchroEngage(bridge, func(data) { ... })
 type Synchro[T any] struct {
 	sync.WaitGroup
-	Data *T
+	Action func()
 }
 
 // SynchroSend sends the provided data over the bridge and waits for a result.
-func SynchroSend[T any](bridge chan *Synchro[T], message *T) *T {
-	synchro := &Synchro[T]{Data: message}
+func SynchroSend[T any](bridge chan *Synchro[T], action func()) {
+	synchro := &Synchro[T]{Action: action}
 	synchro.Add(1)
 	bridge <- synchro
 	synchro.Wait()
-	return synchro.Data
 }
 
-// SynchroEngage bridges the action against the provided channel and then calls Done() on the Synchro.
-func SynchroEngage[T any](bridge chan *Synchro[T], action func(*T)) {
+// SynchroEngage handles incoming messages on the provided channel and then calls Done() on the Synchro.
+func SynchroEngage[T any](bridge chan *Synchro[T]) {
 	for {
 		select {
 		case synchro := <-bridge:
-			action(synchro.Data)
+			synchro.Action()
 			synchro.Done()
 		default:
 			return

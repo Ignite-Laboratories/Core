@@ -16,21 +16,21 @@ import "sync"
 // To process data using a synchro, use:
 //
 //	std.SynchroEngage(bridge, func(data) { ... })
-type Synchro[T any] struct {
+type Synchro struct {
 	sync.WaitGroup
 	Action func()
 }
 
 // SynchroSend sends the provided data over the bridge and waits for a result.
-func SynchroSend[T any](bridge chan *Synchro[T], action func()) {
-	synchro := &Synchro[T]{Action: action}
+func SynchroSend(bridge chan *Synchro, action func()) {
+	synchro := &Synchro{Action: action}
 	synchro.Add(1)
 	bridge <- synchro
 	synchro.Wait()
 }
 
 // SynchroEngage handles incoming messages on the provided channel and then calls Done() on the Synchro.
-func SynchroEngage[T any](bridge chan *Synchro[T]) {
+func SynchroEngage(bridge chan *Synchro) {
 	for {
 		select {
 		case synchro := <-bridge:

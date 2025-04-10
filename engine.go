@@ -67,7 +67,7 @@ func (e *Engine) addNeuron(n *Neuron) {
 // Stop causes the impulse engine to cease firing neural activations.
 func (e *Engine) Stop() {
 	if Verbose {
-		fmt.Printf("Stopping Impulse Engine - [%d] %v\n", e.ID, e.Name)
+		fmt.Printf("[%v] [%d] stopping %v\n", ModuleName, e.ID, e.Name)
 	}
 	e.Active = false
 	if e.OnStop != nil {
@@ -228,7 +228,7 @@ func (e *Engine) Spark() {
 	e.Active = true
 
 	if Verbose {
-		fmt.Printf("Sparking Impulse Engine - [%d] %v\n", e.ID, e.Name)
+		fmt.Printf("[%v] [%d] sparking %v\n", ModuleName, e.ID, e.Name)
 	}
 
 	// Set up a wait group for blocking operations
@@ -321,7 +321,7 @@ func (e *Engine) fire(start time.Time, ctx Context, neuron *Neuron, wg *sync.Wai
 			// Mark it as not executing and log the issue
 			neuron.executing = false
 			neuron.Last.End = time.Now()
-			log.Printf("[%d] Neural panic ", neuron.ID)
+			log.Printf("[%v] [%d] Neural panic ", ModuleName, neuron.ID)
 		}
 	}()
 

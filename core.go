@@ -13,7 +13,7 @@ func init() {
 	fmt.Println("Ignite Laboratories")
 	fmt.Println("-------------------")
 
-	Impulse.Name = "Core Impulse Engine"
+	Impulse.Name = "core impulse engine"
 	Verbose = true
 }
 

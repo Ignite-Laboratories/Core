@@ -13,7 +13,7 @@ import "sync"
 //
 //	msg = std.SynchroSend(bridge, message)
 //
-// To process data using a synchro bridge, use:
+// To process data using a synchro, use:
 //
 //	std.SynchroEngage(bridge, func(data) { ... })
 type Synchro[T any] struct {

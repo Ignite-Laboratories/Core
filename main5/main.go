@@ -2,39 +2,38 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"time"
 
-	"github.com/veandco/go-sdl2/sdl"
+	"github.com/jezek/xgb"
+	"github.com/jezek/xgb/xproto"
 )
 
 func main() {
-	// Initialize SDL2
-	if err := sdl.Init(sdl.INIT_VIDEO); err != nil {
-		panic(fmt.Errorf("failed to initialize SDL: %v", err))
+	// Connect to the X server
+	conn, err := xgb.NewConn()
+	if err != nil {
+		log.Fatalf("Failed to connect to X server: %v", err)
 	}
-	defer sdl.Quit()
+	defer conn.Close()
 
-	// Infinite loop to show global mouse position
-	running := true
-	for running {
-		// Event polling to make sure SDL updates its internal state
-		for event := sdl.PollEvent(); event != nil; event = sdl.PollEvent() {
-			switch ev := event.(type) {
-			case *sdl.QuitEvent:
-				// Exit loop on quit event
-				fmt.Println("Quit event received!")
-				running = false
-			default:
-				// Polling other events, if necessary (none in this example)
-				_ = ev
-			}
+	// Get the root window of the default screen
+	setup := xproto.Setup(conn)
+	root := setup.DefaultScreen(conn).Root
+
+	// Infinite loop to track the mouse position
+	for {
+		// Query the pointer to get global mouse position
+		reply, err := xproto.QueryPointer(conn, root).Reply()
+		if err != nil {
+			log.Printf("Failed to query pointer: %v", err)
+			continue
 		}
 
-		// Get global mouse state
-		x, y, _ := sdl.GetGlobalMouseState()
-		fmt.Printf("Global Mouse Position: X=%d, Y=%d\n", x, y)
+		// Print the global mouse position
+		fmt.Printf("Global Mouse Position: X=%d, Y=%d\n", reply.RootX, reply.RootY)
 
-		// Sleep briefly to not flood output
+		// Sleep briefly to avoid flooding the terminal
 		time.Sleep(500 * time.Millisecond)
 	}
 }

@@ -18,12 +18,12 @@ import "sync"
 //	std.SynchroEngage(bridge, func(data) { ... })
 type Synchro struct {
 	sync.WaitGroup
-	Action func()
+	action func()
 }
 
 // SynchroSend sends the provided data over the bridge and waits for a result.
 func SynchroSend(bridge chan *Synchro, action func()) {
-	synchro := &Synchro{Action: action}
+	synchro := &Synchro{action: action}
 	synchro.Add(1)
 	bridge <- synchro
 	synchro.Wait()
@@ -34,7 +34,7 @@ func SynchroEngage(bridge chan *Synchro) {
 	for {
 		select {
 		case synchro := <-bridge:
-			synchro.Action()
+			synchro.action()
 			synchro.Done()
 		default:
 			return

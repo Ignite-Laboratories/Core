@@ -2,40 +2,45 @@ package std
 
 import "sync"
 
-// Synchro represents a way to synchronize data between two threads.
+// Synchro represents a way to synchronize execution across threads.
 //
-// The mechanic is simple - one thread creates a contextual "packet" of data to send to another thread
-// over a channel.  The other thread should handle messages on that channel and manipulate the packet
-// as desired.  The channel acts as a "bridge" between two spinning threads that need periodic
-// synchronization.
+// To send execution using a synchro, first create one using make.  Then Engage the synchro
+// in "main loop" of the thread you wish to execute on.  The calling thread can Send the
+// desired action to the other loop for execution.
 //
-// To send data using a synchro, use:
+//	 global -
+//		 var synchro = make(std.Synchro)
 //
-//	msg = std.SynchroSend(bridge, message)
+//	 main loop -
+//	  for {
+//		  synchro.Engage()
+//	   ...
+//	  }
 //
-// To process data using a synchro, use:
-//
-//	std.SynchroEngage(bridge, func(data) { ... })
-type Synchro struct {
+//	 sender -
+//		 synchro.Send(func() { ... })
+type Synchro chan *syncAction
+
+type syncAction struct {
 	sync.WaitGroup
 	action func()
 }
 
-// SynchroSend sends the provided data over the bridge and waits for a result.
-func SynchroSend(bridge chan *Synchro, action func()) {
-	synchro := &Synchro{action: action}
-	synchro.Add(1)
-	bridge <- synchro
-	synchro.Wait()
+// Send sends the provided action over the synchro channel and waits for it to be executed.
+func (s Synchro) Send(action func()) {
+	syn := &syncAction{action: action}
+	syn.Add(1)
+	s <- syn
+	syn.Wait()
 }
 
-// SynchroEngage handles incoming messages on the provided channel and then calls Done() on the Synchro.
-func SynchroEngage(bridge chan *Synchro) {
+// Engage handles incoming immediate messages on the Synchro channel before returning control.
+func (s Synchro) Engage() {
 	for {
 		select {
-		case synchro := <-bridge:
-			synchro.action()
-			synchro.Done()
+		case syn := <-s:
+			syn.action()
+			syn.Done()
 		default:
 			return
 		}

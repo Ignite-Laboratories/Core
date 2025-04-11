@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/veandco/go-sdl2/sdl"
 	"log"
-	"time"
 )
 
 func main() {
@@ -29,11 +28,11 @@ func main() {
 	defer window.Destroy()
 	running := true
 
-	go func() {
-		fmt.Println("Exiting")
-		time.Sleep(time.Second * 10)
-		running = false
-	}()
+	//go func() {
+	//	fmt.Println("Exiting")
+	//	time.Sleep(time.Second * 10)
+	//	running = false
+	//}()
 
 	// Run the event loop to display the window and check for inputs
 	for running {

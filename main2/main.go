@@ -21,7 +21,7 @@ func main() {
 }
 
 func Render(ctx core.Context) {
-	gl.ClearColor(0.0, 0.0, 0.0, 0.0) // RGB color
+	gl.ClearColor(1.0, 0.0, 0.0, 1.0) // RGB color
 	gl.Clear(gl.COLOR_BUFFER_BIT)
 }
 

@@ -4,10 +4,6 @@ import (
 	"fmt"
 	"github.com/veandco/go-sdl2/sdl"
 	"log"
-	"os"
-	"os/signal"
-	"syscall"
-	"time"
 )
 
 func main() {
@@ -30,36 +26,30 @@ func main() {
 		log.Fatalf("Failed to create window: %s\n", err)
 	}
 	defer window.Destroy()
-
-	// Variable to manage the running state
 	running := true
 
-	// Create a channel to listen for OS signals
-	signalChan := make(chan os.Signal, 1)
+	//go func() {
+	//	fmt.Println("Exiting")
+	//	time.Sleep(time.Second * 10)
+	//	running = false
+	//}()
 
-	// Notify the channel when a SIGINT (Ctrl+C) or SIGTERM is received
-	signal.Notify(signalChan, os.Interrupt, syscall.SIGTERM)
-
-	go func() {
-		// Wait for a signal
-		sig := <-signalChan
-		fmt.Printf("\nReceived signal: %s. Exiting...\n", sig)
-		running = false
-	}()
-
-	go func() {
-		time.Sleep(time.Second * 20)
-		fmt.Println("terminating")
-		running = false
-	}()
-
-	// Run the event loop
+	// Run the event loop to display the window and check for inputs
 	for running {
 		// Handle SDL events (e.g., window close or keyboard/mouse input)
 		for event := sdl.PollEvent(); event != nil; event = sdl.PollEvent() {
-			switch event.(type) {
-			case *sdl.QuitEvent: // Handle quit event (e.g., window close button)
+			switch e := event.(type) {
+			case *sdl.QuitEvent: // Handle quit event
 				running = false
+			case *sdl.KeyboardEvent: // Handle keyboard events
+				if e.Type == sdl.KEYDOWN { // Check for key press down
+					switch e.Keysym.Sym {
+					case sdl.K_ESCAPE: // If ESC key is pressed
+						running = false
+					default:
+						fmt.Printf("Key pressed: %s\n", sdl.GetKeyName(e.Keysym.Sym))
+					}
+				}
 			}
 		}
 
@@ -68,8 +58,8 @@ func main() {
 		fmt.Printf("Mouse position: X = %d, Y = %d\n", x, y)
 
 		// Limit the loop frequency a bit
-		sdl.Delay(16) // ~60 FPS
+		sdl.Delay(16) // ~60 fps
 	}
 
-	fmt.Println("Exiting program...")
+	fmt.Println("Exit")
 }

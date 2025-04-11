@@ -16,8 +16,8 @@ func main() {
 	// Create a full-screen window
 	window, err := sdl.CreateWindow(
 		"SDL2 Full-Screen Example",    // Window title
-		sdl.WINDOWPOS_CENTERED,        // Window position X
-		sdl.WINDOWPOS_CENTERED,        // Window position Y
+		sdl.WINDOWPOS_UNDEFINED,       // Window position X
+		sdl.WINDOWPOS_UNDEFINED,       // Window position Y
 		1920,                          // Window width (ignored in full-screen mode)
 		1080,                          // Window height (ignored in full-screen mode)
 		sdl.WINDOW_FULLSCREEN_DESKTOP, // Full-screen mode flag

@@ -31,4 +31,5 @@ func Velocity(ctx core.Context, old std.Data[std.MouseState], current std.Data[s
 	if deltaAbs > 100 {
 		fmt.Println("Slow down!")
 	}
+	fmt.Println(current.Point.Position.X)
 }

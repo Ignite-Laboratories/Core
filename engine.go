@@ -247,7 +247,6 @@ func (e *Engine) Spark() {
 		period := now.Sub(lastNow)
 
 		// Don't fire faster than the maximum operating frequency
-		fmt.Printf("%v %v\n", period, HertzToDuration(e.MaxFrequency))
 		if period < HertzToDuration(e.MaxFrequency) {
 			continue
 		}

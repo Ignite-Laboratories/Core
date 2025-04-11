@@ -2,7 +2,6 @@ package core
 
 import (
 	"fmt"
-	"math"
 	"os"
 	"sync/atomic"
 	"time"
@@ -82,7 +81,7 @@ func DurationToHertz(d time.Duration) float64 {
 func HertzToDuration(hz float64) time.Duration {
 	if hz <= 0 {
 		// No division by zero
-		hz = math.SmallestNonzeroFloat64
+		hz = 0.00000000000000000000000000000000000000001 //math.SmallestNonzeroFloat64
 	}
 	s := 1 / hz
 	ns := s * 1e9

@@ -1,27 +1,25 @@
 package main
 
 import (
-	"fmt"
-	"github.com/go-gl/gl/v3.3-core/gl"
 	"github.com/ignite-laboratories/core"
 	"github.com/ignite-laboratories/core/std"
 	"github.com/ignite-laboratories/core/temporal"
 	"github.com/ignite-laboratories/core/when"
-	"github.com/ignite-laboratories/host/hydra"
+	"github.com/ignite-laboratories/glitter/viewport"
 	"github.com/ignite-laboratories/host/mouse"
+	"time"
 )
 
+var framerate = 60.0 //hz
+var xTimeScale = std.TimeScale[int]{Duration: time.Second * 2, Height: 2560}
+
+var xCoords = temporal.Calculation(core.Impulse, when.Frequency(&mouse.SampleRate), false, SampleX)
+
 func main() {
-	temporal.Loop(core.Impulse, when.Frequency(std.HardRef(4.0).Ref), false, sample)
-	hydra.CreateFullscreenWindow(core.Impulse, "glitter", Render, when.Frequency(std.HardRef(60.0).Ref), false)
+	viewport.NewWaveform(true, when.Frequency(&framerate), "Mouse X", nil, nil, &xTimeScale, false, xCoords)
 	core.Impulse.Spark()
 }
 
-func sample(ctx core.Context) {
-	fmt.Println(mouse.Sample())
-}
-
-func Render(ctx core.Context) {
-	gl.ClearColor(1.0, 0.0, 0.0, 1.0) // RGB color
-	gl.Clear(gl.COLOR_BUFFER_BIT)
+func SampleX(ctx core.Context) int {
+	return mouse.Sample().Position.X
 }

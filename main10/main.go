@@ -10,6 +10,7 @@ import (
 
 func main() {
 	temporal.Loop(core.Impulse, when.Frequency(std.HardRef(4.0).Ref), false, sample)
+	core.Impulse.Spark()
 }
 
 func sample(ctx core.Context) {

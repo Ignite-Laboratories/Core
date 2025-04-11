@@ -170,6 +170,7 @@ func (e *Engine) Loop(action Action, potential Potential, muted bool) *Neuron {
 	n.engine = e
 	n.Action = func(ctx Context) {
 		n.executing = true
+		fmt.Println("test")
 		go func() {
 			action(ctx)
 			n.ActivationCount++

@@ -17,7 +17,7 @@ func Operator[TValue core.Numeric](engine *core.Engine, potential core.Potential
 	d := Dimension[Operation[TValue], any]{}
 	d.ID = core.NextID()
 	d.Window = core.DefaultWindow
-	d.Trimmer = engine.Loop(d.Trim, when.Always, false)
+	d.Trimmer = engine.Loop(d.Trim, when.Frequency(&core.TrimFrequency), false)
 	f := func(ctx core.Context) {
 		operation := Operation[TValue]{
 			A: *a.Current,

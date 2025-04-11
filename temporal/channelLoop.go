@@ -13,7 +13,7 @@ func ChannelLoop(engine *core.Engine, potential core.Potential, muted bool) *Dim
 	d := Dimension[core.Runtime, chan std.ChannelAction]{}
 	d.ID = core.NextID()
 	d.Window = core.DefaultWindow
-	d.Trimmer = engine.Loop(d.Trim, when.Always, false)
+	d.Trimmer = engine.Loop(d.Trim, when.Frequency(&core.TrimFrequency), false)
 	c := make(chan std.ChannelAction)
 	d.Cache = &c
 	f := func(ctx core.Context) {

@@ -31,6 +31,8 @@ var ID uint64 = NextID()
 // DefaultWindow is the default dimensional window of observance - 2 seconds.
 var DefaultWindow = 2 * time.Second
 
+var TrimFrequency = 1024.0 //hz
+
 var Verbose bool
 
 // currentId holds the last provided identifier.

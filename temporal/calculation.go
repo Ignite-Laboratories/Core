@@ -16,7 +16,7 @@ func Calculation[TValue any](engine *core.Engine, potential core.Potential, mute
 	d := Dimension[TValue, any]{}
 	d.ID = core.NextID()
 	d.Window = core.DefaultWindow
-	d.Trimmer = engine.Loop(d.Trim, when.Always, false)
+	d.Trimmer = engine.Loop(d.Trim, when.Frequency(&core.TrimFrequency), false)
 	f := func(ctx core.Context) {
 		value := calculate(ctx)
 		data := std.Data[TValue]{

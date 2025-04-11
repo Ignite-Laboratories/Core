@@ -21,7 +21,7 @@ func Integration[TSource any, TValue any, TCache any](engine *core.Engine, poten
 	d := Dimension[TValue, TCache]{}
 	d.ID = core.NextID()
 	d.Window = core.DefaultWindow
-	d.Trimmer = engine.Loop(d.Trim, when.Always, false)
+	d.Trimmer = engine.Loop(d.Trim, when.Frequency(&core.TrimFrequency), false)
 	d.lastCycle = core.Inception
 	d.Cache = new(TCache)
 

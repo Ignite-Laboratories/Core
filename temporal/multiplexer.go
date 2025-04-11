@@ -16,7 +16,7 @@ func Multiplexer[TValue core.Numeric](engine *core.Engine, potential core.Potent
 	d := Dimension[TValue, any]{}
 	d.ID = core.NextID()
 	d.Window = core.DefaultWindow
-	d.Trimmer = engine.Loop(d.Trim, when.Always, false)
+	d.Trimmer = engine.Loop(d.Trim, when.Frequency(&core.TrimFrequency), false)
 	f := func(ctx core.Context) {
 		values := make([]any, len(dimensions))
 		for i, otherD := range dimensions {

@@ -16,7 +16,7 @@ func Loop(engine *core.Engine, potential core.Potential, muted bool, target core
 	d := Dimension[core.Runtime, any]{}
 	d.ID = core.NextID()
 	d.Window = core.DefaultWindow
-	d.Trimmer = engine.Loop(d.Trim, when.Always, false)
+	d.Trimmer = engine.Loop(d.Trim, when.Frequency(&core.TrimFrequency), false)
 	f := func(ctx core.Context) {
 		data := std.Data[core.Runtime]{
 			Context: ctx,

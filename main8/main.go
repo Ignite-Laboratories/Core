@@ -28,12 +28,6 @@ func main() {
 	defer window.Destroy()
 	running := true
 
-	//go func() {
-	//	fmt.Println("Exiting")
-	//	time.Sleep(time.Second * 10)
-	//	running = false
-	//}()
-
 	// Run the event loop to display the window and check for inputs
 	for running {
 		// Handle SDL events (e.g., window close or keyboard/mouse input)

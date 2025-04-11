@@ -54,7 +54,7 @@ func Shutdown(period time.Duration) {
 func ShutdownNow() {
 	Alive = false
 	// Give the threads a brief moment to clean themselves up.
-	time.Sleep(time.Millisecond * 500)
+	time.Sleep(time.Second)
 	os.Exit(0)
 }
 

@@ -16,7 +16,6 @@ func main() {
 	temporal.Loop(core.Impulse, when.Frequency(std.HardRef(4.0).Ref), false, sample)
 	hydra.CreateFullscreenWindow(core.Impulse, "glitter", Render, when.Frequency(std.HardRef(60.0).Ref), false)
 	core.Impulse.Spark()
-	time.Sleep(time.Second)
 }
 
 func sample(ctx core.Context) {

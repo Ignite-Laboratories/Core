@@ -310,6 +310,8 @@ func (e *Engine) Spark() {
 		lastFinishTime = finishTime
 		e.Beat++
 	}
+	// Give everyone a brief moment to cleanup
+	time.Sleep(time.Millisecond * 250)
 }
 
 // fire is what activates each neuron.

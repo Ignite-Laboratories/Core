@@ -170,7 +170,6 @@ func (e *Engine) Loop(action Action, potential Potential, muted bool) *Neuron {
 	n.engine = e
 	n.Action = func(ctx Context) {
 		n.executing = true
-		fmt.Println("test")
 		go func() {
 			action(ctx)
 			n.ActivationCount++
@@ -290,6 +289,7 @@ func (e *Engine) Spark() {
 		}
 
 		// Launch the wave of neurons
+		fmt.Println(len(neurons))
 		for _, neuron := range neurons {
 			// Grab this neuron's start ASAP!
 			start := time.Now()

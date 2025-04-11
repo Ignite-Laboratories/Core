@@ -81,7 +81,7 @@ func DurationToHertz(d time.Duration) float64 {
 func HertzToDuration(hz float64) time.Duration {
 	if hz <= 0 {
 		// No division by zero
-		hz = 1e-308 //math.SmallestNonzeroFloat64
+		hz = 1e-100 //math.SmallestNonzeroFloat64
 	}
 	s := 1 / hz
 	ns := s * 1e9

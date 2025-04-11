@@ -9,7 +9,6 @@ import (
 	"github.com/ignite-laboratories/core/when"
 	"github.com/ignite-laboratories/host/hydra"
 	"github.com/ignite-laboratories/host/mouse"
-	"time"
 )
 
 func main() {

@@ -244,6 +244,7 @@ func (e *Engine) Spark() {
 		now := time.Now()
 		period := now.Sub(lastNow)
 
+		fmt.Println("here")
 		// Don't fire faster than the maximum operating frequency
 		if period < HertzToDuration(e.MaxFrequency) {
 			continue
@@ -289,7 +290,6 @@ func (e *Engine) Spark() {
 		}
 
 		// Launch the wave of neurons
-		fmt.Println(len(neurons))
 		for _, neuron := range neurons {
 			// Grab this neuron's start ASAP!
 			start := time.Now()

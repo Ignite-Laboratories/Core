@@ -9,7 +9,7 @@ import (
 func main() {
 	fmt.Println("evdev Mouse Position Example")
 
-	dev, err := evdev.Open("/dev/input/event0") // Replace "event0" with your device
+	dev, err := evdev.Open("/dev/input/event1") // Replace "event0" with your device
 	if err != nil {
 		log.Fatalf("Failed to open input device: %v", err)
 	}

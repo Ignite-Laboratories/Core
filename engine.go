@@ -3,6 +3,7 @@ package core
 import (
 	"fmt"
 	"log"
+	"math"
 	"sync"
 	"time"
 )
@@ -43,7 +44,7 @@ type Engine struct {
 func NewEngine() *Engine {
 	e := Engine{}
 	e.ID = NextID()
-	e.MaxFrequency = 0
+	e.MaxFrequency = math.MaxFloat64
 
 	// Make the neural map
 	e.neurons = make(map[uint64]*Neuron)

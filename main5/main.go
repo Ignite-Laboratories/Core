@@ -10,6 +10,8 @@ import (
 )
 
 func main() {
+	fmt.Println("X11 Mouse Position Example")
+
 	// Connect to the X server
 	conn, err := xgb.NewConn()
 	if err != nil {

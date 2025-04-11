@@ -4,6 +4,10 @@ import (
 	"fmt"
 	"github.com/veandco/go-sdl2/sdl"
 	"log"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
 )
 
 func main() {
@@ -26,20 +30,35 @@ func main() {
 		log.Fatalf("Failed to create window: %s\n", err)
 	}
 	defer window.Destroy()
+
+	// Variable to manage the running state
 	running := true
 
-	//go func() {
-	//	fmt.Println("Exiting")
-	//	time.Sleep(time.Second * 10)
-	//	running = false
-	//}()
+	// Create a channel to listen for OS signals
+	signalChan := make(chan os.Signal, 1)
 
-	// Run the event loop to display the window and check for inputs
+	// Notify the channel when a SIGINT (Ctrl+C) or SIGTERM is received
+	signal.Notify(signalChan, os.Interrupt, syscall.SIGTERM)
+
+	go func() {
+		// Wait for a signal
+		sig := <-signalChan
+		fmt.Printf("\nReceived signal: %s. Exiting...\n", sig)
+		running = false
+	}()
+
+	go func() {
+		time.Sleep(time.Second * 20)
+		fmt.Println("terminating")
+		running = false
+	}()
+
+	// Run the event loop
 	for running {
 		// Handle SDL events (e.g., window close or keyboard/mouse input)
 		for event := sdl.PollEvent(); event != nil; event = sdl.PollEvent() {
 			switch event.(type) {
-			case *sdl.QuitEvent: // Handle quit event
+			case *sdl.QuitEvent: // Handle quit event (e.g., window close button)
 				running = false
 			}
 		}
@@ -49,8 +68,8 @@ func main() {
 		fmt.Printf("Mouse position: X = %d, Y = %d\n", x, y)
 
 		// Limit the loop frequency a bit
-		sdl.Delay(16) // ~60 fps
+		sdl.Delay(16) // ~60 FPS
 	}
 
-	fmt.Println("Exit")
+	fmt.Println("Exiting program...")
 }

@@ -44,6 +44,7 @@ func NextID() uint64 {
 
 // Shutdown waits a period of time before setting Alive to false.
 func Shutdown(period time.Duration) {
+	fmt.Printf("[%v] shutting down in %v\n", ModuleName, period)
 	go func() {
 		time.Sleep(period)
 		ShutdownNow()
@@ -52,6 +53,7 @@ func Shutdown(period time.Duration) {
 
 // ShutdownNow immediately sets Alive to false.
 func ShutdownNow() {
+	fmt.Printf("[%v] shutting down\n", ModuleName)
 	Alive = false
 	// Give the threads a brief moment to clean themselves up.
 	time.Sleep(time.Second)

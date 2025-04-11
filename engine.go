@@ -245,10 +245,10 @@ func (e *Engine) Spark() {
 		period := now.Sub(lastNow)
 
 		// Don't fire faster than the maximum operating frequency
+		fmt.Println(period)
 		if period < HertzToDuration(e.MaxFrequency) {
 			continue
 		}
-		fmt.Println("hereasdf")
 
 		// Get the current impulse wave of neurons
 		e.mutex.Lock()

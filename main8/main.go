@@ -48,7 +48,7 @@ func main() {
 		}
 
 		// Query and print the mouse position
-		x, y, _ := sdl.GetMouseState()
+		x, y, _ := sdl.GetGlobalMouseState()
 		fmt.Printf("Mouse position: X = %d, Y = %d\n", x, y)
 
 		// Limit the loop frequency a bit

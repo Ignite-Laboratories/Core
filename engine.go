@@ -44,7 +44,7 @@ type Engine struct {
 func NewEngine() *Engine {
 	e := Engine{}
 	e.ID = NextID()
-	e.MaxFrequency = math.MaxFloat64
+	e.MaxFrequency = 1000000000000000000000
 
 	// Make the neural map
 	e.neurons = make(map[uint64]*Neuron)

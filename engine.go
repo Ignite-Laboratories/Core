@@ -43,6 +43,7 @@ type Engine struct {
 func NewEngine() *Engine {
 	e := Engine{}
 	e.ID = NextID()
+	e.MaxFrequency = -1
 
 	// Make the neural map
 	e.neurons = make(map[uint64]*Neuron)
@@ -245,7 +246,6 @@ func (e *Engine) Spark() {
 		period := now.Sub(lastNow)
 
 		// Don't fire faster than the maximum operating frequency
-		fmt.Printf("%v %v\n", period, HertzToDuration(e.MaxFrequency))
 		if period < HertzToDuration(e.MaxFrequency) {
 			continue
 		}

@@ -42,21 +42,25 @@ func NextID() uint64 {
 }
 
 // Shutdown waits a period of time before setting Alive to false.
-func Shutdown(period time.Duration) {
-	fmt.Printf("[%v] shutting down in %v\n", ModuleName, period)
+func Shutdown(period time.Duration, exitCode ...int) {
+	Printf(ModuleName, "shutting down in %v\n", period)
 	go func() {
 		time.Sleep(period)
-		ShutdownNow()
+		ShutdownNow(exitCode...)
 	}()
 }
 
 // ShutdownNow immediately sets Alive to false.
-func ShutdownNow() {
-	fmt.Printf("[%v] shutting down\n", ModuleName)
+func ShutdownNow(exitCode ...int) {
+	Printf(ModuleName, "shutting down\n")
 	Alive = false
 	// Give the threads a brief moment to clean themselves up.
 	time.Sleep(time.Second)
-	os.Exit(0)
+	if len(exitCode) > 0 {
+		os.Exit(exitCode[0])
+	} else {
+		os.Exit(0)
+	}
 }
 
 // WhileAlive can be used to hold a main function open.
@@ -86,4 +90,22 @@ func HertzToDuration(hz float64) time.Duration {
 	s := 1 / hz
 	ns := s * 1e9
 	return time.Duration(ns)
+}
+
+// Verbosef prepends the provided data with a module identifier and then prints it to the console, but only if core.Verbose is true.
+func Verbosef(module string, format string, a ...any) {
+	if Verbose {
+		fmt.Printf("[%v] %v", module, fmt.Sprintf(format, a...))
+	}
+}
+
+// Printf prepends the provided data with a module identifier and then prints it to the console.
+func Printf(module string, format string, a ...any) {
+	fmt.Printf("[%v] %v", module, fmt.Sprintf(format, a...))
+}
+
+// Fatalf prepends the provided data with a module identifier, prints it to the console, and then calls core.ShutdownNow(1)
+func Fatalf(module string, format string, a ...any) {
+	fmt.Printf("[%v] %v", module, fmt.Sprintf(format, a...))
+	ShutdownNow(1)
 }

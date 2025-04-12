@@ -1,4 +1,3 @@
-// Package constraints provides a singular point for referencing 'Numeric' types of both Integer and Float.
 package core
 
 import (

@@ -15,12 +15,12 @@ import (
 func Loop(engine *core.Engine, potential core.Potential, muted bool, target core.Action) *Dimension[core.Runtime, any] {
 	d := Dimension[core.Runtime, any]{}
 	d.ID = core.NextID()
-	d.Window = core.DefaultWindow
+	d.Window = core.DefaultObservanceWindow
 	d.Trimmer = engine.Loop(d.Trim, when.Frequency(&core.TrimFrequency), false)
 	f := func(ctx core.Context) {
 		data := std.Data[core.Runtime]{
 			Context: ctx,
-			Point:   d.Stimulator.Last,
+			Point:   d.Stimulator.LastActivation,
 		}
 		target(ctx)
 		d.Mutex.Lock()

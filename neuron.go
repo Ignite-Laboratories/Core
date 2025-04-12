@@ -4,31 +4,32 @@ package core
 type Neuron struct {
 	Entity
 
-	// executing indicates if the neuron is currently active.
-	executing bool
-
-	// Muted indicates if the neuron has been explicitly suppressed from activation.
+	// Muted can be used to explicitly suppress neural activation.
 	Muted bool
 
-	// Action is what this neuron does.
+	// Action is what the engine calls whenever the Potential returns true.
 	Action Action
 
 	// Destroyed indicates if this neuron has been destroyed and can be used to make cleanup decisions.
-	Destroyed bool
+	//
+	// To destroy a neuron, please use its Destroy() method.
+	Destroyed ReadOnlyBool
 
 	// Potential must return true when called for activation to occur.
 	Potential Potential
 
-	// Last provides temporal runtime information for the last activation.
-	Last Runtime
+	// LastActivation provides temporal runtime information for the last activation.
+	LastActivation Runtime
 
 	// ActivationCount provides the number of times this neuron has been activated.
 	ActivationCount uint64
 
-	engine *Engine
+	destroyed bool
+	executing bool
+	engine    *Engine
 }
 
-// Trigger fires the provided action one time, if the potential returns true.
+// Trigger fires the neural action once, if the potential returns true.
 //
 // If 'async' is true, the action is called asynchronously - otherwise, it blocks the firing impulse.
 func (n *Neuron) Trigger(async bool) {
@@ -37,6 +38,6 @@ func (n *Neuron) Trigger(async bool) {
 
 // Destroy removes this neuron from the engine entirely.
 func (n *Neuron) Destroy() {
-	n.Destroyed = true
+	n.destroyed = true
 	n.engine.remove(n.ID)
 }

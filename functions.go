@@ -7,6 +7,8 @@ type Action func(ctx Context)
 type Potential func(ctx Context) bool
 
 // alwaysFire provides a potential that always returns true.
+//
+// NOTE: This is a helper for the core package - use when.Always() outside of this package.
 func alwaysFire(ctx Context) bool {
 	// This is here because `core` cannot cyclically reference `when`
 	return true

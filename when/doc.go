@@ -1,2 +1,2 @@
-// Package when provides a set of helper functions for creating conditional potentials
+// Package when provides a set of helper functions for creating potentials.
 package when

@@ -4,7 +4,7 @@ import (
 	"time"
 )
 
-// Context represents contextually relevant temporal information.
+// Context provides relevant temporal information which can be associated with data.
 type Context struct {
 	Entity
 

@@ -22,7 +22,7 @@ type Blending[TValue core.Numeric] struct {
 func Blender[TValue core.Numeric](engine *core.Engine, potential core.Potential, muted bool, blend Operate[TValue], a *Dimension[TValue, any], b *Dimension[TValue, any]) *Dimension[Blending[TValue], any] {
 	d := Dimension[Blending[TValue], any]{}
 	d.ID = core.NextID()
-	d.Window = core.DefaultWindow
+	d.Window = core.DefaultObservanceWindow
 	d.Trimmer = engine.Loop(d.Trim, when.Frequency(&core.TrimFrequency), false)
 	f := func(ctx core.Context) {
 		mux := Blending[TValue]{

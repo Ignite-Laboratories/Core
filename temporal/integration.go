@@ -20,7 +20,7 @@ import (
 func Integration[TSource any, TValue any, TCache any](engine *core.Engine, potential core.Potential, muted bool, impulsive bool, integrate Integral[std.Data[TSource], TValue, TCache], target *Dimension[TSource, any]) *Dimension[TValue, TCache] {
 	d := Dimension[TValue, TCache]{}
 	d.ID = core.NextID()
-	d.Window = core.DefaultWindow
+	d.Window = core.DefaultObservanceWindow
 	d.Trimmer = engine.Loop(d.Trim, when.Frequency(&core.TrimFrequency), false)
 	d.lastCycle = core.Inception
 	d.Cache = new(TCache)

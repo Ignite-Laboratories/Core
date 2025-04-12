@@ -12,7 +12,7 @@ func init() {
 	fmt.Println("Ignite Laboratories")
 	fmt.Println("-------------------")
 
-	Impulse.Name = "core impulse engine"
+	Impulse.Name = "Eve"
 	Verbose = true
 }
 
@@ -28,11 +28,13 @@ var Impulse = NewEngine()
 // ID is the operating system identifier - it defaults to 1.
 var ID uint64 = NextID()
 
-// DefaultWindow is the default dimensional window of observance - 2 seconds.
-var DefaultWindow = 2 * time.Second
+// DefaultObservanceWindow is the default dimensional window of observance - 2 seconds.
+var DefaultObservanceWindow = 2 * time.Second
 
+// TrimFrequency sets the global frequency for dimensional trimmers.
 var TrimFrequency = 1024.0 //hz
 
+// Verbose sets whether the system should emit more verbose logs or not.
 var Verbose bool
 
 // currentId holds the last provided identifier.
@@ -44,6 +46,8 @@ func NextID() uint64 {
 }
 
 // Shutdown waits a period of time before setting Alive to false.
+//
+// You may optionally provide an OS exit code, otherwise '0' is implied.
 func Shutdown(period time.Duration, exitCode ...int) {
 	Printf(ModuleName, "shutting down in %v\n", period)
 	go func() {
@@ -53,6 +57,8 @@ func Shutdown(period time.Duration, exitCode ...int) {
 }
 
 // ShutdownNow immediately sets Alive to false.
+//
+// You may optionally provide an OS exit code, otherwise '0' is implied.
 func ShutdownNow(exitCode ...int) {
 	Printf(ModuleName, "shutting down\n")
 	Alive = false
@@ -65,7 +71,7 @@ func ShutdownNow(exitCode ...int) {
 	}
 }
 
-// WhileAlive can be used to hold a main function open.
+// WhileAlive can be used to efficiently hold a main function open.
 func WhileAlive() {
 	for Alive {
 		// Give the host some breathing room.
@@ -87,27 +93,33 @@ func DurationToHertz(d time.Duration) float64 {
 func HertzToDuration(hz float64) time.Duration {
 	if hz <= 0 {
 		// No division by zero
-		hz = 1e-100 //math.SmallestNonzeroFloat64
+		hz = 1e-100 // math.SmallestNonzeroFloat64 <- NOTE: Raspberry Pi doesn't handle this constant well
 	}
 	s := 1 / hz
 	ns := s * 1e9
 	return time.Duration(ns)
 }
 
-// Verbosef prepends the provided data with a module identifier and then prints it to the console, but only if core.Verbose is true.
+// Verbosef prepends the provided string format with a module identifier and then prints it to the console, but only if core.Verbose is true.
 func Verbosef(module string, format string, a ...any) {
 	if Verbose {
 		fmt.Printf("[%v] %v", module, fmt.Sprintf(format, a...))
 	}
 }
 
-// Printf prepends the provided data with a module identifier and then prints it to the console.
+// Printf prepends the provided string format with a module identifier and then prints it to the console.
 func Printf(module string, format string, a ...any) {
 	fmt.Printf("[%v] %v", module, fmt.Sprintf(format, a...))
 }
 
-// Fatalf prepends the provided data with a module identifier, prints it to the console, and then calls core.ShutdownNow(1)
+// Fatalf prepends the provided string format with a module identifier, prints it to the console, and then calls core.ShutdownNow(1).
 func Fatalf(module string, format string, a ...any) {
 	fmt.Printf("[%v] %v", module, fmt.Sprintf(format, a...))
 	ShutdownNow(1)
+}
+
+// FatalfCode prepends the provided string format with a module identifier, prints it to the console, and then calls core.ShutdownNow(exitCode).
+func FatalfCode(exitCode int, module string, format string, a ...any) {
+	fmt.Printf("[%v] %v", module, fmt.Sprintf(format, a...))
+	ShutdownNow(exitCode)
 }

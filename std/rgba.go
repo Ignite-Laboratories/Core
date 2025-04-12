@@ -5,11 +5,18 @@ import (
 	"golang.org/x/exp/rand"
 )
 
-// RGBA is a general structure for holding color values.
+// RGBA is a structure for holding color values.
 type RGBA struct {
+	// R is the red channel.
 	R float32
+
+	// G is the green channel.
 	G float32
+
+	// B is the blue channel.
 	B float32
+
+	// A is the alpha channel.
 	A float32
 }
 
@@ -33,6 +40,17 @@ func RandomRGBA() RGBA {
 	}
 }
 
+// SplitRGBA quickly provides the R G B A values as individual variables.
+func (c RGBA) SplitRGBA() (r, g, b, a float32) {
+	return c.R, c.G, c.B, c.A
+}
+
+// SplitRGB quickly provides the R G B values as individual variables.
+func (c RGBA) SplitRGB() (r, g, b float32) {
+	return c.R, c.G, c.B
+}
+
+// Comparator returns if the two RGBA values are equal in values.
 func Comparator(a RGBA, b RGBA) bool {
 	return a.R == b.R && a.G == b.G && a.B == b.B && a.A == b.A
 }

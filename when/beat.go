@@ -6,7 +6,7 @@ import (
 
 type beat struct{}
 
-// Beat provides a set of helper functions for creating beat oriented potentials.
+// Beat provides a set of helper functions for creating beat-oriented potentials.
 var Beat beat = beat{}
 
 // Downbeat provides a potential that fires when the beat is 0.
@@ -26,7 +26,7 @@ func (b beat) Odd(ctx core.Context) bool {
 
 // Modulo provides the following potential:
 //
-//	beat % value == 0
+//	ctx.Beat % value == 0
 func (b beat) Modulo(value *int) core.Potential {
 	return func(ctx core.Context) bool {
 		return ctx.Beat%*value == 0
@@ -35,7 +35,7 @@ func (b beat) Modulo(value *int) core.Potential {
 
 // Over provides the following potential:
 //
-//	beat > value
+//	ctx.Beat > value
 func (b beat) Over(value *int) core.Potential {
 	return func(ctx core.Context) bool {
 		return ctx.Beat > *value
@@ -44,7 +44,7 @@ func (b beat) Over(value *int) core.Potential {
 
 // On provides the following potential:
 //
-//	beat == value
+//	ctx.Beat == value
 func (b beat) On(beat *int) core.Potential {
 	return func(ctx core.Context) bool {
 		return ctx.Beat == *beat
@@ -53,7 +53,7 @@ func (b beat) On(beat *int) core.Potential {
 
 // Under provides the following potential:
 //
-//	beat < value
+//	ctx.Beat < value
 func (b beat) Under(value *int) core.Potential {
 	return func(ctx core.Context) bool {
 		return ctx.Beat < *value

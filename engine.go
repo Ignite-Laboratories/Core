@@ -318,29 +318,29 @@ func (e *Engine) fire(start time.Time, ctx Context, neuron *Neuron, wg *sync.Wai
 		if r := recover(); r != nil {
 			// Mark it as not executing and log the issue
 			neuron.executing = false
-			neuron.Last.End = time.Now()
+			neuron.LastActivation.End = time.Now()
 			Printf(ModuleName, "[%d] Neural panic ", neuron.ID)
 		}
 	}()
 
 	// Test the potential first
-	ctx.LastActivation = neuron.Last
+	ctx.LastActivation = neuron.LastActivation
 	if !neuron.Potential(ctx) {
 		return
 	}
 
 	// Calculate the refractory period
-	neuron.Last.RefractoryPeriod = start.Sub(neuron.Last.End)
+	neuron.LastActivation.RefractoryPeriod = start.Sub(neuron.LastActivation.End)
 
 	// Save off the runtime info
-	ctx.LastActivation = neuron.Last
+	ctx.LastActivation = neuron.LastActivation
 
 	// Fire the neuron
 	neuron.Action(ctx)
 	end := time.Now()
 
 	// Update the runtime info
-	neuron.Last.Inception = ctx.Moment
-	neuron.Last.Start = start
-	neuron.Last.End = end
+	neuron.LastActivation.Inception = ctx.Moment
+	neuron.LastActivation.Start = start
+	neuron.LastActivation.End = end
 }

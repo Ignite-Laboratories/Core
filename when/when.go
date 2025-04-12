@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-// Frequency provides a potential that activates at the specified frequency (Hertz).
+// Frequency provides a potential that activates at the specified frequency (in Hertz).
 func Frequency(hertz *float64) core.Potential {
 	return func(ctx core.Context) bool {
 		d := core.HertzToDuration(*hertz)
@@ -13,7 +13,7 @@ func Frequency(hertz *float64) core.Potential {
 	}
 }
 
-// Resonant provides a potential that activates at a sympathetic frequency (Hertz) to the provided source.
+// Resonant provides a potential that activates at a sympathetic frequency (in Hertz) to the source frequency.
 //
 //	Resonance = Source / Subdivision
 func Resonant(source *float64, subdivision *float64) core.Potential {
@@ -26,20 +26,20 @@ func Resonant(source *float64, subdivision *float64) core.Potential {
 
 // HalfSpeed provides a potential that activates at half the rate of the source frequency (Hertz).
 func HalfSpeed(hertz *float64) core.Potential {
-	half := 2.0
-	return Resonant(hertz, &half)
+	subdivision := 2.0
+	return Resonant(hertz, &subdivision)
 }
 
-// QuarterSpeed provides a potential that activates at half the rate of the source frequency (Hertz).
+// QuarterSpeed provides a potential that activates at a quarter the rate of the source frequency (Hertz).
 func QuarterSpeed(hertz *float64) core.Potential {
-	half := 4.0
-	return Resonant(hertz, &half)
+	subdivision := 4.0
+	return Resonant(hertz, &subdivision)
 }
 
-// EighthSpeed provides a potential that activates at half the rate of the source frequency (Hertz).
+// EighthSpeed provides a potential that activates at an eighth the rate of the source frequency (Hertz).
 func EighthSpeed(hertz *float64) core.Potential {
-	half := 8.0
-	return Resonant(hertz, &half)
+	subdivision := 8.0
+	return Resonant(hertz, &subdivision)
 }
 
 // Duration provides the following potential:
@@ -53,7 +53,7 @@ func Duration(duration *time.Duration) core.Potential {
 
 // Pace provides a potential that counts to the provided value before returning true.
 //
-// NOTE: This is a impulse slowing operation!
+// NOTE: This kind of potential is an impulse slowing operation, regardless of neural synchronicity!
 func Pace(value *uint64) core.Potential {
 	return func(ctx core.Context) bool {
 		for i := uint64(0); i < *value; i++ {
@@ -62,12 +62,19 @@ func Pace(value *uint64) core.Potential {
 	}
 }
 
-// Always provides a potential that always fires.
+// Always provides a potential that always returns true.
 func Always(ctx core.Context) bool {
 	return true
 }
 
-// Never provides a potential that never fires.
+// Never provides a potential that never returns true.
 func Never() bool {
 	return false
+}
+
+// High provides a potential that dereferences the provided boolean on demand.
+func High(value *bool) core.Potential {
+	return func(ctx core.Context) bool {
+		return *value
+	}
 }

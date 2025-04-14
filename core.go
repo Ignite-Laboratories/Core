@@ -32,6 +32,7 @@ func getModuleVersion(module string) string {
 	return "unknown"
 }
 
+// ModuleReport reports the version information of a module to the console.
 func ModuleReport(module string) {
 	fmt.Printf(" - [%v] initialized - %v\n", module, getModuleVersion(module))
 }

@@ -11,7 +11,7 @@ import (
 func init() {
 	//mouse.Coordinates.Unmute()
 	//temporal.Analyzer[std.XY[int], any, any](core.Impulse, when.EighthSpeed(&mouse.SampleRate), false, Print, mouse.Coordinates)
-	mouse.Reaction(core.Impulse, std.HardRef(2048.0).Ref, Velocity)
+	mouse.Reaction(core.Impulse, std.Ref(2048.0), Velocity)
 	mouse.Reaction(core.Impulse, &mouse.SampleRate, Feedback)
 }
 

@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-var stim = core.Impulse.Loop(Stimulate, when.Frequency(std.HardRef(16.0).Ref), true)
+var stim = core.Impulse.Loop(Stimulate, when.Frequency(std.Ref(16.0)), true)
 
 // Make it so
 func init() {
@@ -18,7 +18,7 @@ func init() {
 
 func main() {
 	// Mute/Unmute the stimulation every three seconds
-	core.Impulse.Loop(Toggle, when.Frequency(std.HardRef(0.5).Ref), false)
+	core.Impulse.Loop(Toggle, when.Frequency(std.Ref(0.5)), false)
 
 	// Trim down the resistance cyclically
 	core.Impulse.Loop(AdjustFrequency, when.Always, false)

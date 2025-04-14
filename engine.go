@@ -8,7 +8,7 @@ import (
 
 // Engine is a neural impulse driver.
 type Engine struct {
-	Entity
+	NamedEntity
 
 	// Active indicates if the engine is currently firing activations or not.
 	Active bool
@@ -67,6 +67,7 @@ func (e *Engine) addNeuron(n *Neuron) {
 // Stop causes the impulse engine to cease firing neural activations.
 func (e *Engine) Stop() {
 	Verbosef(ModuleName, "[%d] stopping %v\n", e.ID, e.Name)
+
 	e.Active = false
 	if e.OnStop != nil {
 		e.OnStop()
@@ -225,7 +226,7 @@ func (e *Engine) Spark() {
 	}
 	e.Active = true
 
-	Verbosef(ModuleName, "[%d] sparking %v\n", e.ID, e.Name)
+	Verbosef(ModuleName, "[%d] sparking impulse engine: %v\n", e.ID, e.GivenName)
 
 	// Set up a wait group for blocking operations
 	var wg sync.WaitGroup

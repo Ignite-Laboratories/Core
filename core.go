@@ -12,8 +12,10 @@ func init() {
 	fmt.Println("Ignite Laboratories")
 	fmt.Println("-------------------")
 
-	Impulse.Name = "Eve"
 	Verbose = true
+
+	initializeNameDB()
+	Impulse.GivenName = RandomName()
 }
 
 // Alive globally keeps neural activity firing until set to false - it's true by default.

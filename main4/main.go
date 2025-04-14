@@ -10,7 +10,7 @@ import (
 
 func main() {
 	var incrementer = temporal.Calculation(core.Impulse, when.Always, false, increment)
-	temporal.Integration(core.Impulse, when.Frequency(std.HardRef(1.0).Ref), false, false, printTimeline, incrementer)
+	temporal.Integration(core.Impulse, when.Frequency(std.Ref(1.0)), false, false, printTimeline, incrementer)
 	core.Impulse.MaxFrequency = 4
 	core.Impulse.Spark()
 }

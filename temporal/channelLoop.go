@@ -11,7 +11,7 @@ import (
 // You must read these messages and handle them for the activation to complete.
 func ChannelLoop(engine *core.Engine, potential core.Potential, muted bool) *Dimension[core.Runtime, chan std.ChannelAction] {
 	d := Dimension[core.Runtime, chan std.ChannelAction]{}
-	d.ID = core.NextID()
+	d.NamedEntity = core.NewNamedEntity()
 	d.Window = core.DefaultObservanceWindow
 	d.Trimmer = engine.Loop(d.Trim, when.Frequency(&core.TrimFrequency), false)
 	c := make(chan std.ChannelAction)

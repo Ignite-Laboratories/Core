@@ -19,7 +19,7 @@ import (
 // If it activates impulsively this will ensure the results are placed accurately on the timeline.
 func Integration[TSource any, TValue any, TCache any](engine *core.Engine, potential core.Potential, muted bool, impulsive bool, integrate Integral[std.Data[TSource], TValue, TCache], target *Dimension[TSource, any]) *Dimension[TValue, TCache] {
 	d := Dimension[TValue, TCache]{}
-	d.ID = core.NextID()
+	d.NamedEntity = core.NewNamedEntity()
 	d.Window = core.DefaultObservanceWindow
 	d.Trimmer = engine.Loop(d.Trim, when.Frequency(&core.TrimFrequency), false)
 	d.lastCycle = core.Inception

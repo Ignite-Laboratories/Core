@@ -14,7 +14,7 @@ import (
 // Muted indicates if the stimulator of this dimension should be created muted.
 func Observer[TValue any](engine *core.Engine, potential core.Potential, muted bool, target std.TargetFunc[TValue]) *Dimension[TValue, any] {
 	d := Dimension[TValue, any]{}
-	d.ID = core.NextID()
+	d.NamedEntity = core.NewNamedEntity()
 	d.Window = core.DefaultObservanceWindow
 	d.Trimmer = engine.Loop(d.Trim, when.Frequency(&core.TrimFrequency), false)
 	f := func(ctx core.Context) {

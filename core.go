@@ -101,6 +101,14 @@ func HertzToDuration(hz float64) time.Duration {
 	return time.Duration(ns)
 }
 
+// AbsDuration returns the absolute value of the provided duration.
+func AbsDuration(d time.Duration) time.Duration {
+	if d < 0 {
+		d = -d
+	}
+	return d
+}
+
 // Verbosef prepends the provided string format with a module identifier and then prints it to the console, but only if core.Verbose is true.
 func Verbosef(module string, format string, a ...any) {
 	if Verbose {

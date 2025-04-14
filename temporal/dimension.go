@@ -51,6 +51,25 @@ func (d *Dimension[TValue, TCache]) GetPastValue(moment time.Time) *std.Data[TVa
 	return nil
 }
 
+// GetClosestMoment retrieves the value of the closest moment in time to the provided target from the timeline,
+// as well as the relative duration between the two.  The returned duration is calculated as the timeline
+// value minus the target value.
+func (d *Dimension[TValue, TCache]) GetClosestMoment(target time.Time) (*std.Data[TValue], time.Duration) {
+	d.Mutex.Lock()
+	defer d.Mutex.Unlock()
+	var closest *std.Data[TValue]
+	closestOffset := closest.Sub(target)
+
+	for _, v := range d.Timeline {
+		offset := v.Moment.Sub(target)
+		if core.AbsDuration(offset) < core.AbsDuration(closestOffset) {
+			closest = &v
+			closestOffset = offset
+		}
+	}
+	return closest, closestOffset
+}
+
 // GetBeatValue retrieves the value of a specific beat from the timeline.
 func (d *Dimension[TValue, TCache]) GetBeatValue(beat int) *std.Data[TValue] {
 	d.Mutex.Lock()

@@ -14,7 +14,7 @@ import (
 // Muted indicates if the stimulator of this dimension should be created muted.
 func Multiplexer[TValue core.Numeric](engine *core.Engine, potential core.Potential, muted bool, blend Blend[TValue], dimensions ...*Dimension[any, any]) *Dimension[TValue, any] {
 	d := Dimension[TValue, any]{}
-	d.ID = core.NextID()
+	d.NamedEntity = core.NewNamedEntity()
 	d.Window = core.DefaultObservanceWindow
 	d.Trimmer = engine.Loop(d.Trim, when.Frequency(&core.TrimFrequency), false)
 	f := func(ctx core.Context) {

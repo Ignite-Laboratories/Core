@@ -20,8 +20,7 @@ type System struct {
 // CreateSystem creates a new structure which fires the provided action whenever the potential returns true.
 func CreateSystem(engine *Engine, action Action, potential Potential, muted bool) *System {
 	sys := &System{}
-	sys.ID = NextID()
-	sys.GivenName = RandomName()
+	sys.NamedEntity = NewNamedEntity()
 	sys.Alive = true
 	sys.Neuron = engine.Loop(func(ctx Context) {
 		if sys.Stopping {

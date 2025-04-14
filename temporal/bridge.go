@@ -19,7 +19,7 @@ import (
 // a dimension, they are not provided; however, the periodicity between activations is.
 func Bridge[TValue any](engine *core.Engine) (func(TValue), *Dimension[TValue, any]) {
 	d := Dimension[TValue, any]{}
-	d.ID = core.NextID()
+	d.NamedEntity = core.NewNamedEntity()
 	d.Window = core.DefaultObservanceWindow
 	d.Trimmer = engine.Loop(d.Trim, when.Frequency(&core.TrimFrequency), false)
 

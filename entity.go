@@ -15,7 +15,7 @@ type NamedEntity struct {
 //
 // If you'd prefer to directly name your entity, provide it as a parameter here.  Otherwise,
 // a random entry from core.Names is chosen.
-func NewNamedEntity(name ...GivenName) *NamedEntity {
+func NewNamedEntity(name ...GivenName) NamedEntity {
 	var given GivenName
 	if len(name) > 0 {
 		given = name[0]
@@ -23,7 +23,7 @@ func NewNamedEntity(name ...GivenName) *NamedEntity {
 		given = RandomName()
 	}
 
-	ne := &NamedEntity{
+	ne := NamedEntity{
 		GivenName: given,
 	}
 	ne.ID = NextID()

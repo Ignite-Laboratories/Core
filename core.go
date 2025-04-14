@@ -4,20 +4,36 @@ import (
 	"debug/buildinfo"
 	"fmt"
 	"os"
+	"strings"
 	"sync/atomic"
 	"time"
 )
 
 func init() {
 	exe, _ := os.Executable()
-	info, _ := buildinfo.ReadFile(exe)
+	exeInfo, _ = buildinfo.ReadFile(exe)
 
-	fmt.Printf("JanOS %v\n", info.Main.Version)
+	fmt.Printf("JanOS %v\n", getModuleVersion(ModuleName))
 	fmt.Println("© 2025, Ignite Laboratories")
 	fmt.Println("---------------------------")
 
 	initializeNameDB()
 	Impulse = NewEngine()
+}
+
+var exeInfo *buildinfo.BuildInfo
+
+func getModuleVersion(module string) string {
+	for _, dep := range exeInfo.Deps {
+		if strings.Contains(dep.Path, "github.com/ignite-laboratories/"+ModuleName) {
+			return dep.Version
+		}
+	}
+	return "unknown"
+}
+
+func ModuleReport(module string) {
+	fmt.Printf(" - [%v] initialized - %v\n", module, getModuleVersion(module))
 }
 
 // Alive globally keeps neural activity firing until set to false - it's true by default.

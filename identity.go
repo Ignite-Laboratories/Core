@@ -50,14 +50,14 @@ func (n GivenName) String() string {
 	}
 	if n.Origin == "" {
 		// If it has no origin defined...
-		return fmt.Sprintf("\"%v\" -", n.Name, n.Meaning)
+		return fmt.Sprintf("\"%v\" ", n.Name, n.Meaning)
 	}
 	if n.Meaning == "" {
 		// If it has no meaning defined...
 		return fmt.Sprintf("\"%v\" [%v]", n.Name, n.Origin)
 	}
 	// ...otherwise, print the full name
-	return fmt.Sprintf("\"%v\" [%v] - %v", n.Name, n.Origin, n.Meaning)
+	return fmt.Sprintf("\"%v\" [%v] %v", n.Name, n.Origin, n.Meaning)
 }
 
 func initializeNameDB() {

@@ -39,9 +39,16 @@ type Engine struct {
 }
 
 // NewEngine creates and configures a new neural impulse engine instance.
-func NewEngine() *Engine {
+//
+// You may optionally provide a name whilst creating your engine.
+func NewEngine(name ...GivenName) *Engine {
 	e := Engine{}
 	e.ID = NextID()
+	if len(name) > 0 {
+		e.GivenName = name[0]
+	} else {
+		e.GivenName = RandomName()
+	}
 	e.MaxFrequency = math.MaxFloat64
 
 	// Make the neural map
@@ -127,6 +134,7 @@ func (e *Engine) Range() []*Neuron {
 func (e *Engine) Block(action Action, potential Potential, muted bool) *Neuron {
 	var n Neuron
 	n.ID = NextID()
+	n.GivenName = RandomName()
 	n.engine = e
 	n.Action = func(ctx Context) {
 		n.executing = true
@@ -147,6 +155,7 @@ func (e *Engine) Stimulate(action Action, potential Potential, muted bool) *Neur
 	// NOTE: The trick here is that it never sets 'Executing' =)
 	var n Neuron
 	n.ID = NextID()
+	n.GivenName = RandomName()
 	n.engine = e
 	n.Action = func(ctx Context) {
 		go action(ctx)
@@ -166,6 +175,7 @@ func (e *Engine) Stimulate(action Action, potential Potential, muted bool) *Neur
 func (e *Engine) Loop(action Action, potential Potential, muted bool) *Neuron {
 	var n Neuron
 	n.ID = NextID()
+	n.GivenName = RandomName()
 	n.engine = e
 	n.Action = func(ctx Context) {
 		n.executing = true
@@ -204,6 +214,7 @@ func (e *Engine) Trigger(action Action, potential Potential, async bool) {
 	// Build the neuron
 	var n Neuron
 	n.ID = NextID()
+	n.GivenName = RandomName()
 	n.engine = e
 	n.Action = func(ctx Context) {
 		if async {

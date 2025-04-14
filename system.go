@@ -7,7 +7,7 @@ import (
 // System represents an impulsable structure.  Embed this in your structures
 // to give them their own unique main loops.
 type System struct {
-	Entity
+	NamedEntity
 	*Neuron
 
 	// Alive indicates if the system is still alive.
@@ -21,6 +21,7 @@ type System struct {
 func CreateSystem(engine *Engine, action Action, potential Potential, muted bool) *System {
 	sys := &System{}
 	sys.ID = NextID()
+	sys.GivenName = RandomName()
 	sys.Alive = true
 	sys.Neuron = engine.Loop(func(ctx Context) {
 		if sys.Stopping {

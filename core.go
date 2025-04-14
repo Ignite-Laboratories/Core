@@ -17,7 +17,7 @@ func init() {
 	fmt.Println("---------------------------")
 
 	initializeNameDB()
-	Impulse.GivenName = RandomName()
+	Impulse = NewEngine()
 }
 
 // Alive globally keeps neural activity firing until set to false - it's true by default.
@@ -27,10 +27,7 @@ var Alive = true
 var Inception = time.Now()
 
 // Impulse is the host engine.
-var Impulse = NewEngine()
-
-// ID is the operating system identifier - it defaults to 1.
-var ID uint64 = NextID()
+var Impulse *Engine
 
 // DefaultObservanceWindow is the default dimensional window of observance - 2 seconds.
 var DefaultObservanceWindow = 2 * time.Second

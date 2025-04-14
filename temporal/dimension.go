@@ -9,7 +9,7 @@ import (
 
 // Dimension is a way of observing a target value across time, limited to a window of observance.
 type Dimension[TValue any, TCache any] struct {
-	core.Entity
+	core.NamedEntity
 
 	// Current is the currently held value of this dimension.
 	Current *std.Data[TValue]

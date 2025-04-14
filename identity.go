@@ -25,10 +25,12 @@ var Names = make([]GivenName, 0, 8888)
 //
 //	tl;dr - you own your identifier, not the other way around!
 type GivenName struct {
-	Name    string
-	Origin  string
-	Sex     Gender
-	Meaning string
+	Name        string
+	Description string
+	Details     struct {
+		Origin string
+		Gender Gender
+	}
 }
 
 // Gender provides global identifiers for Male, Female, or NonBinary interpretations - as gender
@@ -42,20 +44,10 @@ const (
 )
 
 func (n GivenName) String() string {
-	if n.Origin == "" && n.Meaning == "" {
-		// If it only has a name...
-		return fmt.Sprintf("\"%v\"", n.Name)
+	if n.Description == "" {
+		return fmt.Sprintf("%v", n.Name)
 	}
-	if n.Origin == "" {
-		// If it has no origin defined...
-		return fmt.Sprintf("\"%v\" ", n.Name, n.Meaning)
-	}
-	if n.Meaning == "" {
-		// If it has no meaning defined...
-		return fmt.Sprintf("\"%v\" [%v]", n.Name, n.Origin)
-	}
-	// ...otherwise, print the full name
-	return fmt.Sprintf("\"%v\" [%v] %v", n.Name, n.Origin, n.Meaning)
+	return fmt.Sprintf("%v - %v", n.Name, n.Description)
 }
 
 func initializeNameDB() {
@@ -94,10 +86,15 @@ func initializeNameDB() {
 		}
 
 		entry := GivenName{
-			Name:    strings.TrimSpace(record[0]),
-			Origin:  strings.TrimSpace(record[1]),
-			Sex:     genderFunc(strings.TrimSpace(record[2])),
-			Meaning: strings.TrimSpace(record[3]),
+			Name:        strings.TrimSpace(record[0]),
+			Description: strings.TrimSpace(record[3]),
+			Details: struct {
+				Origin string
+				Gender Gender
+			}{
+				Origin: strings.TrimSpace(record[1]),
+				Gender: genderFunc(strings.TrimSpace(record[2])),
+			},
 		}
 		Names = append(Names, entry)
 
@@ -106,10 +103,15 @@ func initializeNameDB() {
 		for _, variation := range variationStrs {
 			if len(variation) > 0 {
 				entry = GivenName{
-					Name:    variation,
-					Origin:  strings.TrimSpace(record[1]),
-					Sex:     genderFunc(strings.TrimSpace(record[2])),
-					Meaning: strings.TrimSpace(record[3]),
+					Name:        variation,
+					Description: strings.TrimSpace(record[3]),
+					Details: struct {
+						Origin string
+						Gender Gender
+					}{
+						Origin: strings.TrimSpace(record[1]),
+						Gender: genderFunc(strings.TrimSpace(record[2])),
+					},
 				}
 				Names = append(Names, entry)
 			}

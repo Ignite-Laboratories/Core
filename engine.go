@@ -68,7 +68,10 @@ func (e *Engine) addNeuron(n *Neuron) {
 
 // Stop causes the impulse engine to cease firing neural activations.
 func (e *Engine) Stop() {
-	Verbosef(ModuleName, "[%d] stopping %v\n", e.ID, e.Name)
+	if !e.Active {
+		return
+	}
+	Verbosef(ModuleName, "stopping impulse engine [%d] %v\n", e.ID, e.Name)
 
 	e.Active = false
 	if e.OnStop != nil {
@@ -228,7 +231,7 @@ func (e *Engine) Spark() {
 	}
 	e.Active = true
 
-	Verbosef(ModuleName, "[%d] sparking impulse engine: %v\n", e.ID, e.GivenName)
+	Verbosef(ModuleName, "sparking impulse [%d] engine: %v\n", e.ID, e.GivenName)
 
 	// Set up a wait group for blocking operations
 	var wg sync.WaitGroup

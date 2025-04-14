@@ -57,8 +57,9 @@ func (d *Dimension[TValue, TCache]) GetPastValue(moment time.Time) *std.Data[TVa
 func (d *Dimension[TValue, TCache]) GetClosestMoment(target time.Time) (*std.Data[TValue], time.Duration) {
 	d.Mutex.Lock()
 	defer d.Mutex.Unlock()
-	var closest *std.Data[TValue]
-	closestOffset := closest.Sub(target)
+	closest := &std.Data[TValue]{}
+	closest.Moment = core.Inception
+	closestOffset := closest.Moment.Sub(target)
 
 	for _, v := range d.Timeline {
 		offset := v.Moment.Sub(target)

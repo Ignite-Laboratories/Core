@@ -46,23 +46,23 @@ func NextID() uint64 {
 	return atomic.AddUint64(&currentId, 1)
 }
 
-// Shutdown waits a period of time before setting Alive to false.
-//
-// You may optionally provide an OS exit code, otherwise '0' is implied.
-func Shutdown(period time.Duration, exitCode ...int) {
+// Shutdown waits a period of time before calling ShutdownNow
+func Shutdown(period time.Duration) {
 	Printf(ModuleName, "shutting down in %v\n", period)
-	go func() {
-		time.Sleep(period)
-		ShutdownNow(exitCode...)
-	}()
+	time.Sleep(period)
+	ShutdownNow()
 }
 
 // ShutdownNow immediately sets Alive to false.
-//
-// You may optionally provide an OS exit code, otherwise '0' is implied.
-func ShutdownNow(exitCode ...int) {
+func ShutdownNow() {
 	Printf(ModuleName, "shutting down\n")
 	Alive = false
+}
+
+// Exit briefly pauses to let other threads clean up before calling os.Exit
+//
+// You may optionally provide an OS exit code, otherwise '0' is implied.
+func Exit(exitCode ...int) {
 	// Give the threads a brief moment to clean themselves up.
 	time.Sleep(time.Second)
 	if len(exitCode) > 0 {
@@ -124,11 +124,13 @@ func Printf(module string, format string, a ...any) {
 // Fatalf prepends the provided string format with a module identifier, prints it to the console, and then calls core.ShutdownNow(1).
 func Fatalf(module string, format string, a ...any) {
 	fmt.Printf("[%v] %v", module, fmt.Sprintf(format, a...))
-	ShutdownNow(1)
+	ShutdownNow()
+	Exit(1)
 }
 
 // FatalfCode prepends the provided string format with a module identifier, prints it to the console, and then calls core.ShutdownNow(exitCode).
 func FatalfCode(exitCode int, module string, format string, a ...any) {
 	fmt.Printf("[%v] %v", module, fmt.Sprintf(format, a...))
-	ShutdownNow(exitCode)
+	ShutdownNow()
+	Exit(exitCode)
 }

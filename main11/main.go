@@ -5,5 +5,6 @@ import (
 )
 
 func main() {
+	core.Verbose = true
 	core.Impulse.Spark()
 }

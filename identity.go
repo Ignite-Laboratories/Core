@@ -42,8 +42,6 @@ const (
 )
 
 func (n GivenName) String() string {
-	// NOTE:
-
 	if n.Origin == "" && n.Meaning == "" {
 		// If it only has a name...
 		return fmt.Sprintf("\"%v\"", n.Name)
@@ -81,6 +79,7 @@ func initializeNameDB() {
 				continue // Some rows might have extra columns
 			}
 
+			Verbosef(ModuleName, "error reading name database: %v\n", err)
 			panic(err) // Otherwise, tell me the issue
 		}
 

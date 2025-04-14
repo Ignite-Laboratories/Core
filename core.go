@@ -1,6 +1,7 @@
 package core
 
 import (
+	"debug/buildinfo"
 	"fmt"
 	"os"
 	"sync/atomic"
@@ -8,11 +9,12 @@ import (
 )
 
 func init() {
-	fmt.Println("      JanOS")
-	fmt.Println("Ignite Laboratories")
-	fmt.Println("-------------------")
+	exe, _ := os.Executable()
+	info, _ := buildinfo.ReadFile(exe)
 
-	Verbose = true
+	fmt.Printf("JanOS %v\n", info.Main.Version)
+	fmt.Println("© 2025, Ignite Laboratories")
+	fmt.Println("---------------------------")
 
 	initializeNameDB()
 	Impulse.GivenName = RandomName()

@@ -6,6 +6,8 @@ package std
 // from the thread you wish to execute on.  The calling thread can then Send actions to the
 // other thread for intermittent execution.
 //
+// NOTE: The sending thread will block and wait for execution to complete on the other thread.
+//
 //		 global -
 //	   var synchro = make(std.Synchro)
 //

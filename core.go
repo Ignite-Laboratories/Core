@@ -34,7 +34,12 @@ func getModuleVersion(module string) string {
 
 // ModuleReport reports the version information of a module to the console.
 func ModuleReport(module string) {
-	fmt.Printf(" - [%v] initialized - %v\n", module, getModuleVersion(module))
+	fmt.Printf(" - [%v] - %v\n", module, getModuleVersion(module))
+}
+
+// SubmoduleReport reports the version information of a submodule to the console.
+func SubmoduleReport(module string, submodule string) {
+	fmt.Printf(" - [%v].[%v]\n", module, submodule)
 }
 
 // Alive globally keeps neural activity firing until set to false - it's true by default.

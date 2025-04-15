@@ -4,8 +4,7 @@ import (
 	"time"
 )
 
-// System represents an impulsable structure.  Embed this in your structures
-// to give them their own unique main loops.
+// System represents an impulsable structure.
 type System struct {
 	NamedEntity
 	*Neuron
@@ -15,6 +14,9 @@ type System struct {
 
 	// Stopping indicates if Alive will shortly be set to false.
 	Stopping bool
+
+	// Cleanup is called (if provided) after Stop() finishes setting Alive to false.
+	Cleanup func()
 }
 
 // CreateSystem creates a new structure which fires the provided action whenever the potential returns true.
@@ -39,5 +41,8 @@ func (sys *System) Stop() {
 	for Alive && sys.Alive {
 		// Hold until finished
 		time.Sleep(time.Millisecond)
+	}
+	if sys.Cleanup != nil {
+		sys.Cleanup()
 	}
 }

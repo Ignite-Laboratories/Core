@@ -34,7 +34,7 @@ func getModuleVersion(module string) string {
 
 // ModuleReport reports the version information of a module to the console.
 func ModuleReport(module string) {
-	fmt.Printf(" - [%v] - %v\n", module, getModuleVersion(module))
+	fmt.Printf(" - [%v] %v\n", module, getModuleVersion(module))
 }
 
 // SubmoduleReport reports the version information of a submodule to the console.

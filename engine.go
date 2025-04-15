@@ -28,6 +28,9 @@ type Engine struct {
 	Beat int
 
 	// MaxFrequency is the maximum frequency of impulse.
+	//
+	// This defaults to the maximum float64 value; but, practically speaking, most
+	// calculation can occur at a rate closer to 60-120hz with negligible degradation.
 	MaxFrequency float64
 
 	// OnStop is called whenever the engine stops, if it's provided.

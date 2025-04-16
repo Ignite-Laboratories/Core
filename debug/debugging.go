@@ -1,4 +1,4 @@
-package debugging
+package debug
 
 import (
 	"bytes"
@@ -10,8 +10,8 @@ import (
 //
 // NOTE: There are no guarantees behind the stack trace's
 // formatting!  This may or may not function going forward,
-// but is pivotal in understanding -how- goroutines are
-// interoperating.
+// but it's pivotal in understanding HOW execution spans
+// across threads.
 //
 //	Works consistently on go 1.24.1
 func GetGoroutineID() uint64 {

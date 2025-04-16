@@ -48,7 +48,7 @@ var Alive = true
 // Inception provides the moment this operating system was initialized.
 var Inception = time.Now()
 
-// Impulse is the host engine.
+// Impulse is the world's global impulse engine.
 var Impulse *Engine
 
 // DefaultObservanceWindow is the default dimensional window of observance - 2 seconds.

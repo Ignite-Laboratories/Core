@@ -30912,7 +30912,7 @@ Zytka	Polish	Female	Rose flower
 Ζ	Greek	Neutral	Uppercase Zeta
 ζ	Greek	Neutral	Lowercase Zeta
 Η	Greek	Neutral	Uppercase Eta
-Η	Greek	Neutral	Lowercase Eta
+η	Greek	Neutral	Lowercase Eta
 Θ	Greek	Neutral	Uppercase Theta
 θ	Greek	Neutral	Lowercase Theta
 Ι	Greek	Neutral	Uppercase Iota
@@ -30934,7 +30934,8 @@ Zytka	Polish	Female	Rose flower
 Ρ	Greek	Neutral	Uppercase Rho
 ρ	Greek	Neutral	Lowercase Rho
 Σ	Greek	Neutral	Uppercase Sigma
-ς	Greek	Neutral	Lowercase Sigma
+σ	Greek	Neutral	Lowercase Sigma
+ς	Greek	Neutral	Lowercase Sigma (final)
 Τ	Greek	Neutral	Uppercase Tau
 τ	Greek	Neutral	Lowercase Tau
 Υ	Greek	Neutral	Uppercase Upsilon

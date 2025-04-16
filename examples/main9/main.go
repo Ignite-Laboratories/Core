@@ -16,7 +16,7 @@ var xTimeScale = std.TimeScale[int]{Duration: time.Second * 2, Height: 3640}
 var xCoords = temporal.Calculation(core.Impulse, when.Frequency(&mouse.SampleRate), false, SampleX)
 
 func main() {
-	viewport.NewWaveform(true, when.Frequency(&framerate), "Mouse X", nil, nil, &xTimeScale, false, xCoords)
+	viewport.NewBasicWaveform(true, when.Frequency(&framerate), "Mouse X", nil, nil, &xTimeScale, false, xCoords)
 	core.Impulse.Spark()
 }
 

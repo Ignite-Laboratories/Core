@@ -5,4 +5,6 @@ type Impulsable interface {
 	Initialize()
 	Impulse(Context)
 	Cleanup()
+	Lock()
+	Unlock()
 }

@@ -33,15 +33,15 @@ func RandomXYZW[T core.Numeric]() XYZW[T] {
 // RandomXYZWUpTo returns a pseudo-random XYZW[T] of the provided type bounded in the closed interval [0, max].
 func RandomXYZWUpTo[T core.Numeric](xUpper T, yUpper T, zUpper T, wUpper T) XYZW[T] {
 	return XYZW[T]{
-		X: core.RandomNumberRange[T](core.NumericRange[T]{Stop: xUpper}),
-		Y: core.RandomNumberRange[T](core.NumericRange[T]{Stop: yUpper}),
-		Z: core.RandomNumberRange[T](core.NumericRange[T]{Stop: zUpper}),
-		W: core.RandomNumberRange[T](core.NumericRange[T]{Stop: wUpper}),
+		X: core.RandomNumberRange[T](core.Tuple[T]{B: xUpper}),
+		Y: core.RandomNumberRange[T](core.Tuple[T]{B: yUpper}),
+		Z: core.RandomNumberRange[T](core.Tuple[T]{B: zUpper}),
+		W: core.RandomNumberRange[T](core.Tuple[T]{B: wUpper}),
 	}
 }
 
 // RandomXYZWRange returns a pseudo-random XYZW[T] of the provided type bounded in the closed interval [min, max].
-func RandomXYZWRange[T core.Numeric](xRange core.NumericRange[T], yRange core.NumericRange[T], zRange core.NumericRange[T], wRange core.NumericRange[T]) XYZW[T] {
+func RandomXYZWRange[T core.Numeric](xRange core.Tuple[T], yRange core.Tuple[T], zRange core.Tuple[T], wRange core.Tuple[T]) XYZW[T] {
 	return XYZW[T]{
 		X: core.RandomNumberRange[T](xRange),
 		Y: core.RandomNumberRange[T](yRange),

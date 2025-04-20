@@ -50,15 +50,15 @@ func RandomRGBA[T core.Numeric]() RGBA[T] {
 // RandomRGBAUpTo returns a pseudo-random RGBA[T] of the provided type bounded in the closed interval [0, max].
 func RandomRGBAUpTo[T core.Numeric](rUpper T, gUpper T, bUpper T, aUpper T) RGBA[T] {
 	return RGBA[T]{
-		R: core.RandomNumberRange[T](core.NumericRange[T]{Stop: rUpper}),
-		G: core.RandomNumberRange[T](core.NumericRange[T]{Stop: gUpper}),
-		B: core.RandomNumberRange[T](core.NumericRange[T]{Stop: bUpper}),
-		A: core.RandomNumberRange[T](core.NumericRange[T]{Stop: aUpper}),
+		R: core.RandomNumberRange[T](core.Tuple[T]{B: rUpper}),
+		G: core.RandomNumberRange[T](core.Tuple[T]{B: gUpper}),
+		B: core.RandomNumberRange[T](core.Tuple[T]{B: bUpper}),
+		A: core.RandomNumberRange[T](core.Tuple[T]{B: aUpper}),
 	}
 }
 
 // RandomRGBARange returns a pseudo-random RGBA[T] of the provided type bounded in the closed interval [min, max].
-func RandomRGBARange[T core.Numeric](rRange core.NumericRange[T], gRange core.NumericRange[T], bRange core.NumericRange[T], aRange core.NumericRange[T]) RGBA[T] {
+func RandomRGBARange[T core.Numeric](rRange core.Tuple[T], gRange core.Tuple[T], bRange core.Tuple[T], aRange core.Tuple[T]) RGBA[T] {
 	return RGBA[T]{
 		R: core.RandomNumberRange[T](rRange),
 		G: core.RandomNumberRange[T](gRange),

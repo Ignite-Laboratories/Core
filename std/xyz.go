@@ -31,14 +31,14 @@ func RandomXYZ[T core.Numeric]() XYZ[T] {
 // RandomXYZUpTo returns a pseudo-random XYZ[T] of the provided type bounded in the closed interval [0, max].
 func RandomXYZUpTo[T core.Numeric](xUpper T, yUpper T, zUpper T) XYZ[T] {
 	return XYZ[T]{
-		X: core.RandomNumberRange[T](core.NumericRange[T]{Stop: xUpper}),
-		Y: core.RandomNumberRange[T](core.NumericRange[T]{Stop: yUpper}),
-		Z: core.RandomNumberRange[T](core.NumericRange[T]{Stop: zUpper}),
+		X: core.RandomNumberRange[T](core.Tuple[T]{B: xUpper}),
+		Y: core.RandomNumberRange[T](core.Tuple[T]{B: yUpper}),
+		Z: core.RandomNumberRange[T](core.Tuple[T]{B: zUpper}),
 	}
 }
 
 // RandomXYZRange returns a pseudo-random XYZ[T] of the provided type bounded in the closed interval [min, max].
-func RandomXYZRange[T core.Numeric](xRange core.NumericRange[T], yRange core.NumericRange[T], zRange core.NumericRange[T]) XYZ[T] {
+func RandomXYZRange[T core.Numeric](xRange core.Tuple[T], yRange core.Tuple[T], zRange core.Tuple[T]) XYZ[T] {
 	return XYZ[T]{
 		X: core.RandomNumberRange[T](xRange),
 		Y: core.RandomNumberRange[T](yRange),

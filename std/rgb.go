@@ -45,14 +45,14 @@ func RandomRGB[T core.Numeric]() RGB[T] {
 // RandomRGBUpTo returns a pseudo-random RGB[T] of the provided type bounded in the closed interval [0, max].
 func RandomRGBUpTo[T core.Numeric](rUpper T, gUpper T, bUpper T) RGB[T] {
 	return RGB[T]{
-		R: core.RandomNumberRange[T](core.NumericRange[T]{Stop: rUpper}),
-		G: core.RandomNumberRange[T](core.NumericRange[T]{Stop: gUpper}),
-		B: core.RandomNumberRange[T](core.NumericRange[T]{Stop: bUpper}),
+		R: core.RandomNumberRange[T](core.Tuple[T]{B: rUpper}),
+		G: core.RandomNumberRange[T](core.Tuple[T]{B: gUpper}),
+		B: core.RandomNumberRange[T](core.Tuple[T]{B: bUpper}),
 	}
 }
 
 // RandomRGBRange returns a pseudo-random RGB[T] of the provided type bounded in the closed interval [min, max].
-func RandomRGBRange[T core.Numeric](rRange core.NumericRange[T], gRange core.NumericRange[T], bRange core.NumericRange[T]) RGB[T] {
+func RandomRGBRange[T core.Numeric](rRange core.Tuple[T], gRange core.Tuple[T], bRange core.Tuple[T]) RGB[T] {
 	return RGB[T]{
 		R: core.RandomNumberRange[T](rRange),
 		G: core.RandomNumberRange[T](gRange),

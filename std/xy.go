@@ -29,13 +29,13 @@ func RandomXY[T core.Numeric]() XY[T] {
 // RandomXYUpTo returns a pseudo-random XY[T] of the provided type bounded in the closed interval [0, max].
 func RandomXYUpTo[T core.Numeric](xUpper T, yUpper T) XY[T] {
 	return XY[T]{
-		X: core.RandomNumberRange[T](core.NumericRange[T]{Stop: xUpper}),
-		Y: core.RandomNumberRange[T](core.NumericRange[T]{Stop: yUpper}),
+		X: core.RandomNumberRange[T](core.Tuple[T]{B: xUpper}),
+		Y: core.RandomNumberRange[T](core.Tuple[T]{B: yUpper}),
 	}
 }
 
 // RandomXYRange returns a pseudo-random XY[T] of the provided type bounded in the closed interval [min, max].
-func RandomXYRange[T core.Numeric](xRange core.NumericRange[T], yRange core.NumericRange[T]) XY[T] {
+func RandomXYRange[T core.Numeric](xRange core.Tuple[T], yRange core.Tuple[T]) XY[T] {
 	return XY[T]{
 		X: core.RandomNumberRange[T](xRange),
 		Y: core.RandomNumberRange[T](yRange),

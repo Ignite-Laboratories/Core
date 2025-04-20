@@ -3,7 +3,6 @@ package core
 import (
 	"debug/buildinfo"
 	"fmt"
-	"math/rand"
 	"os"
 	"strings"
 	"sync/atomic"
@@ -156,79 +155,4 @@ func FatalfCode(exitCode int, module string, format string, a ...any) {
 	fmt.Printf("[%v] %v", module, fmt.Sprintf(format, a...))
 	ShutdownNow()
 	Exit(exitCode)
-}
-
-// RandomNumber returns a random number of the provided type.
-func RandomNumber[T Numeric]() T {
-	switch any(T(0)).(type) {
-	case float32:
-		return T(rand.Float32())
-	case float64:
-		return T(rand.Float64())
-	case int8:
-		return T(rand.Intn(256))
-	case uint8:
-		return T(rand.Intn(256))
-	case int16:
-		return T(rand.Intn(1 << 16))
-	case uint16:
-		return T(rand.Intn(1 << 16))
-	case int32:
-		return T(rand.Int31())
-	case uint32:
-		return T(rand.Uint32())
-	case int64:
-		return T(rand.Int63())
-	case int:
-		return T(rand.Int())
-	case uint64:
-		return T(rand.Uint64())
-	case uint:
-		return T(rand.Uint64())
-	default:
-		panic("unsupported numeric type")
-	}
-}
-
-func RandomNumberRange[T Numeric](min, max T) T {
-	if min >= max {
-		return min
-	}
-
-	switch any(T(0)).(type) {
-	case float32, float64:
-		// Linear interpolation between min and max
-		return T(float64(min) + (float64(max)-float64(min))*rand.Float64())
-
-	case int8, int16, int32, int64, int:
-		minInt := int64(min)
-		maxInt := int64(max)
-		range64 := maxInt - minInt
-		if range64 <= 0 {
-			return T(minInt)
-		}
-		return T(minInt + rand.Int63n(range64+1))
-
-	case uint8, uint16, uint32, uint64, uint:
-		minUint := uint64(min)
-		maxUint := uint64(max)
-		range64 := maxUint - minUint
-		if range64 <= 0 {
-			return T(minUint)
-		}
-		// For uniform distribution
-		n := rand.Uint64()
-		if range64&(range64-1) == 0 {
-			// Power of 2 range optimization
-			return T(minUint + (n & range64))
-		}
-		// Rejection sampling for uniform distribution
-		for n >= (range64+1)*(1<<64)/(range64+1) {
-			n = rand.Uint64()
-		}
-		return T(minUint + (n % (range64 + 1)))
-
-	default:
-		panic("unsupported numeric type")
-	}
 }

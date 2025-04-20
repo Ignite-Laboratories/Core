@@ -34,53 +34,72 @@ func RGBAFromHex(value uint32) RGBA[byte] {
 	}
 }
 
-// RandomRGBA generates a random set of RGBA values of the provided type.
+// RandomRGBA returns a pseudo-random RGBA[T] of the provided type using core.RandomNumber[T].
+//
+// If requesting a floating point type, the resulting number will be bounded
+// in the fully closed interval [0.0, 1.0]
+//
+// If requesting an integer type, the resulting number will be bounded
+// in the fully closed interval [0, n] - where n is the maximum value of
+// the provided type.
 func RandomRGBA[T core.Numeric]() RGBA[T] {
 	return RGBA[T]{
 		R: core.RandomNumber[T](),
 		G: core.RandomNumber[T](),
 		B: core.RandomNumber[T](),
-		A: core.RandomNumber[T](),
 	}
 }
 
-// Normalize32 returns an RGBA[float32] ranging from 0.0-1.0.
-func (c RGBA[byte]) Normalize32() RGBA[float32] {
+// RandomRGBARange returns a pseudo-random RGBA[T] of the provided type bounded in the closed interval [min, max].
+func RandomRGBARange[T core.Numeric](min T, max T) RGBA[T] {
+	return RGBA[T]{
+		R: core.RandomNumberRange[T](min, max),
+		G: core.RandomNumberRange[T](min, max),
+		B: core.RandomNumberRange[T](min, max),
+	}
+}
+
+// NormalizeRGBA32 returns an RGBA[float32] ranging from 0.0-1.0.
+func NormalizeRGBA32[T core.Integer](source RGBA[T]) RGBA[float32] {
 	return RGBA[float32]{
-		R: float32(c.R) / 255.0,
-		G: float32(c.G) / 255.0,
-		B: float32(c.B) / 255.0,
-		A: float32(c.A) / 255.0,
+		R: core.NormalizeToFloat32(source.R),
+		G: core.NormalizeToFloat32(source.G),
+		B: core.NormalizeToFloat32(source.B),
+		A: core.NormalizeToFloat32(source.A),
 	}
 }
 
-// Normalize64 returns an RGBA[float64] ranging from 0.0-1.0.
-func (c RGBA[byte]) Normalize64() RGBA[float64] {
+// NormalizeRGBA64 returns an RGBA[float64] ranging from 0.0-1.0.
+func NormalizeRGBA64[T core.Integer](source RGBA[T]) RGBA[float64] {
 	return RGBA[float64]{
-		R: float64(c.R) / 255.0,
-		G: float64(c.G) / 255.0,
-		B: float64(c.B) / 255.0,
-		A: float64(c.A) / 255.0,
+		R: core.NormalizeToFloat64(source.R),
+		G: core.NormalizeToFloat64(source.G),
+		B: core.NormalizeToFloat64(source.B),
+		A: core.NormalizeToFloat64(source.A),
 	}
 }
 
-// Denormalize64 returns an RGBA[byte] ranging from 0-255.
-func (c RGBA[float64]) Denormalize64() RGBA[byte] {
-	return RGBA[byte]{
-		R: byte(c.R * 255.0),
-		G: byte(c.G * 255.0),
-		B: byte(c.B * 255.0),
-		A: byte(c.A * 255.0),
+// ScaleToTypeRGBA32 returns a scaled value of the provided type in the range [0, T.MaxValue].
+//
+// NOTE: This will panic if the provided value is greater than the maximum value of the provided type.
+func ScaleToTypeRGBA32[TOut core.Integer](source RGBA[float32]) RGBA[TOut] {
+	return RGBA[TOut]{
+		R: core.ScaleFloat32ToType[TOut](source.R),
+		G: core.ScaleFloat32ToType[TOut](source.G),
+		B: core.ScaleFloat32ToType[TOut](source.B),
+		A: core.ScaleFloat32ToType[TOut](source.A),
 	}
 }
 
-// Denormalize32 returns an RGBA[byte] ranging from 0-255.
-func (c RGBA[float32]) Denormalize32() RGBA[byte] {
-	return RGBA[byte]{
-		R: byte(c.R * 255.0),
-		G: byte(c.G * 255.0),
-		B: byte(c.B * 255.0),
-		A: byte(c.A * 255.0),
+// ScaleToTypeRGBA64 returns a scaled value of the provided type in the range [0, T.MaxValue].
+//
+// NOTE: This will panic if the provided value is greater than the maximum value of the provided type.
+func ScaleToTypeRGBA64[TOut core.Integer](source RGBA[float64]) RGBA[TOut] {
+	return RGBA[TOut]{
+		R: core.ScaleFloat64ToType[TOut](source.R),
+		G: core.ScaleFloat64ToType[TOut](source.G),
+		B: core.ScaleFloat64ToType[TOut](source.B),
+		A: core.ScaleFloat64ToType[TOut](source.A),
 	}
 }
 
@@ -89,7 +108,10 @@ func RGBAComparator[T core.Numeric](a RGBA[T], b RGBA[T]) bool {
 	return a.R == b.R && a.G == b.G && a.B == b.B && a.A == b.A
 }
 
-// 2-component swizzles
+/**
+Swlizzling
+*/
+
 func (c RGBA[T]) RR() (T, T) { return c.R, c.R }
 func (c RGBA[T]) RG() (T, T) { return c.R, c.G }
 func (c RGBA[T]) RB() (T, T) { return c.R, c.B }
@@ -107,7 +129,6 @@ func (c RGBA[T]) AG() (T, T) { return c.A, c.G }
 func (c RGBA[T]) AB() (T, T) { return c.A, c.B }
 func (c RGBA[T]) AA() (T, T) { return c.A, c.A }
 
-// 3-component swizzles
 func (c RGBA[T]) RRR() (T, T, T) { return c.R, c.R, c.R }
 func (c RGBA[T]) RRG() (T, T, T) { return c.R, c.R, c.G }
 func (c RGBA[T]) RRB() (T, T, T) { return c.R, c.R, c.B }
@@ -173,7 +194,6 @@ func (c RGBA[T]) AAG() (T, T, T) { return c.A, c.A, c.G }
 func (c RGBA[T]) AAB() (T, T, T) { return c.A, c.A, c.B }
 func (c RGBA[T]) AAA() (T, T, T) { return c.A, c.A, c.A }
 
-// 4-component swizzles
 func (c RGBA[T]) RRRR() (T, T, T, T) { return c.R, c.R, c.R, c.R }
 func (c RGBA[T]) RRRG() (T, T, T, T) { return c.R, c.R, c.R, c.G }
 func (c RGBA[T]) RRRB() (T, T, T, T) { return c.R, c.R, c.R, c.B }

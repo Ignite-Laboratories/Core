@@ -30,8 +30,15 @@ func RGBFromHex(value uint32) RGB[byte] {
 	}
 }
 
-// RandomRGB generates a random set of RGB values of the provided type.
-func RandomRGB[T core.Numeric]() RGBA[T] {
+// RandomRGB returns a pseudo-random RGB[T] of the provided type using core.RandomNumber[T].
+//
+// If requesting a floating point type, the resulting number will be bounded
+// in the fully closed interval [0.0, 1.0]
+//
+// If requesting an integer type, the resulting number will be bounded
+// in the fully closed interval [0, n] - where n is the maximum value of
+// the provided type.
+func RandomRGB[T core.Numeric]() RGB[T] {
 	return RGB[T]{
 		R: core.RandomNumber[T](),
 		G: core.RandomNumber[T](),
@@ -39,39 +46,52 @@ func RandomRGB[T core.Numeric]() RGBA[T] {
 	}
 }
 
-// Normalize32 returns an RGB[float32] ranging from 0.0-1.0.
-func (c RGB[byte]) Normalize32() RGB[float32] {
+// RandomRGBRange returns a pseudo-random RGB[T] of the provided type bounded in the closed interval [min, max].
+func RandomRGBRange[T core.Numeric](min T, max T) RGB[T] {
+	return RGB[T]{
+		R: core.RandomNumberRange[T](min, max),
+		G: core.RandomNumberRange[T](min, max),
+		B: core.RandomNumberRange[T](min, max),
+	}
+}
+
+// NormalizeRGB32 returns an RGB[float32] ranging from 0.0-1.0.
+func NormalizeRGB32[T core.Integer](source RGB[T]) RGB[float32] {
 	return RGB[float32]{
-		R: float32(c.R) / 255.0,
-		G: float32(c.G) / 255.0,
-		B: float32(c.B) / 255.0,
+		R: core.NormalizeToFloat32(source.R),
+		G: core.NormalizeToFloat32(source.G),
+		B: core.NormalizeToFloat32(source.B),
 	}
 }
 
-// Normalize64 returns an RGB[float64] ranging from 0.0-1.0.
-func (c RGB[byte]) Normalize64() RGB[float64] {
+// NormalizeRGB64 returns an RGB[float64] ranging from 0.0-1.0.
+func NormalizeRGB64[T core.Integer](source RGB[T]) RGB[float64] {
 	return RGB[float64]{
-		R: float64(c.R) / 255.0,
-		G: float64(c.G) / 255.0,
-		B: float64(c.B) / 255.0,
+		R: core.NormalizeToFloat64(source.R),
+		G: core.NormalizeToFloat64(source.G),
+		B: core.NormalizeToFloat64(source.B),
 	}
 }
 
-// Denormalize64 returns an RGB[byte] ranging from 0-255.
-func (c RGB[float64]) Denormalize64() RGB[byte] {
-	return RGB[byte]{
-		R: byte(c.R * 255.0),
-		G: byte(c.G * 255.0),
-		B: byte(c.B * 255.0),
+// ScaleToTypeRGB32 returns a scaled value of the provided type in the range [0, T.MaxValue].
+//
+// NOTE: This will panic if the provided value is greater than the maximum value of the provided type.
+func ScaleToTypeRGB32[TOut core.Integer](source RGB[float32]) RGB[TOut] {
+	return RGB[TOut]{
+		R: core.ScaleFloat32ToType[TOut](source.R),
+		G: core.ScaleFloat32ToType[TOut](source.G),
+		B: core.ScaleFloat32ToType[TOut](source.B),
 	}
 }
 
-// Denormalize32 returns an RGB[byte] ranging from 0-255.
-func (c RGB[float32]) Denormalize32() RGB[byte] {
-	return RGB[byte]{
-		R: byte(c.R * 255.0),
-		G: byte(c.G * 255.0),
-		B: byte(c.B * 255.0),
+// ScaleToTypeRGB64 returns a scaled value of the provided type in the range [0, T.MaxValue].
+//
+// NOTE: This will panic if the provided value is greater than the maximum value of the provided type.
+func ScaleToTypeRGB64[TOut core.Integer](source RGB[float64]) RGB[TOut] {
+	return RGB[TOut]{
+		R: core.ScaleFloat64ToType[TOut](source.R),
+		G: core.ScaleFloat64ToType[TOut](source.G),
+		B: core.ScaleFloat64ToType[TOut](source.B),
 	}
 }
 
@@ -80,7 +100,10 @@ func RGBComparator[T core.Numeric](a RGB[T], b RGB[T]) bool {
 	return a.R == b.R && a.G == b.G && a.B == b.B
 }
 
-// 2-component swizzles
+/**
+Swizzling
+*/
+
 func (c RGB[T]) RR() (T, T) { return c.R, c.R }
 func (c RGB[T]) RG() (T, T) { return c.R, c.G }
 func (c RGB[T]) RB() (T, T) { return c.R, c.B }
@@ -91,7 +114,6 @@ func (c RGB[T]) BR() (T, T) { return c.B, c.R }
 func (c RGB[T]) BG() (T, T) { return c.B, c.G }
 func (c RGB[T]) BB() (T, T) { return c.B, c.B }
 
-// 3-component swizzles
 func (c RGB[T]) RRR() (T, T, T) { return c.R, c.R, c.R }
 func (c RGB[T]) RRG() (T, T, T) { return c.R, c.R, c.G }
 func (c RGB[T]) RRB() (T, T, T) { return c.R, c.R, c.B }

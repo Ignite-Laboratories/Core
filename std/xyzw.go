@@ -13,7 +13,14 @@ type XYZW[T core.Numeric] struct {
 	W T
 }
 
-// RandomXYZW generates a random set of XYZW values of the provided type.
+// RandomXYZW returns a pseudo-random XYZW[T] of the provided type using core.RandomNumber[T].
+//
+// If requesting a floating point type, the resulting number will be bounded
+// in the fully closed interval [0.0, 1.0]
+//
+// If requesting an integer type, the resulting number will be bounded
+// in the fully closed interval [0, n] - where n is the maximum value of
+// the provided type.
 func RandomXYZW[T core.Numeric]() XYZW[T] {
 	return XYZW[T]{
 		X: core.RandomNumber[T](),
@@ -23,14 +30,57 @@ func RandomXYZW[T core.Numeric]() XYZW[T] {
 	}
 }
 
-// RandomXYZWRange generates a random set of XYZW values of the provided type,
-// bound within the minimum and maximum range.
+// RandomXYZWRange returns a pseudo-random XYZW[T] of the provided type bounded in the closed interval [min, max].
 func RandomXYZWRange[T core.Numeric](min T, max T) XYZW[T] {
 	return XYZW[T]{
 		X: core.RandomNumberRange[T](min, max),
 		Y: core.RandomNumberRange[T](min, max),
 		Z: core.RandomNumberRange[T](min, max),
 		W: core.RandomNumberRange[T](min, max),
+	}
+}
+
+// NormalizeXYZW32 returns an XYZW[float32] ranging from 0.0-1.0.
+func NormalizeXYZW32[T core.Integer](source XYZW[T]) XYZW[float32] {
+	return XYZW[float32]{
+		X: core.NormalizeToFloat32(source.X),
+		Y: core.NormalizeToFloat32(source.Y),
+		Z: core.NormalizeToFloat32(source.Z),
+		W: core.NormalizeToFloat32(source.W),
+	}
+}
+
+// NormalizeXYZW64 returns an XYZW[float64] ranging from 0.0-1.0.
+func NormalizeXYZW64[T core.Integer](source XYZW[T]) XYZW[float64] {
+	return XYZW[float64]{
+		X: core.NormalizeToFloat64(source.X),
+		Y: core.NormalizeToFloat64(source.Y),
+		Z: core.NormalizeToFloat64(source.Z),
+		W: core.NormalizeToFloat64(source.W),
+	}
+}
+
+// ScaleToTypeXYZW32 returns a scaled value of the provided type in the range [0, T.MaxValue].
+//
+// NOTE: This will panic if the provided value is greater than the maximum value of the provided type.
+func ScaleToTypeXYZW32[TOut core.Integer](source XYZW[float32]) XYZW[TOut] {
+	return XYZW[TOut]{
+		X: core.ScaleFloat32ToType[TOut](source.X),
+		Y: core.ScaleFloat32ToType[TOut](source.Y),
+		Z: core.ScaleFloat32ToType[TOut](source.Z),
+		W: core.ScaleFloat32ToType[TOut](source.W),
+	}
+}
+
+// ScaleToTypeXYZW64 returns a scaled value of the provided type in the range [0, T.MaxValue].
+//
+// NOTE: This will panic if the provided value is greater than the maximum value of the provided type.
+func ScaleToTypeXYZW64[TOut core.Integer](source XYZW[float64]) XYZW[TOut] {
+	return XYZW[TOut]{
+		X: core.ScaleFloat64ToType[TOut](source.X),
+		Y: core.ScaleFloat64ToType[TOut](source.Y),
+		Z: core.ScaleFloat64ToType[TOut](source.Z),
+		W: core.ScaleFloat64ToType[TOut](source.W),
 	}
 }
 
@@ -43,7 +93,10 @@ func (c XYZW[T]) String() string {
 	return fmt.Sprintf("(%d, %d, %d, %d)", c.X, c.Y, c.Z, c.W)
 }
 
-// 2-component swizzles
+/**
+Swizzling
+*/
+
 func (c XYZW[T]) XX() (T, T) { return c.X, c.X }
 func (c XYZW[T]) XY() (T, T) { return c.X, c.Y }
 func (c XYZW[T]) XZ() (T, T) { return c.X, c.Z }
@@ -61,7 +114,6 @@ func (c XYZW[T]) WY() (T, T) { return c.W, c.Y }
 func (c XYZW[T]) WZ() (T, T) { return c.W, c.Z }
 func (c XYZW[T]) WW() (T, T) { return c.W, c.W }
 
-// 3-component swizzles
 func (c XYZW[T]) XXX() (T, T, T) { return c.X, c.X, c.X }
 func (c XYZW[T]) XXY() (T, T, T) { return c.X, c.X, c.Y }
 func (c XYZW[T]) XXZ() (T, T, T) { return c.X, c.X, c.Z }
@@ -127,7 +179,6 @@ func (c XYZW[T]) WWY() (T, T, T) { return c.W, c.W, c.Y }
 func (c XYZW[T]) WWZ() (T, T, T) { return c.W, c.W, c.Z }
 func (c XYZW[T]) WWW() (T, T, T) { return c.W, c.W, c.W }
 
-// 4-component swizzles
 func (c XYZW[T]) XXXX() (T, T, T, T) { return c.X, c.X, c.X, c.X }
 func (c XYZW[T]) XXXY() (T, T, T, T) { return c.X, c.X, c.X, c.Y }
 func (c XYZW[T]) XXXZ() (T, T, T, T) { return c.X, c.X, c.X, c.Z }

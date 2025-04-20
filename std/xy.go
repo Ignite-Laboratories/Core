@@ -19,6 +19,15 @@ func RandomXY[T core.Numeric]() XY[T] {
 	}
 }
 
+// RandomXYRange generates a random set of XY values of the provided type,
+// bound within the minimum and maximum range.
+func RandomXYRange[T core.Numeric](min T, max T) XY[T] {
+	return XY[T]{
+		X: core.RandomNumberRange[T](min, max),
+		Y: core.RandomNumberRange[T](min, max),
+	}
+}
+
 // XYComparator returns if the two XY values are equal in values.
 func XYComparator[T core.Numeric](a XY[T], b XY[T]) bool {
 	return a.X == b.X && a.Y == b.Y

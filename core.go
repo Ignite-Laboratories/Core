@@ -189,3 +189,46 @@ func RandomNumber[T Numeric]() T {
 		panic("unsupported numeric type")
 	}
 }
+
+func RandomNumberRange[T Numeric](min, max T) T {
+	if min >= max {
+		return min
+	}
+
+	switch any(T(0)).(type) {
+	case float32, float64:
+		// Linear interpolation between min and max
+		return T(float64(min) + (float64(max)-float64(min))*rand.Float64())
+
+	case int8, int16, int32, int64, int:
+		minInt := int64(min)
+		maxInt := int64(max)
+		range64 := maxInt - minInt
+		if range64 <= 0 {
+			return T(minInt)
+		}
+		return T(minInt + rand.Int63n(range64+1))
+
+	case uint8, uint16, uint32, uint64, uint:
+		minUint := uint64(min)
+		maxUint := uint64(max)
+		range64 := maxUint - minUint
+		if range64 <= 0 {
+			return T(minUint)
+		}
+		// For uniform distribution
+		n := rand.Uint64()
+		if range64&(range64-1) == 0 {
+			// Power of 2 range optimization
+			return T(minUint + (n & range64))
+		}
+		// Rejection sampling for uniform distribution
+		for n >= (range64+1)*(1<<64)/(range64+1) {
+			n = rand.Uint64()
+		}
+		return T(minUint + (n % (range64 + 1)))
+
+	default:
+		panic("unsupported numeric type")
+	}
+}

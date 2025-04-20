@@ -21,6 +21,16 @@ func RandomXYZ[T core.Numeric]() XYZ[T] {
 	}
 }
 
+// RandomXYZRange generates a random set of XYZ values of the provided type,
+// bound within the minimum and maximum range.
+func RandomXYZRange[T core.Numeric](min T, max T) XYZ[T] {
+	return XYZ[T]{
+		X: core.RandomNumberRange[T](min, max),
+		Y: core.RandomNumberRange[T](min, max),
+		Z: core.RandomNumberRange[T](min, max),
+	}
+}
+
 // XYZComparator returns if the two XYZ values are equal in values.
 func XYZComparator[T core.Numeric](a XYZ[T], b XYZ[T]) bool {
 	return a.X == b.X && a.Y == b.Y && a.Z == b.Z

@@ -23,6 +23,17 @@ func RandomXYZW[T core.Numeric]() XYZW[T] {
 	}
 }
 
+// RandomXYZWRange generates a random set of XYZW values of the provided type,
+// bound within the minimum and maximum range.
+func RandomXYZWRange[T core.Numeric](min T, max T) XYZW[T] {
+	return XYZW[T]{
+		X: core.RandomNumberRange[T](min, max),
+		Y: core.RandomNumberRange[T](min, max),
+		Z: core.RandomNumberRange[T](min, max),
+		W: core.RandomNumberRange[T](min, max),
+	}
+}
+
 // XYZWComparator returns if the two XYZW values are equal in values.
 func XYZWComparator[T core.Numeric](a XYZW[T], b XYZW[T]) bool {
 	return a.X == b.X && a.Y == b.Y && a.Z == b.Z && a.W == b.W

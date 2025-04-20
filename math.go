@@ -5,66 +5,62 @@ import (
 	"math/rand"
 )
 
-// MaxValue returns the maximum value of the provided type.
-func MaxValue[T Numeric]() T {
+// MaxIntegerValue returns the maximum value of the provided type.
+func MaxIntegerValue[T Integer]() uint64 {
 	switch any(T(0)).(type) {
-	case float32:
-		return T(float32(math.MaxFloat32))
-	case float64:
-		return T(float64(math.MaxFloat64))
 	case int8:
-		return T(int8(math.MaxInt8))
+		return math.MaxInt8
 	case uint8:
-		return T(uint8(math.MaxUint8))
+		return uint64(math.MaxUint8)
 	case int16:
-		return T(int16(math.MaxInt16))
+		return uint64(math.MaxInt16)
 	case uint16:
-		return T(uint16(math.MaxUint16))
+		return uint64(math.MaxUint16)
 	case int32:
-		return T(int32(math.MaxInt32))
+		return uint64(math.MaxInt32)
 	case uint32:
-		return T(uint32(math.MaxUint32))
+		return uint64(math.MaxUint32)
 	case int64:
-		return T(int64(math.MaxInt64))
-	case int:
-		return T(int(math.MaxInt))
+		return uint64(math.MaxInt64)
 	case uint64:
-		return T(uint64(math.MaxUint64))
+		return math.MaxUint64
+	case int:
+		return math.MaxInt
 	case uint:
-		return T(uint(math.MaxUint))
+		return math.MaxUint
 	default:
 		panic("unsupported numeric type")
 	}
 }
 
 // NormalizeToFloat64 returns a normalized value of the provided type in the range [0.0, 1.0].
-func NormalizeToFloat64[T Numeric](value T) float64 {
-	return float64(value) / float64(MaxValue[T]())
+func NormalizeToFloat64[T Integer](value T) float64 {
+	return float64(value) / float64(MaxIntegerValue[T]())
 }
 
 // NormalizeToFloat32 returns a normalized value of the provided type in the range [0.0, 1.0].
-func NormalizeToFloat32[T Numeric](value T) float32 {
-	return float32(value) / float32(MaxValue[T]())
+func NormalizeToFloat32[T Integer](value T) float32 {
+	return float32(value) / float32(MaxIntegerValue[T]())
 }
 
 // ScaleFloat64ToType returns a scaled value of the provided type in the range [0, T.MaxValue].
 //
 // NOTE: This will panic if the provided value is greater than the maximum value of the provided type.
-func ScaleFloat64ToType[T Numeric](value float64) T {
+func ScaleFloat64ToType[T Integer](value float64) T {
 	if value < 0.0 || value > 1.0 {
 		panic("value must be in range [0.0, 1.0]")
 	}
-	return T(value * float64(MaxValue[T]()))
+	return T(value * float64(MaxIntegerValue[T]()))
 }
 
 // ScaleFloat32ToType returns a scaled value of the provided type in the range [0, T.MaxValue].
 //
 // NOTE: This will panic if the provided value is greater than the maximum value of the provided type.
-func ScaleFloat32ToType[T Numeric](value float32) T {
+func ScaleFloat32ToType[T Integer](value float32) T {
 	if value < 0.0 || value > 1.0 {
 		panic("value must be in range [0.0, 1.0]")
 	}
-	return T(value * float32(MaxValue[T]()))
+	return T(value * float32(MaxIntegerValue[T]()))
 }
 
 // RandomNumber returns a non-negative pseudo-random number of the provided type.
@@ -78,29 +74,29 @@ func ScaleFloat32ToType[T Numeric](value float32) T {
 func RandomNumber[T Numeric]() T {
 	switch any(T(0)).(type) {
 	case float32:
-		return RandomNumberRange[T](0.0, 1.0)
+		return T(RandomNumberRange[float32](NumericRange[float32]{0.0, 1.0}))
 	case float64:
-		return RandomNumberRange[T](0.0, 1.0)
+		return T(RandomNumberRange[float64](NumericRange[float64]{0.0, 1.0}))
 	case int8:
-		return RandomNumberRange[T](math.MinInt8, math.MaxInt8)
+		return T(RandomNumberRange[int8](NumericRange[int8]{math.MinInt8, math.MaxInt8}))
 	case uint8:
-		return RandomNumberRange[T](0, math.MaxUint8)
+		return T(RandomNumberRange[uint8](NumericRange[uint8]{0, math.MaxUint8}))
 	case int16:
-		return RandomNumberRange[T](math.MinInt16, math.MaxInt16)
+		return T(RandomNumberRange[int16](NumericRange[int16]{math.MinInt16, math.MaxInt16}))
 	case uint16:
-		return RandomNumberRange[T](0, math.MaxUint16)
+		return T(RandomNumberRange[uint16](NumericRange[uint16]{0, math.MaxUint16}))
 	case int32:
-		return RandomNumberRange[T](math.MinInt32, math.MaxInt32)
+		return T(RandomNumberRange[int32](NumericRange[int32]{math.MinInt32, math.MaxInt32}))
 	case uint32:
-		return RandomNumberRange[T](0, math.MaxUint32)
+		return T(RandomNumberRange[uint32](NumericRange[uint32]{0, math.MaxUint32}))
 	case int64:
-		return RandomNumberRange[T](math.MinInt64, math.MaxInt64)
+		return T(RandomNumberRange[int64](NumericRange[int64]{math.MinInt64, math.MaxInt64}))
 	case int:
-		return RandomNumberRange[T](math.MinInt, math.MaxInt)
+		return T(RandomNumberRange[int](NumericRange[int]{math.MinInt, math.MaxInt}))
 	case uint64:
-		return RandomNumberRange[T](0, math.MaxUint64)
+		return T(RandomNumberRange[uint64](NumericRange[uint64]{0, math.MaxUint64}))
 	case uint:
-		return RandomNumberRange[T](0, math.MaxUint)
+		return T(RandomNumberRange[uint](NumericRange[uint]{0, math.MaxUint}))
 	default:
 		panic("unsupported numeric type")
 	}
@@ -109,21 +105,33 @@ func RandomNumber[T Numeric]() T {
 // RandomNumberRange returns a pseudo-random number of the provided type bounded in the closed interval [min, max].
 //
 // NOTE: This uses a 0.01% chance to return exactly max.
-func RandomNumberRange[T Numeric](min, max T) T {
-	if min >= max {
-		return min
+func RandomNumberRange[T Numeric](numericRange NumericRange[T]) T {
+	if numericRange.Start >= numericRange.Stop {
+		return numericRange.Start
 	}
 	switch any(T(0)).(type) {
 	case float32, float64:
-		// 1% chance to return exactly max
-		if rand.Float64() < 0.01 {
-			return max
+		// 0.1% chance to return exactly max
+		if rand.Float64() < 0.001 {
+			return numericRange.Stop
 		}
-		return T(float64(min) + (float64(max)-float64(min))*rand.Float64())
+		return T(float64(numericRange.Start) + (float64(numericRange.Stop)-float64(numericRange.Start))*rand.Float64())
 	case int8, int16, int32, int64, int, uint8, uint16, uint32, uint64, uint:
-		range64 := uint64(max) - uint64(min)
-		return T(uint64(min) + uint64(rand.Int63n(int64(range64+1))))
+		range64 := uint64(numericRange.Stop) - uint64(numericRange.Start)
+		return T(uint64(numericRange.Start) + uint64(rand.Int63n(int64(range64+1))))
 	default:
 		panic("unsupported numeric type")
+	}
+}
+
+type NumericRange[T Numeric] struct {
+	Start T
+	Stop  T
+}
+
+func Range[T Numeric](start T, stop T) NumericRange[T] {
+	return NumericRange[T]{
+		Start: start,
+		Stop:  stop,
 	}
 }

@@ -26,11 +26,19 @@ func RandomXY[T core.Numeric]() XY[T] {
 	}
 }
 
-// RandomXYRange returns a pseudo-random XY[T] of the provided type bounded in the closed interval [min, max].
-func RandomXYRange[T core.Numeric](min T, max T) XY[T] {
+// RandomXYUpTo returns a pseudo-random XY[T] of the provided type bounded in the closed interval [0, max].
+func RandomXYUpTo[T core.Numeric](xUpper T, yUpper T) XY[T] {
 	return XY[T]{
-		X: core.RandomNumberRange[T](min, max),
-		Y: core.RandomNumberRange[T](min, max),
+		X: core.RandomNumberRange[T](core.NumericRange[T]{Stop: xUpper}),
+		Y: core.RandomNumberRange[T](core.NumericRange[T]{Stop: yUpper}),
+	}
+}
+
+// RandomXYRange returns a pseudo-random XY[T] of the provided type bounded in the closed interval [min, max].
+func RandomXYRange[T core.Numeric](xRange core.NumericRange[T], yRange core.NumericRange[T]) XY[T] {
+	return XY[T]{
+		X: core.RandomNumberRange[T](xRange),
+		Y: core.RandomNumberRange[T](yRange),
 	}
 }
 
@@ -76,5 +84,5 @@ func XYComparator[T core.Numeric](a XY[T], b XY[T]) bool {
 }
 
 func (c XY[T]) String() string {
-	return fmt.Sprintf("(%d, %d)", c.X, c.Y)
+	return fmt.Sprintf("(%v, %v)", c.X, c.Y)
 }

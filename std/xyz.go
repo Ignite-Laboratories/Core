@@ -28,12 +28,21 @@ func RandomXYZ[T core.Numeric]() XYZ[T] {
 	}
 }
 
-// RandomXYZRange returns a pseudo-random XYZ[T] of the provided type bounded in the closed interval [min, max].
-func RandomXYZRange[T core.Numeric](min T, max T) XYZ[T] {
+// RandomXYZUpTo returns a pseudo-random XYZ[T] of the provided type bounded in the closed interval [0, max].
+func RandomXYZUpTo[T core.Numeric](xUpper T, yUpper T, zUpper T) XYZ[T] {
 	return XYZ[T]{
-		X: core.RandomNumberRange[T](min, max),
-		Y: core.RandomNumberRange[T](min, max),
-		Z: core.RandomNumberRange[T](min, max),
+		X: core.RandomNumberRange[T](core.NumericRange[T]{Stop: xUpper}),
+		Y: core.RandomNumberRange[T](core.NumericRange[T]{Stop: yUpper}),
+		Z: core.RandomNumberRange[T](core.NumericRange[T]{Stop: zUpper}),
+	}
+}
+
+// RandomXYZRange returns a pseudo-random XYZ[T] of the provided type bounded in the closed interval [min, max].
+func RandomXYZRange[T core.Numeric](xRange core.NumericRange[T], yRange core.NumericRange[T], zRange core.NumericRange[T]) XYZ[T] {
+	return XYZ[T]{
+		X: core.RandomNumberRange[T](xRange),
+		Y: core.RandomNumberRange[T](yRange),
+		Z: core.RandomNumberRange[T](zRange),
 	}
 }
 
@@ -83,7 +92,7 @@ func XYZComparator[T core.Numeric](a XYZ[T], b XYZ[T]) bool {
 }
 
 func (c XYZ[T]) String() string {
-	return fmt.Sprintf("(%d, %d, %d)", c.X, c.Y, c.Z)
+	return fmt.Sprintf("(%v, %v, %v)", c.X, c.Y, c.Z)
 }
 
 /**

@@ -20,10 +20,6 @@ type RGBA[T core.Numeric] struct {
 	A T
 }
 
-func (c RGBA[T]) String() string {
-	return fmt.Sprintf("(r:%d, g:%d, b:%d, a:%d)", c.R, c.G, c.B, c.A)
-}
-
 // RGBAFromHex converts the provided RGBA hex values into a std.RGBA[byte].
 func RGBAFromHex(value uint32) RGBA[byte] {
 	return RGBA[byte]{
@@ -47,15 +43,27 @@ func RandomRGBA[T core.Numeric]() RGBA[T] {
 		R: core.RandomNumber[T](),
 		G: core.RandomNumber[T](),
 		B: core.RandomNumber[T](),
+		A: core.RandomNumber[T](),
+	}
+}
+
+// RandomRGBAUpTo returns a pseudo-random RGBA[T] of the provided type bounded in the closed interval [0, max].
+func RandomRGBAUpTo[T core.Numeric](rUpper T, gUpper T, bUpper T, aUpper T) RGBA[T] {
+	return RGBA[T]{
+		R: core.RandomNumberRange[T](core.NumericRange[T]{Stop: rUpper}),
+		G: core.RandomNumberRange[T](core.NumericRange[T]{Stop: gUpper}),
+		B: core.RandomNumberRange[T](core.NumericRange[T]{Stop: bUpper}),
+		A: core.RandomNumberRange[T](core.NumericRange[T]{Stop: aUpper}),
 	}
 }
 
 // RandomRGBARange returns a pseudo-random RGBA[T] of the provided type bounded in the closed interval [min, max].
-func RandomRGBARange[T core.Numeric](min T, max T) RGBA[T] {
+func RandomRGBARange[T core.Numeric](rRange core.NumericRange[T], gRange core.NumericRange[T], bRange core.NumericRange[T], aRange core.NumericRange[T]) RGBA[T] {
 	return RGBA[T]{
-		R: core.RandomNumberRange[T](min, max),
-		G: core.RandomNumberRange[T](min, max),
-		B: core.RandomNumberRange[T](min, max),
+		R: core.RandomNumberRange[T](rRange),
+		G: core.RandomNumberRange[T](gRange),
+		B: core.RandomNumberRange[T](bRange),
+		A: core.RandomNumberRange[T](aRange),
 	}
 }
 
@@ -106,6 +114,10 @@ func ScaleToTypeRGBA64[TOut core.Integer](source RGBA[float64]) RGBA[TOut] {
 // RGBAComparator returns if the two RGBA values are equal in values.
 func RGBAComparator[T core.Numeric](a RGBA[T], b RGBA[T]) bool {
 	return a.R == b.R && a.G == b.G && a.B == b.B && a.A == b.A
+}
+
+func (c RGBA[T]) String() string {
+	return fmt.Sprintf("(%v, %v, %v, %v)", c.R, c.G, c.B, c.A)
 }
 
 /**

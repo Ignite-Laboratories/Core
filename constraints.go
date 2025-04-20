@@ -6,7 +6,7 @@ import (
 
 // Numeric represents any integer or floating-point type.
 type Numeric interface {
-	constraints.Integer | constraints.Float
+	Integer | Float
 }
 
 // Integer represents any integer type.

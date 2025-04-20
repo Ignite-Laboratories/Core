@@ -17,10 +17,6 @@ type RGB[T core.Numeric] struct {
 	B T
 }
 
-func (c RGB[T]) String() string {
-	return fmt.Sprintf("(r:%d, g:%d, b:%d)", c.R, c.G, c.B)
-}
-
 // RGBFromHex converts the provided RGB hex values into a std.RGB[byte].
 func RGBFromHex(value uint32) RGB[byte] {
 	return RGB[byte]{
@@ -46,12 +42,21 @@ func RandomRGB[T core.Numeric]() RGB[T] {
 	}
 }
 
-// RandomRGBRange returns a pseudo-random RGB[T] of the provided type bounded in the closed interval [min, max].
-func RandomRGBRange[T core.Numeric](min T, max T) RGB[T] {
+// RandomRGBUpTo returns a pseudo-random RGB[T] of the provided type bounded in the closed interval [0, max].
+func RandomRGBUpTo[T core.Numeric](rUpper T, gUpper T, bUpper T) RGB[T] {
 	return RGB[T]{
-		R: core.RandomNumberRange[T](min, max),
-		G: core.RandomNumberRange[T](min, max),
-		B: core.RandomNumberRange[T](min, max),
+		R: core.RandomNumberRange[T](core.NumericRange[T]{Stop: rUpper}),
+		G: core.RandomNumberRange[T](core.NumericRange[T]{Stop: gUpper}),
+		B: core.RandomNumberRange[T](core.NumericRange[T]{Stop: bUpper}),
+	}
+}
+
+// RandomRGBRange returns a pseudo-random RGB[T] of the provided type bounded in the closed interval [min, max].
+func RandomRGBRange[T core.Numeric](rRange core.NumericRange[T], gRange core.NumericRange[T], bRange core.NumericRange[T]) RGB[T] {
+	return RGB[T]{
+		R: core.RandomNumberRange[T](rRange),
+		G: core.RandomNumberRange[T](gRange),
+		B: core.RandomNumberRange[T](bRange),
 	}
 }
 
@@ -98,6 +103,10 @@ func ScaleToTypeRGB64[TOut core.Integer](source RGB[float64]) RGB[TOut] {
 // RGBComparator returns if the two RGB values are equal in values.
 func RGBComparator[T core.Numeric](a RGB[T], b RGB[T]) bool {
 	return a.R == b.R && a.G == b.G && a.B == b.B
+}
+
+func (c RGB[T]) String() string {
+	return fmt.Sprintf("(%v, %v, %v)", c.R, c.G, c.B)
 }
 
 /**

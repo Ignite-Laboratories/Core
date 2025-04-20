@@ -3,6 +3,7 @@ package core
 import (
 	"debug/buildinfo"
 	"fmt"
+	"math/rand"
 	"os"
 	"strings"
 	"sync/atomic"
@@ -155,4 +156,36 @@ func FatalfCode(exitCode int, module string, format string, a ...any) {
 	fmt.Printf("[%v] %v", module, fmt.Sprintf(format, a...))
 	ShutdownNow()
 	Exit(exitCode)
+}
+
+// RandomNumber returns a random number of the provided type.
+func RandomNumber[T Numeric]() T {
+	switch any(T(0)).(type) {
+	case float32:
+		return T(rand.Float32())
+	case float64:
+		return T(rand.Float64())
+	case int8:
+		return T(rand.Intn(256))
+	case uint8:
+		return T(rand.Intn(256))
+	case int16:
+		return T(rand.Intn(1 << 16))
+	case uint16:
+		return T(rand.Intn(1 << 16))
+	case int32:
+		return T(rand.Int31())
+	case uint32:
+		return T(rand.Uint32())
+	case int64:
+		return T(rand.Int63())
+	case int:
+		return T(rand.Int())
+	case uint64:
+		return T(rand.Uint64())
+	case uint:
+		return T(rand.Uint64())
+	default:
+		panic("unsupported numeric type")
+	}
 }

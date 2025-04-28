@@ -30,6 +30,23 @@ func RGBAFromHex(value uint32) RGBA[byte] {
 	}
 }
 
+// RGBFromHex converts the provided RGB hex values into a std.RGBA[byte].
+//
+// The alpha channel can optionally be provided, otherwise it defaults to 0.
+func RGBFromHex(value uint32, alpha ...byte) RGBA[byte] {
+	a := byte(0)
+	if len(alpha) > 0 {
+		a = alpha[0]
+	}
+
+	return RGBA[byte]{
+		R: byte((value >> 16) & 0xFF),
+		G: byte((value >> 8) & 0xFF),
+		B: byte(value & 0xFF),
+		A: a,
+	}
+}
+
 // RandomRGBA returns a pseudo-random RGBA[T] of the provided type using core.RandomNumber[T].
 //
 // If requesting a floating point type, the resulting number will be bounded
@@ -47,6 +64,30 @@ func RandomRGBA[T core.Numeric]() RGBA[T] {
 	}
 }
 
+// RandomRGB returns a pseudo-random RGB[T] of the provided type using core.RandomNumber[T].
+//
+// If requesting a floating point type, the resulting number will be bounded
+// in the fully closed interval [0.0, 1.0]
+//
+// If requesting an integer type, the resulting number will be bounded
+// in the fully closed interval [0, n] - where n is the maximum value of
+// the provided type.
+//
+// The alpha channel can optionally be provided, otherwise it defaults to 0.
+func RandomRGB[T core.Numeric](alpha ...T) RGBA[T] {
+	a := T(0)
+	if len(alpha) > 0 {
+		a = alpha[0]
+	}
+
+	return RGBA[T]{
+		R: core.RandomNumber[T](),
+		G: core.RandomNumber[T](),
+		B: core.RandomNumber[T](),
+		A: a,
+	}
+}
+
 // RandomRGBAUpTo returns a pseudo-random RGBA[T] of the provided type bounded in the closed interval [0, max].
 func RandomRGBAUpTo[T core.Numeric](rUpper T, gUpper T, bUpper T, aUpper T) RGBA[T] {
 	return RGBA[T]{
@@ -54,6 +95,23 @@ func RandomRGBAUpTo[T core.Numeric](rUpper T, gUpper T, bUpper T, aUpper T) RGBA
 		G: core.RandomNumberRange[T](core.Tuple[T]{B: gUpper}),
 		B: core.RandomNumberRange[T](core.Tuple[T]{B: bUpper}),
 		A: core.RandomNumberRange[T](core.Tuple[T]{B: aUpper}),
+	}
+}
+
+// RandomRGBUpTo returns a pseudo-random RGB[T] of the provided type bounded in the closed interval [0, max].
+//
+// The alpha channel can optionally be provided, otherwise it defaults to 0.
+func RandomRGBUpTo[T core.Numeric](rUpper T, gUpper T, bUpper T, alpha ...T) RGBA[T] {
+	a := T(0)
+	if len(alpha) > 0 {
+		a = alpha[0]
+	}
+
+	return RGBA[T]{
+		R: core.RandomNumberRange[T](core.Tuple[T]{B: rUpper}),
+		G: core.RandomNumberRange[T](core.Tuple[T]{B: gUpper}),
+		B: core.RandomNumberRange[T](core.Tuple[T]{B: bUpper}),
+		A: a,
 	}
 }
 
@@ -67,23 +125,38 @@ func RandomRGBARange[T core.Numeric](rRange core.Tuple[T], gRange core.Tuple[T],
 	}
 }
 
-// NormalizeRGBA32 returns an RGBA[float32] ranging from 0.0-1.0.
-func NormalizeRGBA32[T core.Integer](source RGBA[T]) RGBA[float32] {
-	return RGBA[float32]{
-		R: core.NormalizeToFloat32(source.R),
-		G: core.NormalizeToFloat32(source.G),
-		B: core.NormalizeToFloat32(source.B),
-		A: core.NormalizeToFloat32(source.A),
+// RandomRGBRange returns a pseudo-random RGB[T] of the provided type bounded in the closed interval [min, max].
+func RandomRGBRange[T core.Numeric](rRange core.Tuple[T], gRange core.Tuple[T], bRange core.Tuple[T], alpha ...T) RGBA[T] {
+	a := T(0)
+	if len(alpha) > 0 {
+		a = alpha[0]
+	}
+
+	return RGBA[T]{
+		R: core.RandomNumberRange[T](rRange),
+		G: core.RandomNumberRange[T](gRange),
+		B: core.RandomNumberRange[T](bRange),
+		A: a,
 	}
 }
 
-// NormalizeRGBA64 returns an RGBA[float64] ranging from 0.0-1.0.
-func NormalizeRGBA64[T core.Integer](source RGBA[T]) RGBA[float64] {
+// NormalizeToFloat32 returns an RGBA[float32] ranging from 0.0-1.0.
+func (c RGBA[T]) NormalizeToFloat32() RGBA[float32] {
+	return RGBA[float32]{
+		R: core.NormalizeToFloat32(c.R),
+		G: core.NormalizeToFloat32(c.G),
+		B: core.NormalizeToFloat32(c.B),
+		A: core.NormalizeToFloat32(c.A),
+	}
+}
+
+// NormalizeToFloat64 returns an RGBA[float64] ranging from 0.0-1.0.
+func (c RGBA[T]) NormalizeToFloat64() RGBA[float64] {
 	return RGBA[float64]{
-		R: core.NormalizeToFloat64(source.R),
-		G: core.NormalizeToFloat64(source.G),
-		B: core.NormalizeToFloat64(source.B),
-		A: core.NormalizeToFloat64(source.A),
+		R: core.NormalizeToFloat64(c.R),
+		G: core.NormalizeToFloat64(c.G),
+		B: core.NormalizeToFloat64(c.B),
+		A: core.NormalizeToFloat64(c.A),
 	}
 }
 
@@ -121,7 +194,7 @@ func (c RGBA[T]) String() string {
 }
 
 /**
-Swlizzling
+Swizzling
 */
 
 func (c RGBA[T]) RR() (T, T) { return c.R, c.R }

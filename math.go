@@ -6,9 +6,13 @@ import (
 	"reflect"
 )
 
-// MaxIntegerValue returns the maximum value of the provided type.
-func MaxIntegerValue[T Integer]() uint64 {
+// MaxIntegerValue returns the maximum whole integer value of the provided type.
+func MaxIntegerValue[T Numeric]() uint64 {
 	switch any(T(0)).(type) {
+	case float64:
+		panic("unsupported numeric type - float64's maximum cannot be represented by a uint64")
+	case float32:
+		panic("unsupported numeric type - float32's maximum cannot be represented by a uint64")
 	case int8:
 		return math.MaxInt8
 	case uint8:
@@ -35,19 +39,19 @@ func MaxIntegerValue[T Integer]() uint64 {
 }
 
 // NormalizeToFloat64 returns a normalized value of the provided type in the range [0.0, 1.0].
-func NormalizeToFloat64[T Integer](value T) float64 {
+func NormalizeToFloat64[T Numeric](value T) float64 {
 	return float64(value) / float64(MaxIntegerValue[T]())
 }
 
 // NormalizeToFloat32 returns a normalized value of the provided type in the range [0.0, 1.0].
-func NormalizeToFloat32[T Integer](value T) float32 {
+func NormalizeToFloat32[T Numeric](value T) float32 {
 	return float32(value) / float32(MaxIntegerValue[T]())
 }
 
 // ScaleFloat64ToType returns a scaled value of the provided type in the range [0, T.MaxValue].
 //
 // NOTE: This will panic if the provided value is greater than the maximum value of the provided type.
-func ScaleFloat64ToType[T Integer](value float64) T {
+func ScaleFloat64ToType[T Numeric](value float64) T {
 	if value < 0.0 || value > 1.0 {
 		panic("value must be in range [0.0, 1.0]")
 	}
@@ -57,7 +61,7 @@ func ScaleFloat64ToType[T Integer](value float64) T {
 // ScaleFloat32ToType returns a scaled value of the provided type in the range [0, T.MaxValue].
 //
 // NOTE: This will panic if the provided value is greater than the maximum value of the provided type.
-func ScaleFloat32ToType[T Integer](value float32) T {
+func ScaleFloat32ToType[T Numeric](value float32) T {
 	if value < 0.0 || value > 1.0 {
 		panic("value must be in range [0.0, 1.0]")
 	}

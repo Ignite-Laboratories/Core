@@ -53,6 +53,15 @@ func (d *Dimension[TValue, TCache]) IsHostAlive() bool {
 	return d.HostAliveFunc()
 }
 
+// Read returns a copy of the current timeline information.
+func (d *Dimension[TValue, TCache]) Read() []std.Data[TValue] {
+	d.Mutex.Lock()
+	defer d.Mutex.Unlock()
+	result := make([]std.Data[TValue], len(d.Timeline))
+	copy(result, d.Timeline)
+	return result
+}
+
 // GetPastValue retrieves the value of a specific moment in time from the timeline.
 func (d *Dimension[TValue, TCache]) GetPastValue(moment time.Time) *std.Data[TValue] {
 	d.Mutex.Lock()

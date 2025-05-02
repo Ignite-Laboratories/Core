@@ -35,8 +35,22 @@ type Dimension[TValue any, TCache any] struct {
 	// Destroyed indicates if this dimension has been destroyed.
 	Destroyed bool
 
-	// lastCycle is used by integration to located timeline indexes.
+	// HostAliveFunc can be set to override the default IsHostAlive check.
+	HostAliveFunc func() bool
+
+	// lastCycle is used by integration to locate timeline indexes.
 	lastCycle time.Time
+}
+
+// IsHostAlive returns whether the system that hosts this dimension is alive.
+//
+// By default, this returns core.Alive.  If you would like different logic, you can provide
+// a function to the dimension's HostAliveFunc field.
+func (d *Dimension[TValue, TCache]) IsHostAlive() bool {
+	if d.HostAliveFunc != nil {
+		return core.Alive
+	}
+	return d.HostAliveFunc()
 }
 
 // GetPastValue retrieves the value of a specific moment in time from the timeline.

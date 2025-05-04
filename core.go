@@ -16,6 +16,7 @@ func init() {
 	fmt.Printf("JanOS %v\n", getModuleVersion(ModuleName))
 	fmt.Println("© 2025, Ignite Laboratories")
 	fmt.Println("---------------------------")
+	fmt.Println("JanOS is provided as-is, without warranties or guarantees of any kind. Use at your own discretion.")
 
 	initializeNameDB()
 	Impulse = NewEngine()

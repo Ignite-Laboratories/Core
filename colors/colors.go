@@ -1,4 +1,4 @@
-package color
+package colors
 
 import "github.com/ignite-laboratories/core/std"
 

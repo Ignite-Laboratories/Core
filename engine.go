@@ -20,6 +20,9 @@ type Engine struct {
 	Last Runtime
 
 	// Resistance indicates how much to resist the next impulse, with 0 (default) providing no resistance.
+	//
+	// This specifically sets the number of nanoseconds to sleep for each cycle of the engine, though
+	// provides no guarantee with regard to temporal precision.
 	Resistance int
 
 	// Beat provides the current count of impulses fired while performing asynchronous activations.
@@ -53,13 +56,15 @@ func NewEngine(name ...GivenName) *Engine {
 	e.neurons = make(map[uint64]*Neuron)
 
 	// Set up impulse regulation
-	regulator := func(ctx Context) {
-		for i := 0; i < e.Resistance; i++ {
-		}
-	}
-	e.Block(regulator, func(ctx Context) bool { return true }, false)
+	e.Block(e.regulator, func(ctx Context) bool { return true }, false)
 
 	return &e
+}
+
+func (e *Engine) regulator(ctx Context) {
+	if e.Resistance > 0 {
+		time.Sleep(time.Duration(e.Resistance))
+	}
 }
 
 // addNeuron provides a thread-safe way of adding neurons to the internal map.

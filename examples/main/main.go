@@ -23,7 +23,7 @@ func main() {
 	// Trim down the resistance cyclically
 	core.Impulse.Loop(AdjustFrequency, when.Always, false)
 
-	// Set the initial resistance high
+	// Set the initial resistance to 10 ms
 	core.Impulse.Resistance = 10000000
 
 	core.WhileAlive()

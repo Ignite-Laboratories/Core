@@ -30,7 +30,7 @@ func (s Synchro) Send(action func()) {
 	syn.Wait()
 }
 
-// Engage asynchronously handles incoming messages on the Synchro channel before returning control.
+// Engage asynchronously handles the currently incoming messages on the Synchro channel before returning control.
 func (s Synchro) Engage() {
 	for {
 		select {

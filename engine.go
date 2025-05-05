@@ -36,7 +36,7 @@ type Engine struct {
 	// calculation can occur at a rate closer to 60-120hz with negligible degradation.
 	MaxFrequency float64
 
-	// OnStop is called whenever the engine stops, if it's provided.
+	// OnStop is called whenever the engine stops, if not nil.
 	OnStop func()
 
 	stopPotential Potential

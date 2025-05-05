@@ -88,5 +88,6 @@ func Integration[TSource any, TValue any, TCache any](engine *core.Engine, poten
 	} else {
 		d.Stimulator = engine.Stimulate(f, potential, muted)
 	}
+	d.engine = engine
 	return &d
 }

@@ -29,5 +29,6 @@ func Loop(engine *core.Engine, potential core.Potential, muted bool, target core
 		d.Mutex.Unlock()
 	}
 	d.Stimulator = engine.Loop(f, potential, muted)
+	d.engine = engine
 	return &d
 }

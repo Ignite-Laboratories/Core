@@ -29,5 +29,6 @@ func Calculation[TValue any](engine *core.Engine, potential core.Potential, mute
 		d.Mutex.Unlock()
 	}
 	d.Stimulator = engine.Stimulate(f, potential, muted)
+	d.engine = engine
 	return &d
 }

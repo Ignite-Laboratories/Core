@@ -40,6 +40,7 @@ type Dimension[TValue any, TCache any] struct {
 
 	// lastCycle is used by integration to locate timeline indexes.
 	lastCycle time.Time
+	engine    *core.Engine
 }
 
 // IsHostAlive returns whether the system that hosts this dimension is alive.
@@ -51,6 +52,30 @@ func (d *Dimension[TValue, TCache]) IsHostAlive() bool {
 		return core.Alive
 	}
 	return d.HostAliveFunc()
+}
+
+// Write circumvents the impulse engine and writes a value directly to the dimension.
+func (d *Dimension[TValue, TCache]) Write(value TValue) {
+	d.Mutex.Lock()
+	defer d.Mutex.Unlock()
+
+	now := time.Now()
+	period := now.Sub(d.Current.Moment)
+
+	var ctx core.Context
+	ctx.ID = core.NextID()
+	ctx.Moment = now
+	ctx.Period = period
+	ctx.Beat = d.engine.Beat
+	ctx.LastImpulse = d.engine.Last
+
+	data := std.Data[TValue]{
+		Context: ctx,
+		Point:   value,
+	}
+
+	d.Current = &data
+	d.Timeline = append(d.Timeline, data)
 }
 
 // Read returns a copy of the current timeline information.

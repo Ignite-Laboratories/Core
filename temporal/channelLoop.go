@@ -29,5 +29,6 @@ func ChannelLoop(engine *core.Engine, potential core.Potential, muted bool) *Dim
 	}
 
 	d.Stimulator = engine.Loop(f, potential, muted)
+	d.engine = engine
 	return &d
 }

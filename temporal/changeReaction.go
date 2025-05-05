@@ -34,5 +34,6 @@ func ChangeReaction[TValue any](engine *core.Engine, potential core.Potential, m
 		}
 	}
 	d.Stimulator = engine.Stimulate(f, potential, muted)
+	d.engine = engine
 	return &d
 }

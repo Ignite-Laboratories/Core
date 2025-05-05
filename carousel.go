@@ -2,11 +2,10 @@ package core
 
 import (
 	"container/list"
-	"github.com/ignite-laboratories/core"
 	"sync"
 )
 
-// Carousel represetns a FIFO collection of Go routines which can be activated via their std.Synchro.
+// Carousel represetns a FIFO collection of Go routines which can be used to execute code.
 //
 // The number of Go routines is based upon demand - if none are available when a request is made,
 // a new Go routine is spawned.  The TTL value indicates the number of activations a single routine
@@ -25,6 +24,7 @@ type routine struct {
 	TTL     int
 	Input   chan func()
 	Running bool
+	Alive   bool
 }
 
 func NewCarousel(ttl int) *Carousel {
@@ -42,7 +42,7 @@ func (c *Carousel) getNextAvailable() *routine {
 		if value, ok := front.Value.(*routine); ok {
 			// Move the found routine to the back of the carousel
 			c.Remove(front)
-			if value.TTL > 0 {
+			if value.Alive {
 				c.PushBack(value)
 				if !value.Running {
 					// If it's not running, return it
@@ -55,25 +55,31 @@ func (c *Carousel) getNextAvailable() *routine {
 	}
 	// ...if one wasn't found, spawn a new one
 	r := routine{
-		TTL: c.TTL,
+		TTL:   c.TTL,
+		Input: make(chan func()),
+		Alive: true,
 	}
 	go r.Run()
 	c.PushBack(r)
 	return &r
 }
 
-// Step takes the provided action and calls it on a Go routine.  If none is currently available,
-// a new Go routine will be spawned.
+// Step takes the provided action and calls it on an existing Go routine.
+//
+// If none is currently available, a new Go routine will be spawned.
 func (c *Carousel) Step(action func()) {
 	r := c.getNextAvailable()
 	r.Input <- action
 }
 
-// Run starts listening for actions, decrementing the spawned TTL with each fired action until 0 before returning.
+// Run starts listening for actions, decrementing the spawned TTL value with each message until 0 before "dying."
 func (r *routine) Run() {
-	for core.Alive && TTL > 0 {
+	for Alive && r.TTL > 0 {
 		action := <-r.Input
+		r.Running = true
 		action()
-		TTL--
+		r.Running = false
+		r.TTL--
 	}
+	r.Alive = false
 }

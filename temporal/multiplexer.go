@@ -32,5 +32,6 @@ func Multiplexer[TValue core.Numeric](engine *core.Engine, potential core.Potent
 		d.Mutex.Unlock()
 	}
 	d.Stimulator = engine.Stimulate(f, potential, muted)
+	d.engine = engine
 	return &d
 }

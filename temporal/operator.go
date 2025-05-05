@@ -34,5 +34,6 @@ func Operator[TValue core.Numeric](engine *core.Engine, potential core.Potential
 		d.Mutex.Unlock()
 	}
 	d.Stimulator = engine.Stimulate(f, potential, muted)
+	d.engine = engine
 	return &d
 }

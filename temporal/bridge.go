@@ -48,5 +48,6 @@ func Bridge[TValue any](engine *core.Engine) (func(TValue), *Dimension[TValue, a
 		lastMoment = now
 	}
 
+	d.engine = engine
 	return callback, &d
 }

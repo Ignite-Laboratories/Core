@@ -23,7 +23,7 @@ type Engine struct {
 	//
 	// This specifically sets the number of nanoseconds to sleep for each cycle of the engine, though
 	// provides no guarantee with regard to temporal precision.
-	Resistance int
+	Resistance time.Duration
 
 	// Beat provides the current count of impulses fired while performing asynchronous activations.
 	//
@@ -63,7 +63,7 @@ func NewEngine(name ...GivenName) *Engine {
 
 func (e *Engine) regulator(ctx Context) {
 	if e.Resistance > 0 {
-		time.Sleep(time.Duration(e.Resistance))
+		time.Sleep(e.Resistance)
 	}
 }
 

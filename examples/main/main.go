@@ -24,7 +24,7 @@ func main() {
 	core.Impulse.Loop(AdjustFrequency, when.Always, false)
 
 	// Set the initial resistance to 10 ms
-	core.Impulse.Resistance = 0
+	core.Impulse.Resistance = time.Millisecond * 10
 
 	core.WhileAlive()
 }

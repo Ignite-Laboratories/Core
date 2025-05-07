@@ -5,6 +5,8 @@ import (
 )
 
 // Data represents a contextual point value in time.
+//
+// It also includes impulse runtime information.
 type Data[T any] struct {
 	core.Context
 

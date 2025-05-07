@@ -16,7 +16,7 @@ func Reaction[TValue any](engine *core.Engine, potential core.Potential, muted b
 	d := Dimension[TValue, any]{}
 	d.NamedEntity = core.NewNamedEntity()
 	d.Window = core.DefaultObservanceWindow
-	d.Trimmer = engine.Loop(d.Trim, when.Frequency(&core.TrimFrequency), false)
+	d.Trimmer = engine.Loop(d.ImpulseTrim, when.Frequency(&core.TrimFrequency), false)
 	f := func(ctx core.Context) {
 		data := std.Data[TValue]{
 			Context: ctx,
@@ -36,6 +36,5 @@ func Reaction[TValue any](engine *core.Engine, potential core.Potential, muted b
 		d.Mutex.Unlock()
 	}
 	d.Stimulator = engine.Stimulate(f, potential, muted)
-	d.engine = engine
 	return &d
 }

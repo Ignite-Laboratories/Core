@@ -13,7 +13,7 @@ func ChannelLoop(engine *core.Engine, potential core.Potential, muted bool) *Dim
 	d := Dimension[core.Runtime, chan std.ChannelAction]{}
 	d.NamedEntity = core.NewNamedEntity()
 	d.Window = core.DefaultObservanceWindow
-	d.Trimmer = engine.Loop(d.Trim, when.Frequency(&core.TrimFrequency), false)
+	d.Trimmer = engine.Loop(d.ImpulseTrim, when.Frequency(&core.TrimFrequency), false)
 	c := make(chan std.ChannelAction)
 	d.Cache = &c
 	f := func(ctx core.Context) {
@@ -29,6 +29,5 @@ func ChannelLoop(engine *core.Engine, potential core.Potential, muted bool) *Dim
 	}
 
 	d.Stimulator = engine.Loop(f, potential, muted)
-	d.engine = engine
 	return &d
 }

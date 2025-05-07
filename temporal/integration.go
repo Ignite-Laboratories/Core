@@ -21,7 +21,7 @@ func Integration[TSource any, TValue any, TCache any](engine *core.Engine, poten
 	d := Dimension[TValue, TCache]{}
 	d.NamedEntity = core.NewNamedEntity()
 	d.Window = core.DefaultObservanceWindow
-	d.Trimmer = engine.Loop(d.Trim, when.Frequency(&core.TrimFrequency), false)
+	d.Trimmer = engine.Loop(d.ImpulseTrim, when.Frequency(&core.TrimFrequency), false)
 	d.lastCycle = core.Inception
 	d.Cache = new(TCache)
 
@@ -88,6 +88,5 @@ func Integration[TSource any, TValue any, TCache any](engine *core.Engine, poten
 	} else {
 		d.Stimulator = engine.Stimulate(f, potential, muted)
 	}
-	d.engine = engine
 	return &d
 }

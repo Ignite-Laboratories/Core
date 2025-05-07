@@ -40,7 +40,6 @@ type Dimension[TValue any, TCache any] struct {
 
 	// lastCycle is used by integration to locate timeline indexes.
 	lastCycle time.Time
-	engine    *core.Engine
 }
 
 // IsHostAlive returns whether the system that hosts this dimension is alive.
@@ -66,8 +65,6 @@ func (d *Dimension[TValue, TCache]) Write(value TValue) {
 	ctx.ID = core.NextID()
 	ctx.Moment = now
 	ctx.Period = period
-	ctx.Beat = d.engine.Beat
-	ctx.LastImpulse = d.engine.Last
 
 	data := std.Data[TValue]{
 		Context: ctx,
@@ -131,9 +128,18 @@ func (d *Dimension[TValue, TCache]) GetBeatValue(beat int) *std.Data[TValue] {
 	return nil
 }
 
+// ImpulseTrim removes anything on the timeline that is older than the dimension's window of observance.
+//
+// This version allows an impulse to trigger the trimming operation - Please use Trim if calling directly.
+func (d *Dimension[TValue, TCache]) ImpulseTrim(ctx core.Context) {
+	d.Trim()
+}
+
 // Trim removes anything on the timeline that is older than the dimension's window of observance.
-func (d *Dimension[TValue, TCache]) Trim(ctx core.Context) {
+func (d *Dimension[TValue, TCache]) Trim() {
 	d.Mutex.Lock()
+	defer d.Mutex.Unlock()
+
 	var trimCount int
 	for _, v := range d.Timeline {
 		if time.Now().Sub(v.Moment) < d.Window {
@@ -142,7 +148,6 @@ func (d *Dimension[TValue, TCache]) Trim(ctx core.Context) {
 		trimCount++
 	}
 	d.Timeline = d.Timeline[trimCount:]
-	d.Mutex.Unlock()
 }
 
 // Destroy removes this dimension's neurons from the engine entirely.

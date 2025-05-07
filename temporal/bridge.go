@@ -21,7 +21,7 @@ func Bridge[TValue any](engine *core.Engine) (func(TValue), *Dimension[TValue, a
 	d := Dimension[TValue, any]{}
 	d.NamedEntity = core.NewNamedEntity()
 	d.Window = core.DefaultObservanceWindow
-	d.Trimmer = engine.Loop(d.Trim, when.Frequency(&core.TrimFrequency), false)
+	d.Trimmer = engine.Loop(d.ImpulseTrim, when.Frequency(&core.TrimFrequency), false)
 
 	var beat int
 	var lastMoment time.Time
@@ -48,6 +48,5 @@ func Bridge[TValue any](engine *core.Engine) (func(TValue), *Dimension[TValue, a
 		lastMoment = now
 	}
 
-	d.engine = engine
 	return callback, &d
 }

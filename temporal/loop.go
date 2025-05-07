@@ -16,7 +16,7 @@ func Loop(engine *core.Engine, potential core.Potential, muted bool, target core
 	d := Dimension[core.Runtime, any]{}
 	d.NamedEntity = core.NewNamedEntity()
 	d.Window = core.DefaultObservanceWindow
-	d.Trimmer = engine.Loop(d.Trim, when.Frequency(&core.TrimFrequency), false)
+	d.Trimmer = engine.Loop(d.ImpulseTrim, when.Frequency(&core.TrimFrequency), false)
 	f := func(ctx core.Context) {
 		data := std.Data[core.Runtime]{
 			Context: ctx,
@@ -29,6 +29,5 @@ func Loop(engine *core.Engine, potential core.Potential, muted bool, target core
 		d.Mutex.Unlock()
 	}
 	d.Stimulator = engine.Loop(f, potential, muted)
-	d.engine = engine
 	return &d
 }

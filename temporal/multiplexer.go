@@ -16,7 +16,7 @@ func Multiplexer[TValue core.Numeric](engine *core.Engine, potential core.Potent
 	d := Dimension[TValue, any]{}
 	d.NamedEntity = core.NewNamedEntity()
 	d.Window = core.DefaultObservanceWindow
-	d.Trimmer = engine.Loop(d.Trim, when.Frequency(&core.TrimFrequency), false)
+	d.Trimmer = engine.Loop(d.ImpulseTrim, when.Frequency(&core.TrimFrequency), false)
 	f := func(ctx core.Context) {
 		values := make([]any, len(dimensions))
 		for i, otherD := range dimensions {
@@ -32,6 +32,5 @@ func Multiplexer[TValue core.Numeric](engine *core.Engine, potential core.Potent
 		d.Mutex.Unlock()
 	}
 	d.Stimulator = engine.Stimulate(f, potential, muted)
-	d.engine = engine
 	return &d
 }

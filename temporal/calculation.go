@@ -16,7 +16,7 @@ func Calculation[TValue any](engine *core.Engine, potential core.Potential, mute
 	d := Dimension[TValue, any]{}
 	d.NamedEntity = core.NewNamedEntity()
 	d.Window = core.DefaultObservanceWindow
-	d.Trimmer = engine.Loop(d.Trim, when.Frequency(&core.TrimFrequency), false)
+	d.Trimmer = engine.Loop(d.ImpulseTrim, when.Frequency(&core.TrimFrequency), false)
 	f := func(ctx core.Context) {
 		value := calculate(ctx)
 		data := std.Data[TValue]{
@@ -29,6 +29,5 @@ func Calculation[TValue any](engine *core.Engine, potential core.Potential, mute
 		d.Mutex.Unlock()
 	}
 	d.Stimulator = engine.Stimulate(f, potential, muted)
-	d.engine = engine
 	return &d
 }

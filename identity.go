@@ -14,6 +14,7 @@ var nameDB string
 // Names provides a collection of cultural names for seeding identifiers with.
 //
 // All credit goes to Kevin MacLeod of Incompetech for such a wonderful source database!
+// https://incompetech.com
 //
 // Please check his stuff out, he's quite clever!
 var Names = make(NameDB, 0, 8888)
@@ -48,8 +49,7 @@ func NewName(name string, description ...string) GivenName {
 	}
 }
 
-// Gender provides global identifiers for Male, Female, or NonBinary interpretations - as gender
-// is ultimately self-defined.
+// Gender provides global identifiers for Male, Female, or NonBinary interpretations.
 type Gender int
 
 const (

@@ -72,7 +72,7 @@ func (s FilterableSlice[T]) Where(predicate func(int, T) bool) []T {
 	}
 
 	wg.Wait()
-	
+
 	results := make([]T, 0, len(s))
 	for item := range resultChan {
 		results = append(results, item)

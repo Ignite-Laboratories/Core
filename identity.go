@@ -16,7 +16,9 @@ var nameDB string
 // All credit goes to Kevin MacLeod of Incompetech for such a wonderful source database!
 //
 // Please check his stuff out, he's quite clever!
-var Names = make([]GivenName, 0, 8888)
+var Names = make(NameDB, 0, 8888)
+
+type NameDB []GivenName
 
 // GivenName represents a name, as well as its original cultural meaning.
 //
@@ -125,6 +127,12 @@ func LookupName(name string, caseInsensitive ...bool) (GivenName, error) {
 }
 
 // RandomName returns a random name from the Names slice.
-func RandomName() GivenName {
+//
+// If you'd prefer a random name from your own name database, provide it as a parameter.
+func RandomName(database ...NameDB) GivenName {
+	if len(database) > 0 {
+		names := database[0]
+		return names[rand.Intn(len(names))]
+	}
 	return Names[rand.Intn(len(Names))]
 }

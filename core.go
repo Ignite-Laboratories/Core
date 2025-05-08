@@ -18,6 +18,7 @@ func init() {
 	fmt.Println("---------------------------")
 	fmt.Println("JanOS is provided as-is, without warranties or guarantees of any kind. Use at your own discretion.")
 
+	ConfigureEnivornment()
 	initializeNameDB()
 	Impulse = NewEngine()
 }

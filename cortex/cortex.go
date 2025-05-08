@@ -9,3 +9,7 @@ type Cortex struct {
 	core.Engine
 	temporal.Universe
 }
+
+func (c Cortex) Spark() {
+	c.Engine.Spark()
+}

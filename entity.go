@@ -1,11 +1,12 @@
 package core
 
-// Entity provides 'ID' and 'Name' fields to any composite types.
+// Entity provides an 'ID' field to any composite types.
 type Entity struct {
 	// ID is the unique identifier for this entity, relative to its home world.
 	ID uint64
 }
 
+// NamedEntity provides a given name to the entity.
 type NamedEntity struct {
 	GivenName
 	Entity

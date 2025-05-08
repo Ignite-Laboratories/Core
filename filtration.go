@@ -47,17 +47,13 @@ func (s FilterableSlice[T]) Where(predicate func(int, T) bool) []T {
 		return results
 	}
 
-	// Create channels for collecting results
 	resultChan := make(chan T, len(s))
-
-	// Calculate chunks
 	chunkSize := 1024
-	numGoroutines := (len(s) + chunkSize - 1) / chunkSize // ceiling division
+	numGoroutines := (len(s) + chunkSize - 1) / chunkSize
 
 	var wg sync.WaitGroup
 	wg.Add(numGoroutines)
 
-	// Process chunks
 	for i := 0; i < numGoroutines; i++ {
 		start := i * chunkSize
 		end := start + chunkSize
@@ -75,13 +71,8 @@ func (s FilterableSlice[T]) Where(predicate func(int, T) bool) []T {
 		}(s[start:end], start)
 	}
 
-	// Close channel after all goroutines complete
-	go func() {
-		wg.Wait()
-		close(resultChan)
-	}()
-
-	// Collect results
+	wg.Wait()
+	
 	results := make([]T, 0, len(s))
 	for item := range resultChan {
 		results = append(results, item)

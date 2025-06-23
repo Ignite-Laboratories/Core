@@ -12,7 +12,12 @@ func NewRecorder[TValue any](dimension *Dimension[TValue, any]) *Recorder[TValue
 	return &r
 }
 
-// Emit places the provided value on the dimension.
-func (r *Recorder[TValue]) Emit(value interface{}) {
+// Emit records the provided value onto the dimensional timeline.
+//
+// NOTE: This timestamps the emission with the current instant.
+// The ability to back-date emitted values directly contradicts the spirit of this library,
+// and as such you should reconsider your implementation if you wish to circumvent this limitation.
+// Remember, the amount of calculation time something takes to emit a value is a useful data point in of itself.
+func (r *Recorder[TValue]) Emit(value TValue) {
 	r.Write(value)
 }

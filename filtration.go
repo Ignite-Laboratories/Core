@@ -27,12 +27,32 @@ func (m FilterableMap[K, V]) Where(predicate func(K, V) bool) map[K]V {
 	return results
 }
 
-// Where is a filtration method for slices.  It calls the predicate for every entry
+// Where is a filtration method for slices. It calls the predicate for every entry
 // in the slice and returns a new slice containing only the entries for which the
 // predicate returned true.  This is effectively a "Where" clause.
 //
 // If a nil predicate is provided, an empty slice is returned.
 func (s FilterableSlice[T]) Where(predicate func(int, T) bool) []T {
+	results := make([]T, 0, len(s))
+	if predicate == nil {
+		return results
+	}
+
+	for i, v := range s {
+		if predicate(i, v) {
+			results = append(results, v)
+		}
+	}
+	return results
+}
+
+// WhereAsync is a filtration method for slices.  It calls the predicate for every entry
+// in the slice and returns a new slice containing only the entries for which the
+// predicate returned true.  This is effectively a "Where" clause.  This uses goroutines
+// to parallelize the filtering process.
+//
+// If a nil predicate is provided, an empty slice is returned.
+func (s FilterableSlice[T]) WhereAsync(predicate func(int, T) bool) []T {
 	if predicate == nil || len(s) == 0 {
 		return make([]T, 0)
 	}

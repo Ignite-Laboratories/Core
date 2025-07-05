@@ -118,7 +118,7 @@ func DurationToHertz(d time.Duration) float64 {
 func HertzToDuration(hz float64) time.Duration {
 	if hz <= 0 {
 		// No division by zero
-		hz = 1e-100 // math.SmallestNonzeroFloat64 <- NOTE: Raspberry Pi doesn't handle this constant well
+		hz = 1e-100 // math.SmallestNonzeroFloat64 🡨 NOTE: Raspberry Pi doesn't handle this constant well
 	}
 	s := 1 / hz
 	ns := s * 1e9

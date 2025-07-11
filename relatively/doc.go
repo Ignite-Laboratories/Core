@@ -28,5 +28,5 @@
 //	 if 𝑏 != relatively.After { ... }   // Has 𝑏 not yet crossed a threshold?
 //	       etc...
 //
-// See relatively.Before, relatively.Aligned, relatively.After
+// See Relativity, Before, Aligned, and After
 package relatively

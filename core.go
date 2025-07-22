@@ -70,6 +70,12 @@ func NextID() uint64 {
 	return atomic.AddUint64(&currentId, 1)
 }
 
+// True is a constantly referenceable true.
+var True bool = true
+
+// False is a constantly referenceable false.
+var False bool = false
+
 // Shutdown waits a period of time before calling ShutdownNow
 func Shutdown(period time.Duration) {
 	Printf(ModuleName, "shutting down in %v\n", period)

@@ -8,6 +8,10 @@ type FilterableMap[K comparable, V any] map[K]V
 // FilterableSlice is a type of slice that provides primitive filtration methods.
 type FilterableSlice[T any] []T
 
+func NewFilterableSlice[T any](data ...T) FilterableSlice[T] {
+	return data
+}
+
 // Where is a filtration method for maps. It calls the predicate for every entry
 // in the map and returns a new map containing only the entries for which the
 // predicate returned true.  This is effectively a "Where" clause.
@@ -83,15 +87,18 @@ func (s FilterableSlice[T]) WhereAsync(predicate func(int, T) bool) []T {
 
 		go func(chunk []T, baseIndex int) {
 			defer wg.Done()
-			for i, item := range chunk {
-				if predicate(baseIndex+i, item) {
+			for ii, item := range chunk {
+				if predicate(baseIndex+ii, item) {
 					resultChan <- item
 				}
 			}
 		}(s[start:end], start)
 	}
 
-	wg.Wait()
+	go func() {
+		wg.Wait()
+		close(resultChan)
+	}()
 
 	results := make([]T, 0, len(s))
 	for item := range resultChan {

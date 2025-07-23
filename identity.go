@@ -30,9 +30,31 @@ type NameDB []GivenName
 type GivenName struct {
 	Name        string
 	Description string
-	Details     struct {
-		Origin string
-		Gender Gender
+	Details     NameDetails
+}
+
+func (n GivenName) String() string {
+	if n.Description == "" {
+		return fmt.Sprintf("%v", n.Name)
+	}
+	return fmt.Sprintf("%v - %v", n.Name, n.Description)
+}
+
+type NameDetails struct {
+	Origin string
+	Gender Gender
+}
+
+func (d NameDetails) String() string {
+	switch d.Gender {
+	case Male:
+		return fmt.Sprintf("%v - Male", d.Origin)
+	case Female:
+		return fmt.Sprintf("%v - Female", d.Origin)
+	case NonBinary:
+		return fmt.Sprintf("%v - Non-binary", d.Origin)
+	default:
+		return fmt.Sprintf("%v", d.Origin)
 	}
 }
 
@@ -50,6 +72,8 @@ func NewName(name string, description ...string) GivenName {
 }
 
 // Gender provides global identifiers for Male, Female, or NonBinary interpretations.
+//
+// NOTE: Every single name is inherently 'non-binary' - these simply are cultural traditions =)
 type Gender int
 
 const (
@@ -57,13 +81,6 @@ const (
 	Male
 	NonBinary
 )
-
-func (n GivenName) String() string {
-	if n.Description == "" {
-		return fmt.Sprintf("%v", n.Name)
-	}
-	return fmt.Sprintf("%v - %v", n.Name, n.Description)
-}
 
 func initializeNameDB() {
 	reader := csv.NewReader(strings.NewReader(nameDB))
@@ -135,4 +152,16 @@ func RandomName(database ...NameDB) GivenName {
 		return names[rand.Intn(len(names))]
 	}
 	return Names[rand.Intn(len(Names))]
+}
+
+// RandomNameFiltered returns a random name from the Names slice which passes the provided predicate check.
+//
+// If you'd prefer a random name from your own name database, provide it as a parameter.
+func RandomNameFiltered(predicate func(GivenName) bool, database ...NameDB) GivenName {
+	for {
+		name := RandomName(database...)
+		if predicate(name) {
+			return name
+		}
+	}
 }

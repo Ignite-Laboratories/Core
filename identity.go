@@ -5,6 +5,7 @@ import (
 	"encoding/csv"
 	"fmt"
 	"math/rand"
+	"regexp"
 	"strings"
 )
 
@@ -164,4 +165,38 @@ func RandomNameFiltered(predicate func(GivenName) bool, database ...NameDB) Give
 			return name
 		}
 	}
+}
+
+/**
+tiny
+*/
+
+var _usedTinyNames = make(map[string]*GivenName)
+
+// RandomTinyName is a standard function for returning a name which satisfies tiny's requirements for implicit naming.
+// Currently, these are our explicit filters -
+//
+//   - Only the standard 26 letters of the English alphabet (case-insensitive)
+//   - No whitespace or special characters (meaning only single word names)
+//   - At least three characters in length
+//
+// These filters will never be reduced - if any changes are made, they will only be augmented.
+//
+// NOTE: This guarantees up to 2¹⁴ unique names before it begins recycling names.
+func RandomTinyName() GivenName {
+	return RandomNameFiltered(tinyNameFilter)
+}
+
+func tinyNameFilter(name GivenName) bool {
+	var nonAlphaRegex = regexp.MustCompile(`^[a-zA-Z]+$`)
+
+	if len(_usedTinyNames) >= 1<<14 {
+		_usedTinyNames = make(map[string]*GivenName)
+	}
+
+	if nonAlphaRegex.MatchString(name.Name) && _usedTinyNames[name.Name] == nil && len(name.Name) > 2 {
+		_usedTinyNames[name.Name] = &name
+		return true
+	}
+	return false
 }

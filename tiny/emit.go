@@ -1,0 +1,282 @@
+package tiny
+
+import (
+	"fmt"
+	"github.com/ignite-laboratories/core/std"
+)
+
+// Select expresses the input operands according to the provided logical expression.
+//
+// NOTE: This will return an ErrorNothingToEmit and an empty slice if provided no operands.
+//
+// NOTE: This will return an ErrorOutOfEmittableData if there were not enough operands to satisfy
+// the expression, while still returning whatever it could find.
+func Select[T any](expr std.Expression, operands ...T) ([]T, error) {
+	totalWidth := uint(len(operands))
+	if totalWidth == 0 {
+		return make([]T, 0), ErrorNothingToEmit
+	}
+
+	// Evaluate and set the appropriate expression boundary values
+	expr, operands = evaluateExpression(expr, totalWidth, operands...)
+
+	// This is essentially 'slice logic' - but there is no reason to split this into a separate function.
+	panic("unimplemented")
+}
+
+// Emit expresses the underlying bits of the Operable operands according to the provided logical expression.
+//
+// NOTE: This will return an ErrorNothingToEmit and an empty bit slice if the input operands have no overall bits.
+//
+// NOTE: This will return an ErrorOutOfEmittableData if there were not enough bits found to satisfy
+// the expression, while still returning whatever it could find.
+func Emit[T std.Operable](expr std.Expression, operands ...T) ([]std.Bit, error) {
+	// Do nothing if there is no binary information to emit
+	totalWidth := GetBitWidth(operands...)
+	if totalWidth == 0 {
+		return make([]std.Bit, 0), ErrorNothingToEmit
+	}
+
+	// Evaluate and set the appropriate expression boundary values
+	expr, operands = evaluateExpression(expr, totalWidth, operands...)
+
+	// Switch between matrix or linear logic based upon the presence of an artifact function
+
+	// Matrix logic - Performs logic at the phrase level while emitting out the underlying bits
+	if expr.Artifact != nil {
+		yield, _ := matrixLogic(0, expr, operands...)
+		return yield, nil
+	}
+
+	// Linear logic - Recurses to the bit level before performing logic
+	yield, _ := linearLogic(0, expr, operands...)
+	if len(yield) < int(expr.Limit) {
+		return yield, ErrorOutOfEmittableData
+	}
+
+	return yield, nil
+}
+
+func linearLogic[T std.Operable](cursor uint, expr std.Expression, operands ...T) ([]std.Bit, uint) {
+	yield := make([]std.Bit, 0, 1<<10) // Pre-allocate a reasonable chunk of memory
+
+	// Walk through the current operands one at a time
+	for _, raw := range operands {
+		if GetBitWidth(raw) == 0 {
+			continue
+		}
+
+		cycleBits := make([]std.Bit, 0, 1<<10) // Pre-allocate a reasonable chunk of memory
+
+		// Decompose them through recursion
+		switch operand := any(raw).(type) {
+		case std.Complex:
+			panic(fmt.Errorf("cannot perform linear logic on complex numbers as they cannot be implicitly aligned"))
+		case std.Phrase:
+			// Phrases recurse into their respective measurements
+			var bits []std.Bit
+			bits, cursor = linearLogic(cursor, expr, operand.GetData()...)
+			cycleBits = append(cycleBits, bits...)
+		case std.Index:
+			// Indexes recurse into their respective measurements
+			var bits []std.Bit
+			bits, cursor = linearLogic(cursor, expr, operand.GetData()...)
+			cycleBits = append(cycleBits, bits...)
+		case std.Real:
+			// Reals recurse into their phrase form
+			var bits []std.Bit
+			bits, cursor = linearLogic(cursor, expr, operand.AsPhrase())
+			cycleBits = append(cycleBits, bits...)
+		case std.Natural:
+			// Naturals recurse into their composed measurement
+			var bits []std.Bit
+			bits, cursor = linearLogic(cursor, expr, operand.Measurement)
+			cycleBits = append(cycleBits, bits...)
+		case std.Measurement:
+			// Measurements recurse into their individual bits
+			var bits []std.Bit
+
+			bits, cursor = linearLogic(cursor, expr, operand.GetAllBits()...)
+			cycleBits = append(cycleBits, bits...)
+		case []byte:
+			// Byte slices recurse into their individual bytes
+			var bits []std.Bit
+			bits, cursor = linearLogic(cursor, expr, operand...)
+			cycleBits = append(cycleBits, bits...)
+		case byte:
+			// Bytes recurse into their individual bits
+			bits := make([]std.Bit, 8)
+			for i := 7; i >= 0; i-- {
+				bits[i] = std.Bit((operand >> i) & 1)
+			}
+			bits, cursor = linearLogic(cursor, expr, bits...)
+			cycleBits = append(cycleBits, bits...)
+		case std.Bit:
+			// Bits step the cursor across the bits and select out data
+			if expr.BitLogic != nil {
+				bits, _ := (*expr.BitLogic)(cursor, operand)
+				operand = bits[0]
+			}
+
+			if expr.Positions != nil && len(*expr.Positions) > 0 {
+				// We are performing explicit position selection
+				for _, pos := range *expr.Positions {
+					if pos == cursor {
+
+						cycleBits = append(cycleBits, operand)
+					}
+				}
+			} else {
+				// We are performing ranged selection
+				if cursor >= *expr.Low && cursor < *expr.High {
+					cycleBits = append(cycleBits, operand)
+				}
+			}
+
+			// Increment the cursor's current bit position in the source information
+			cursor++
+		default:
+			panic(fmt.Errorf("invalid binary type: %T", operand))
+		}
+
+		// Yield the found bits
+		yield = append(yield, cycleBits...)
+
+		// Check if there is a continuation function and whether it has returned false
+		if expr.Continue != nil && !(*expr.Continue)(cursor, yield) {
+			return yield, cursor
+		}
+
+		// Bailout when the pre-calculated limit has been met
+		overage := len(yield) - int(expr.Limit)
+		if overage > 0 {
+			cursor -= uint(overage)
+			return yield[:int(expr.Limit)], cursor
+		}
+	}
+	return yield, cursor
+}
+
+func matrixLogic[T std.Operable](cursor uint, expr std.Expression, operands ...T) ([]std.Bit, uint) {
+	// TODO: start sub-expressions to grab bits and build a matrix for computation
+
+	//if expr._matrix != nil && *expr._matrix {
+	//	/**
+	//	Matrix Logic
+	//	*/
+	//
+	//	if expr._matrixLogic == nil {
+	//		panic("matrix expressions require a logic function")
+	//	}
+	//
+	//	calculate := *expr._matrixLogic
+	//
+	//	if expr._alignment == nil {
+	//		align := PadLeftSideWithZeros
+	//		expr._alignment = &align
+	//	}
+	//
+	//	longest := GetWidestOperand(data...)
+	//
+	//	if longest <= 0 {
+	//		return yield, 0
+	//	}
+	//
+	//	subExpr := expr
+	//	subExpr._matrix = &False
+	//
+	//	// The underlying table is ordered [Col][Row]Bit
+	//	table := make([][]std.Bit, longest)
+	//	for i, raw := range data {
+	//		data[i] = AlignOperands(raw, longest, *expr._alignment)
+	//		table[i], _ = Emit[T](subExpr, raw)
+	//	}
+	//
+	//	// TODO: We can't walk using longest because longest will grow as we carry - instead we need to just walk until we are out of bits to walk and pass the walk count to the matrix func
+	//
+	//	for i := 0; i < longest; i++ {
+	//		colId := i
+	//		if reverse {
+	//			colId = longest - i - 1
+	//		}
+	//
+	//		column := make([]std.Bit, len(table))
+	//		for rowId, row := range table {
+	//			column[rowId] = row[colId]
+	//		}
+	//		calculated, overflow := calculate(colId, column...)
+	//
+	//		// TODO: Insert the overflow binary value BELOW the upcoming columns in the direction of calculation
+	//
+	//		if reverse {
+	//			yield = append(yield, calculated)
+	//		} else {
+	//			yield = append([]std.Bit{b}, yield...)
+	//		}
+	//	}
+	//
+	//	linear := make([]std.Bit, 0, len(matrix)*longest)
+	//	for _, element := range matrix {
+	//		linear = append(linear, element...)
+	//	}
+	//
+	//	yield = linear
+	//	count = uint(longest) // TODO: Alignment all the operands and set this to the number of returned operands
+	//} else {
+	return nil, Unlimited
+}
+
+// evaluateExpression performs sanity checks and sets the boundary values for the expression.
+func evaluateExpression[T any](expr std.Expression, totalWidth uint, operands ...T) (std.Expression, []T) {
+	if (expr.Positions != nil && len(*expr.Positions) > 0) && (expr.Low != nil || expr.High != nil) {
+		panic("cannot search for an explicit position inside of a range - you can perform that operation with compound emit operations")
+	}
+
+	// Set our cursor limit
+	if expr.Positions != nil {
+		// We are performing point selection
+		expr.Limit += uint(len(*expr.Positions))
+	} else {
+		// We are performing range selection
+		expr.Limit = totalWidth
+
+		// Set the boundaries and limit value according to the expression
+		if expr.Low != nil {
+			expr.Limit -= uint(*expr.Low)
+
+			if expr.High != nil {
+				expr.Limit = *expr.High - *expr.Low
+			} else {
+				// If no high boundary, set it to the last index of the operands
+				last := uint(int(totalWidth))
+				expr.High = &last
+			}
+		} else {
+			first := uint(0)
+			last := uint(int(totalWidth))
+
+			if expr.High != nil {
+				last = *expr.High
+			}
+
+			expr.Low = &first
+			expr.High = &last
+		}
+	}
+
+	// Calculate the last bit position of the operands, if requested
+	if expr.Last != nil {
+		added := append(*expr.Positions, totalWidth-1)
+		expr.Positions = &added
+
+		expr.Last = nil
+	}
+
+	// Check if the data should be reversed at this point
+	if expr.Reverse != nil && *expr.Reverse {
+		// If so...put your thing down, flip it, and reverse it
+		operands = ReverseOperands(operands...)
+		expr.Reverse = nil
+	}
+	return expr, operands
+}

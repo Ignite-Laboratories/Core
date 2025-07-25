@@ -62,6 +62,16 @@ var TrimFrequency = 1024.0 //hz
 // Verbose sets whether the system should emit more verbose logs or not.
 var Verbose bool
 
+// True is a constantly referenceable true.
+//
+// See False
+var True bool = true
+
+// False is a constantly referenceable false.
+//
+// See True
+var False bool = false
+
 // currentId holds the last provided identifier.
 var currentId uint64
 
@@ -69,12 +79,6 @@ var currentId uint64
 func NextID() uint64 {
 	return atomic.AddUint64(&currentId, 1)
 }
-
-// True is a constantly referenceable true.
-var True bool = true
-
-// False is a constantly referenceable false.
-var False bool = false
 
 // Shutdown waits a period of time before calling ShutdownNow
 func Shutdown(period time.Duration) {

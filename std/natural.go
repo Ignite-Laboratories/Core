@@ -1,6 +1,8 @@
 package std
 
-import "github.com/ignite-laboratories/core"
+import (
+	"github.com/ignite-laboratories/core/internal"
+)
 
 // Natural represents a kind of Measurement with a value belonging to the set of naturally countable numbers - or all
 // positive whole numbers, including zero.
@@ -32,7 +34,7 @@ type Natural struct {
 // NewNatural takes a Measurement of the provided unsigned integer value as a Natural number.
 func NewNatural(value uint) Natural {
 	return Natural{
-		Measurement: NewMeasurementOfBytes(core.Measure(value)[0]...),
+		Measurement: NewMeasurementOfBytes(internal.Measure(value)[0]...),
 	}
 }
 

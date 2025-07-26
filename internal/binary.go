@@ -1,4 +1,4 @@
-package core
+package internal
 
 import (
 	"encoding/binary"
@@ -25,8 +25,6 @@ func ReverseByte(b byte) byte {
 }
 
 // Measure takes "raw" measurements of many objects at runtime and returns slices with each of their underlying bytes.
-//
-// NOTE: A "raw" measurement is one typed as a []byte, rather than a std.Measurement for proper measurements, please use 'tiny'.
 //
 // NOTE: Be sure to explicitly provide the type parameter to ensure Go doesn't implicitly
 // give you, say, all 8 bytes worth of an 'int' to represent a single 'byte' =)

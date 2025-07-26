@@ -93,20 +93,11 @@ const WordWidth = strconv.IntSize // NOTE: While this could mismatch on exotic h
 Errors
 */
 
-const errorMsgNotABit = "bits must be 0 or 1 in value"
-const errorMsgNotABitWithNil = "bits must be 0, 1, or 219 (nil) in value"
-const errorMsgOutOfEmittableData = "ran out of data to emit"
-const errorMsgNothingToEmit = "nothing to emit"
-
 // ErrorNotABit is emitted whenever a method expecting a Bit is provided with any other byte value than 1, 0 - as Bit is a byte underneath.
-var ErrorNotABit = fmt.Errorf(errorMsgNotABit)
+var ErrorNotABit = fmt.Errorf("bits must be 0 or 1 in value")
 
 // ErrorNotABitWithNil is emitted whenever a method expecting a Bit is provided with any other byte value than 1, 0, or 219 (nil) - as Bit is a byte underneath.
-var ErrorNotABitWithNil = fmt.Errorf(errorMsgNotABitWithNil)
+var ErrorNotABitWithNil = fmt.Errorf("bits must be 0, 1, or 219 (nil) in value")
 
-// ErrorOutOfEmittableData is emitted whenever an emission operation requested more bits than could be emitted.
-var ErrorOutOfEmittableData = fmt.Errorf(errorMsgOutOfEmittableData)
-
-// ErrorNothingToEmit is emitted whenever Emit is provided with nothing to emit - this may mean no operands were provided,
-// or there was no underlying binary information.
-var ErrorNothingToEmit = fmt.Errorf(errorMsgNothingToEmit)
+// ErrorOutOfData is emitted whenever an emission operation requested more bits than could be emitted.
+var ErrorOutOfData = fmt.Errorf("ran out of data")

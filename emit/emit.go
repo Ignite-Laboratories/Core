@@ -30,7 +30,7 @@ func FromAny[T any](target T) Target[std.Measurement] {
 
 // Until keeps reading your binary information until the continue function returns false while traveling.Eastbound, unless otherwise specified.
 func (t Target[T]) Until(continueFn std.ContinueFunc, travel ...traveling.Traveling) ([]std.Bit, error) {
-	reverse := tiny.ShouldReverseLongitudinally(travel...)
+	reverse := itiny.ShouldReverseLongitudinally(travel...)
 	return itiny.Emit(istd.Expression{
 		Continue: &continueFn,
 		Reverse:  &reverse,
@@ -39,7 +39,7 @@ func (t Target[T]) Until(continueFn std.ContinueFunc, travel ...traveling.Travel
 
 // Positions [𝑛₀,𝑛₁,𝑛₂...] creates a std.Expression which will read the provided index positions of your binary information while traveling.Eastbound, unless otherwise specified.
 func (t Target[T]) Positions(positions []uint, travel ...traveling.Traveling) ([]std.Bit, error) {
-	reverse := tiny.ShouldReverseLongitudinally(travel...)
+	reverse := itiny.ShouldReverseLongitudinally(travel...)
 	return itiny.Emit(istd.Expression{
 		Positions: &positions,
 		Reverse:   &reverse,
@@ -48,7 +48,7 @@ func (t Target[T]) Positions(positions []uint, travel ...traveling.Traveling) ([
 
 // Width [𝑛] creates a std.Expression which will read the provided bit width while traveling.Eastbound, unless otherwise specified.
 func (t Target[T]) Width(width uint, travel ...traveling.Traveling) ([]std.Bit, error) {
-	reverse := tiny.ShouldReverseLongitudinally(travel...)
+	reverse := itiny.ShouldReverseLongitudinally(travel...)
 	return itiny.Emit(istd.Expression{
 		Low:     &tiny.Start,
 		High:    &width,
@@ -72,7 +72,7 @@ func (t Target[T]) Last() ([]std.Bit, error) {
 
 // Low [low:] creates a std.Expression which will read from the provided index to the end of your binary information while traveling.Eastbound, unless otherwise specified.
 func (t Target[T]) Low(low uint, travel ...traveling.Traveling) ([]std.Bit, error) {
-	reverse := tiny.ShouldReverseLongitudinally(travel...)
+	reverse := itiny.ShouldReverseLongitudinally(travel...)
 	return itiny.Emit(istd.Expression{
 		Low:     &low,
 		Reverse: &reverse,
@@ -81,7 +81,7 @@ func (t Target[T]) Low(low uint, travel ...traveling.Traveling) ([]std.Bit, erro
 
 // High [:high] creates a std.Expression which will read to the provided index from the start of your binary information while traveling.Eastbound, unless otherwise specified.
 func (t Target[T]) High(high uint, travel ...traveling.Traveling) ([]std.Bit, error) {
-	reverse := tiny.ShouldReverseLongitudinally(travel...)
+	reverse := itiny.ShouldReverseLongitudinally(travel...)
 	return itiny.Emit(istd.Expression{
 		High:    &high,
 		Reverse: &reverse,
@@ -90,7 +90,7 @@ func (t Target[T]) High(high uint, travel ...traveling.Traveling) ([]std.Bit, er
 
 // Between [low:high:*] creates a std.Expression which will read between the provided indexes of your binary information up to the provided maximum while traveling.Eastbound, unless otherwise specified.
 func (t Target[T]) Between(low uint, high uint, travel ...traveling.Traveling) ([]std.Bit, error) {
-	reverse := tiny.ShouldReverseLongitudinally(travel...)
+	reverse := itiny.ShouldReverseLongitudinally(travel...)
 	return itiny.Emit(istd.Expression{
 		Low:     &low,
 		High:    &high,
@@ -100,7 +100,7 @@ func (t Target[T]) Between(low uint, high uint, travel ...traveling.Traveling) (
 
 // All [:] creates a std.Expression which will read the entirety of your binary information while traveling.Eastbound, unless otherwise specified.
 func (t Target[T]) All(travel ...traveling.Traveling) ([]std.Bit, error) {
-	reverse := tiny.ShouldReverseLongitudinally(travel...)
+	reverse := itiny.ShouldReverseLongitudinally(travel...)
 	return itiny.Emit(istd.Expression{
 		Reverse: &reverse,
 	}, t.target...)
@@ -112,7 +112,7 @@ Logic Gates
 
 // Gate creates a std.Expression which will apply the provided logic gate against every input bit while traveling.Eastbound, unless otherwise specified.
 func (t Target[T]) Gate(logic std.BitLogicFunc, travel ...traveling.Traveling) ([]std.Bit, error) {
-	reverse := tiny.ShouldReverseLongitudinally(travel...)
+	reverse := itiny.ShouldReverseLongitudinally(travel...)
 	return itiny.Emit(istd.Expression{
 		BitLogic: &logic,
 		Reverse:  &reverse,

@@ -9,14 +9,11 @@ import (
 
 // Select expresses the input operands according to the provided logical expression.
 //
-// NOTE: This will return an ErrorNothingToEmit and an empty slice if provided no operands.
-//
-// NOTE: This will return an ErrorOutOfEmittableData if there were not enough operands to satisfy
-// the expression, while still returning whatever it could find.
+// NOTE: This will return a tiny.ErrorOutOfData if the expression either couldn't be satisfied or no input data was provided.
 func Select[T any](expr istd.Expression, operands ...T) ([]T, error) {
 	totalWidth := uint(len(operands))
 	if totalWidth == 0 {
-		return make([]T, 0), tiny.ErrorNothingToEmit
+		return make([]T, 0), tiny.ErrorOutOfData
 	}
 
 	// Evaluate and set the appropriate expression boundary values
@@ -47,15 +44,12 @@ func Select[T any](expr istd.Expression, operands ...T) ([]T, error) {
 
 // Emit expresses the underlying bits of the Operable operands according to the provided logical expression.
 //
-// NOTE: This will return an ErrorNothingToEmit and an empty bit slice if the input operands have no overall bits.
-//
-// NOTE: This will return an ErrorOutOfEmittableData if there were not enough bits found to satisfy
-// the expression, while still returning whatever it could find.
+// NOTE: This will return a tiny.ErrorOutOfData if the expression either couldn't be satisfied or no input data was provided.
 func Emit[T std.Operable](expr istd.Expression, operands ...T) ([]std.Bit, error) {
 	// Do nothing if there is no binary information to emit
 	totalWidth := tiny.GetBitWidth(operands...)
 	if totalWidth == 0 {
-		return make([]std.Bit, 0), tiny.ErrorNothingToEmit
+		return make([]std.Bit, 0), tiny.ErrorOutOfData
 	}
 
 	// Evaluate and set the appropriate expression boundary values
@@ -72,7 +66,7 @@ func Emit[T std.Operable](expr istd.Expression, operands ...T) ([]std.Bit, error
 	// Linear logic - Recurses to the bit level before performing logic
 	yield, _ := linearLogic(0, expr, operands...)
 	if len(yield) < int(expr.Limit) {
-		return yield, tiny.ErrorOutOfEmittableData
+		return yield, tiny.ErrorOutOfData
 	}
 
 	return yield, nil
@@ -296,7 +290,7 @@ func evaluateExpression[T any](expr istd.Expression, totalWidth uint, operands .
 	// Check if the data should be reversed at this point
 	if expr.Reverse != nil && *expr.Reverse {
 		// If so...put your thing down, flip it, and reverse it
-		operands = tiny.ReverseOperands(operands...)
+		operands = ReverseOperands(operands...)
 		expr.Reverse = nil
 	}
 	return expr, operands

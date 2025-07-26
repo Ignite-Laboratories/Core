@@ -1,4 +1,4 @@
-package tiny
+package itiny
 
 import (
 	"github.com/ignite-laboratories/core"

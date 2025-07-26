@@ -2,9 +2,9 @@ package std
 
 import (
 	"fmt"
-	"github.com/ignite-laboratories/core"
 	"github.com/ignite-laboratories/core/enum/endian"
 	"github.com/ignite-laboratories/core/enum/traveling"
+	"github.com/ignite-laboratories/core/internal"
 	"strings"
 )
 
@@ -248,7 +248,7 @@ func (a Measurement) Reverse() Measurement {
 
 	ii := 0
 	for i := len(a.Bytes) - 1; i >= 0; i-- {
-		reversedBytes[ii] = core.ReverseByte(a.Bytes[i])
+		reversedBytes[ii] = internal.ReverseByte(a.Bytes[i])
 		ii++
 	}
 

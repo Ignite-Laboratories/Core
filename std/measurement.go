@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/ignite-laboratories/core"
 	"github.com/ignite-laboratories/core/enum/endian"
-	"github.com/ignite-laboratories/core/enum/travel"
+	"github.com/ignite-laboratories/core/enum/traveling"
 	"strings"
 )
 
@@ -73,29 +73,29 @@ func NewMeasurementOfOnes(width int) Measurement {
 //
 // Inward and outward travel directions are supported and work from the midpoint of the width, biased towards the west.
 func NewMeasurementOfBit(w int, b Bit) Measurement {
-	return NewMeasurementOfPattern(w, travel.Eastbound, b)
+	return NewMeasurementOfPattern(w, traveling.Eastbound, b)
 }
 
 // NewMeasurementOfPattern creates a new Measurement of the provided bit-width consisting of the pattern emitted across it in the direction.Direction of travel.Traveling.
 //
 // Inward and outward travel directions are supported and work from the midpoint of the width, biased towards the west.
-func NewMeasurementOfPattern(w int, t travel.Traveling, p ...Bit) Measurement {
+func NewMeasurementOfPattern(w int, t traveling.Traveling, p ...Bit) Measurement {
 	if w <= 0 || len(p) == 0 {
 		return Measurement{
 			Endianness: endian.Big,
 		}
 	}
 
-	if t == travel.Northbound || t == travel.Southbound {
+	if t == traveling.Northbound || t == traveling.Southbound {
 		panic(fmt.Sprintf("cannot take a latitudinal binary measurement [%v]", t.StringFull(true)))
 	}
 
-	printer := func(width int, tt travel.Traveling) []Bit {
+	printer := func(width int, tt traveling.Traveling) []Bit {
 		bits := make([]Bit, width)
 		patternI := 0
 		for i := 0; i < width; i++ {
 			ii := i
-			if tt == travel.Westbound {
+			if tt == traveling.Westbound {
 				ii = width - 1 - i
 			}
 
@@ -105,16 +105,16 @@ func NewMeasurementOfPattern(w int, t travel.Traveling, p ...Bit) Measurement {
 		return bits
 	}
 
-	if t == travel.Inbound || t == travel.Outbound {
+	if t == traveling.Inbound || t == traveling.Outbound {
 		leftWidth := w / 2
 		rightWidth := w - leftWidth
 
-		if t == travel.Inbound {
-			left := NewMeasurement(printer(leftWidth, travel.Eastbound)...)
-			right := NewMeasurement(printer(rightWidth, travel.Westbound)...)
+		if t == traveling.Inbound {
+			left := NewMeasurement(printer(leftWidth, traveling.Eastbound)...)
+			right := NewMeasurement(printer(rightWidth, traveling.Westbound)...)
 			return left.AppendMeasurements(right)
 		}
-		return NewMeasurement(printer(leftWidth, travel.Westbound)...).Append(printer(rightWidth, travel.Eastbound)...)
+		return NewMeasurement(printer(leftWidth, traveling.Westbound)...).Append(printer(rightWidth, traveling.Eastbound)...)
 	}
 	return NewMeasurement(printer(w, t)...)
 }

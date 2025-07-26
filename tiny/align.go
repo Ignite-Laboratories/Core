@@ -3,11 +3,11 @@ package tiny
 import (
 	"fmt"
 	"github.com/ignite-laboratories/core/enum/direction"
-	"github.com/ignite-laboratories/core/enum/travel"
+	"github.com/ignite-laboratories/core/enum/traveling"
 	"github.com/ignite-laboratories/core/std"
 )
 
-func middlePadOperands[T std.Operable](width uint, d direction.Direction, t travel.Traveling, digits []std.Bit, operands ...T) []T {
+func middlePadOperands[T std.Operable](width uint, d direction.Direction, t traveling.Traveling, digits []std.Bit, operands ...T) []T {
 	// TODO: Implement north/south padding
 	out := make([]T, len(operands))
 
@@ -17,12 +17,12 @@ func middlePadOperands[T std.Operable](width uint, d direction.Direction, t trav
 		left := toPad / 2
 		right := toPad - left
 
-		if t == travel.Outbound {
-			out[i] = padOperands(left, d, travel.Westbound, digits, o)[0]
-			out[i] = padOperands(right, d, travel.Eastbound, digits, out[i])[0]
-		} else if t == travel.Inbound {
-			out[i] = padOperands(left, d, travel.Eastbound, digits, o)[0]
-			out[i] = padOperands(right, d, travel.Westbound, digits, out[i])[0]
+		if t == traveling.Outbound {
+			out[i] = padOperands(left, d, traveling.Westbound, digits, o)[0]
+			out[i] = padOperands(right, d, traveling.Eastbound, digits, out[i])[0]
+		} else if t == traveling.Inbound {
+			out[i] = padOperands(left, d, traveling.Eastbound, digits, o)[0]
+			out[i] = padOperands(right, d, traveling.Westbound, digits, out[i])[0]
 		} else {
 			out[i] = padOperands(left, d, t, digits, o)[0]
 			out[i] = padOperands(right, d, t, digits, out[i])[0]
@@ -32,7 +32,7 @@ func middlePadOperands[T std.Operable](width uint, d direction.Direction, t trav
 	return out
 }
 
-func padOperands[T std.Operable](width uint, d direction.Direction, t travel.Traveling, digits []std.Bit, operands ...T) []T {
+func padOperands[T std.Operable](width uint, d direction.Direction, t traveling.Traveling, digits []std.Bit, operands ...T) []T {
 	out := make([]T, len(operands))
 
 	if d == direction.North || d == direction.South {

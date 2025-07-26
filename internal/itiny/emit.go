@@ -1,8 +1,10 @@
-package tiny
+package itiny
 
 import (
 	"fmt"
+	"github.com/ignite-laboratories/core/internal/istd"
 	"github.com/ignite-laboratories/core/std"
+	"github.com/ignite-laboratories/core/tiny"
 )
 
 // Select expresses the input operands according to the provided logical expression.
@@ -11,17 +13,36 @@ import (
 //
 // NOTE: This will return an ErrorOutOfEmittableData if there were not enough operands to satisfy
 // the expression, while still returning whatever it could find.
-func Select[T any](expr std.Expression, operands ...T) ([]T, error) {
+func Select[T any](expr istd.Expression, operands ...T) ([]T, error) {
 	totalWidth := uint(len(operands))
 	if totalWidth == 0 {
-		return make([]T, 0), ErrorNothingToEmit
+		return make([]T, 0), tiny.ErrorNothingToEmit
 	}
 
 	// Evaluate and set the appropriate expression boundary values
 	expr, operands = evaluateExpression(expr, totalWidth, operands...)
 
-	// This is essentially 'slice logic' - but there is no reason to split this into a separate function.
-	panic("unimplemented")
+	var yield []T
+
+	if expr.Positions != nil {
+		yield = make([]T, expr.Limit)
+
+		for i, pos := range *expr.Positions {
+			yield[i] = operands[pos]
+		}
+		return yield, nil
+	}
+	if expr.Where != nil {
+		yield = make([]T, 0, expr.Limit)
+		for _, operand := range operands {
+			if (*expr.Where)(operand) {
+				yield = append(yield, operand)
+			}
+		}
+		return yield, nil
+	}
+	yield = operands[*expr.Low:*expr.High]
+	return yield, nil
 }
 
 // Emit expresses the underlying bits of the Operable operands according to the provided logical expression.
@@ -30,11 +51,11 @@ func Select[T any](expr std.Expression, operands ...T) ([]T, error) {
 //
 // NOTE: This will return an ErrorOutOfEmittableData if there were not enough bits found to satisfy
 // the expression, while still returning whatever it could find.
-func Emit[T std.Operable](expr std.Expression, operands ...T) ([]std.Bit, error) {
+func Emit[T std.Operable](expr istd.Expression, operands ...T) ([]std.Bit, error) {
 	// Do nothing if there is no binary information to emit
-	totalWidth := GetBitWidth(operands...)
+	totalWidth := tiny.GetBitWidth(operands...)
 	if totalWidth == 0 {
-		return make([]std.Bit, 0), ErrorNothingToEmit
+		return make([]std.Bit, 0), tiny.ErrorNothingToEmit
 	}
 
 	// Evaluate and set the appropriate expression boundary values
@@ -51,18 +72,18 @@ func Emit[T std.Operable](expr std.Expression, operands ...T) ([]std.Bit, error)
 	// Linear logic - Recurses to the bit level before performing logic
 	yield, _ := linearLogic(0, expr, operands...)
 	if len(yield) < int(expr.Limit) {
-		return yield, ErrorOutOfEmittableData
+		return yield, tiny.ErrorOutOfEmittableData
 	}
 
 	return yield, nil
 }
 
-func linearLogic[T std.Operable](cursor uint, expr std.Expression, operands ...T) ([]std.Bit, uint) {
+func linearLogic[T std.Operable](cursor uint, expr istd.Expression, operands ...T) ([]std.Bit, uint) {
 	yield := make([]std.Bit, 0, 1<<10) // Pre-allocate a reasonable chunk of memory
 
 	// Walk through the current operands one at a time
 	for _, raw := range operands {
-		if GetBitWidth(raw) == 0 {
+		if tiny.GetBitWidth(raw) == 0 {
 			continue
 		}
 
@@ -157,7 +178,7 @@ func linearLogic[T std.Operable](cursor uint, expr std.Expression, operands ...T
 	return yield, cursor
 }
 
-func matrixLogic[T std.Operable](cursor uint, expr std.Expression, operands ...T) ([]std.Bit, uint) {
+func matrixLogic[T std.Operable](cursor uint, expr istd.Expression, operands ...T) ([]std.Bit, uint) {
 	// TODO: start sub-expressions to grab bits and build a matrix for computation
 
 	//if expr._matrix != nil && *expr._matrix {
@@ -223,11 +244,11 @@ func matrixLogic[T std.Operable](cursor uint, expr std.Expression, operands ...T
 	//	yield = linear
 	//	count = uint(longest) // TODO: Alignment all the operands and set this to the number of returned operands
 	//} else {
-	return nil, Unlimited
+	return nil, tiny.Unlimited
 }
 
 // evaluateExpression performs sanity checks and sets the boundary values for the expression.
-func evaluateExpression[T any](expr std.Expression, totalWidth uint, operands ...T) (std.Expression, []T) {
+func evaluateExpression[T any](expr istd.Expression, totalWidth uint, operands ...T) (istd.Expression, []T) {
 	if (expr.Positions != nil && len(*expr.Positions) > 0) && (expr.Low != nil || expr.High != nil) {
 		panic("cannot search for an explicit position inside of a range - you can perform that operation with compound emit operations")
 	}
@@ -275,7 +296,7 @@ func evaluateExpression[T any](expr std.Expression, totalWidth uint, operands ..
 	// Check if the data should be reversed at this point
 	if expr.Reverse != nil && *expr.Reverse {
 		// If so...put your thing down, flip it, and reverse it
-		operands = ReverseOperands(operands...)
+		operands = tiny.ReverseOperands(operands...)
 		expr.Reverse = nil
 	}
 	return expr, operands

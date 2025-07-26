@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/ignite-laboratories/core"
 	"github.com/ignite-laboratories/core/enum/pad"
-	"github.com/ignite-laboratories/core/enum/travel"
+	"github.com/ignite-laboratories/core/enum/traveling"
 	"github.com/ignite-laboratories/core/std"
 	"reflect"
 	"unsafe"
@@ -140,7 +140,7 @@ func GetWidestOperand[T std.Operable](operands ...T) uint {
 // from the West side and working towards the East.  If working latitudinally, the pattern bits are applied longitudinally across each operand in the same way.
 //
 // NOTE: If you wish for
-func AlignOperands[T std.Operable](operands []T, width uint, scheme pad.Scheme, traveling travel.Traveling, digits ...std.Bit) []T {
+func AlignOperands[T std.Operable](operands []T, width uint, scheme pad.Scheme, travel traveling.Traveling, digits ...std.Bit) []T {
 	// TODO: alignment
 	return operands
 }
@@ -292,21 +292,20 @@ func ToType[T any](m std.Measurement) T {
 	return result
 }
 
-// ShouldReverseLongitudinally indicates if the direction of travel is westerly and the emission should be reversed, otherwise it panics.
-//
-// NOTE: This is entirely a convenience function for emission passthrough
-func ShouldReverseLongitudinally(traveling ...travel.Traveling) bool {
+// ShouldReverseLongitudinally indicates if the direction of travel is westerly and the emission should be reversed,
+// easterly and remain as is, or panic.
+func ShouldReverseLongitudinally(travel ...traveling.Traveling) bool {
 	reverse := false
-	if len(traveling) > 0 {
-		t := traveling[0]
+	if len(travel) > 0 {
+		t := travel[0]
 		switch t {
-		case travel.Westbound:
+		case traveling.Westbound:
 			reverse = true
-		case travel.Eastbound:
+		case traveling.Eastbound:
 			reverse = false
-		case travel.Inbound, travel.Outbound:
+		case traveling.Inbound, traveling.Outbound:
 			panic(fmt.Sprintf("cannot emit in multiple directions [%v]", t.StringFull()))
-		case travel.Northbound, travel.Southbound:
+		case traveling.Northbound, traveling.Southbound:
 			panic(fmt.Sprintf("cannot emit latitudinally from a linear binary measurement [%v]", t.StringFull()))
 		default:
 			panic(fmt.Sprintf("unknown direction of travel [%v]", t))

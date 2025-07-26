@@ -1,7 +1,7 @@
 // Package traveling provides access to the Traveling enumeration.
-package travel
+package traveling
 
-// Traveling represents a longitudinal or latitudinal direction.Direction of Traveling.
+// Traveling represents a longitudinal or latitudinal direction.Direction of "travel".
 //
 // These directly relate to the cardinal directions of calculation.
 //

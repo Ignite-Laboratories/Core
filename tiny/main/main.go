@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/ignite-laboratories/core/emit"
 	"github.com/ignite-laboratories/core/enum/direction"
-	"github.com/ignite-laboratories/core/enum/travel"
+	"github.com/ignite-laboratories/core/enum/traveling"
 	"github.com/ignite-laboratories/core/std"
 	"github.com/ignite-laboratories/core/tiny"
 	"math/rand/v2"
@@ -33,11 +33,11 @@ func main() {
 		return false
 	}
 
-	bits, err = emit.From(p).Until(continueFn, travel.Westbound)
-	fmt.Printf("%v ← %v %v while ( len(found) < %d )\n", bits, p.Name, travel.Westbound.StringFull(true), width)
+	bits, err = emit.From(p).Until(continueFn, traveling.Westbound)
+	fmt.Printf("%v ← %v %v while ( len(found) < %d )\n", bits, p.Name, traveling.Westbound.StringFull(true), width)
 
-	bits, err = emit.From(p).Until(continueFn, travel.Eastbound)
-	fmt.Printf("%v ← %v %v while ( len(found) < %d )\n\n", bits, p.Name, travel.Eastbound.StringFull(true), width)
+	bits, err = emit.From(p).Until(continueFn, traveling.Eastbound)
+	fmt.Printf("%v ← %v %v while ( len(found) < %d )\n\n", bits, p.Name, traveling.Eastbound.StringFull(true), width)
 
 	fmt.Printf("#3 - Emitting specific bits of %v:\n", p.Name)
 	bits, _ = emit.From(p).Between(11, 44)
@@ -48,7 +48,7 @@ func main() {
 	fmt.Printf("%v ← %v[55:88] - Error: %v\n\n", bits, p.Name, err)
 
 	fmt.Printf("#5 -  Emitting the NOT of the last emitted bits from %v:\n", p.Name)
-	notBits, _ := emit.From(bits).NOT()
+	notBits, _ := emit.From(bits...).NOT()
 	fmt.Printf("%v ← !%v\n\n", notBits, p.Name)
 
 	fmt.Println("#6 - Measuring an object in memory:")
@@ -62,10 +62,10 @@ func main() {
 	fmt.Println("#8 - Pattern emission:")
 
 	pattern := []std.Bit{1, 0, 0, 1, 1}
-	fmt.Printf("%v ← %v %v\n", std.NewMeasurementOfPattern(22, travel.Westbound, pattern...).AsPhrase(-1).StringPretty(), pattern, travel.Westbound.StringFull())
-	fmt.Printf("%v ← %v %v\n", std.NewMeasurementOfPattern(22, travel.Eastbound, pattern...).AsPhrase(-1).StringPretty(), pattern, travel.Eastbound.StringFull())
-	fmt.Printf("%v ← %v %v\n", std.NewMeasurementOfPattern(22, travel.Inbound, pattern...).AsPhrase(-1).StringPretty(), pattern, travel.Inbound.StringFull())
-	fmt.Printf("%v ← %v %v\n", std.NewMeasurementOfPattern(22, travel.Outbound, pattern...).AsPhrase(-1).StringPretty(), pattern, travel.Outbound.StringFull())
+	fmt.Printf("%v ← %v %v\n", std.NewMeasurementOfPattern(22, traveling.Westbound, pattern...).AsPhrase(-1).StringPretty(), pattern, traveling.Westbound.StringFull())
+	fmt.Printf("%v ← %v %v\n", std.NewMeasurementOfPattern(22, traveling.Eastbound, pattern...).AsPhrase(-1).StringPretty(), pattern, traveling.Eastbound.StringFull())
+	fmt.Printf("%v ← %v %v\n", std.NewMeasurementOfPattern(22, traveling.Inbound, pattern...).AsPhrase(-1).StringPretty(), pattern, traveling.Inbound.StringFull())
+	fmt.Printf("%v ← %v %v\n", std.NewMeasurementOfPattern(22, traveling.Outbound, pattern...).AsPhrase(-1).StringPretty(), pattern, traveling.Outbound.StringFull())
 	width = 11
 	fmt.Printf("%v ← %d repeating `0`s\n", std.NewMeasurementOfBit(width, 0).AsPhrase(-1).StringPretty(), width)
 	fmt.Printf("%v ← %d repeating `1`s\n\n", std.NewMeasurementOfBit(width, 1).AsPhrase(-1).StringPretty(), width)

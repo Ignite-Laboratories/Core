@@ -1,18 +1,5 @@
 package std
 
-// Expression represents the standard slice index accessor pattern, and expressions can be generated from the global Read variable.
-type Expression struct {
-	Positions *[]uint
-	Low       *uint
-	High      *uint
-	Last      *bool
-	Reverse   *bool
-	BitLogic  *BitLogicFunc
-	Artifact  *ArtifactFunc
-	Continue  *ContinueFunc
-	Limit     uint
-}
-
 /**
 Tiny functions
 */
@@ -25,3 +12,6 @@ type ArtifactFunc func(i uint, artifact Phrase, operands ...Phrase) []Phrase
 
 // ContinueFunc is called after every Bit is read with the currently read bits - if it returns false, the emission terminates traversal.
 type ContinueFunc func(i uint, data []Bit) bool
+
+// SelectionFunc acts as a selection predicate for selection queries.
+type SelectionFunc[T any] func(T) bool

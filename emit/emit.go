@@ -5,121 +5,121 @@ package emit
 
 import (
 	"github.com/ignite-laboratories/core"
-	"github.com/ignite-laboratories/core/enum/travel"
+	"github.com/ignite-laboratories/core/enum/traveling"
+	"github.com/ignite-laboratories/core/internal/istd"
+	"github.com/ignite-laboratories/core/internal/itiny"
 	"github.com/ignite-laboratories/core/std"
 	"github.com/ignite-laboratories/core/tiny"
 )
 
 type Target[T std.Operable] struct {
-	target T
+	target []T
 }
 
-func From[T std.Operable](target T) Target[T] {
+// From starts a fluent expression chain against the provided target.
+func From[T std.Operable](target ...T) Target[T] {
 	return Target[T]{
 		target: target,
 	}
 }
 
-// Until keeps reading the provided bit width until the continue function returns false in most→to→least significant order
-func (t Target[T]) Until(continueFn std.ContinueFunc, traveling ...travel.Traveling) ([]std.Bit, error) {
-	reverse := tiny.ShouldReverseLongitudinally(traveling...)
-	return tiny.Emit(std.Expression{
+// FromAny takes a measurement of the provided target, then starts a fluent expression chain against the provided target.
+func FromAny[T any](target T) Target[std.Measurement] {
+	return From(tiny.Measure[T](target))
+}
+
+// Until keeps reading your binary information until the continue function returns false while traveling.Eastbound, unless otherwise specified.
+func (t Target[T]) Until(continueFn std.ContinueFunc, travel ...traveling.Traveling) ([]std.Bit, error) {
+	reverse := tiny.ShouldReverseLongitudinally(travel...)
+	return itiny.Emit(istd.Expression{
 		Continue: &continueFn,
 		Reverse:  &reverse,
-	}, t.target)
+	}, t.target...)
 }
 
-// Positions [𝑛₀,𝑛₁,𝑛₂...] creates a std.Expression which will read the provided index positions of your binary information in most→to→least significant order - regardless of the provided variadic order.
-func (t Target[T]) Positions(positions []uint, traveling ...travel.Traveling) ([]std.Bit, error) {
-	reverse := tiny.ShouldReverseLongitudinally(traveling...)
-	return tiny.Emit(std.Expression{
+// Positions [𝑛₀,𝑛₁,𝑛₂...] creates a std.Expression which will read the provided index positions of your binary information while traveling.Eastbound, unless otherwise specified.
+func (t Target[T]) Positions(positions []uint, travel ...traveling.Traveling) ([]std.Bit, error) {
+	reverse := tiny.ShouldReverseLongitudinally(travel...)
+	return itiny.Emit(istd.Expression{
 		Positions: &positions,
 		Reverse:   &reverse,
-	}, t.target)
+	}, t.target...)
 }
 
-// Width [𝑛] creates a std.Expression which will read the provided bit width in most→to→least significant order.
-//
-// Expression operations happen in most→to→least significant order - if you would like least←to←most order, please indicate "reverse".
-func (t Target[T]) Width(width uint, traveling ...travel.Traveling) ([]std.Bit, error) {
-	reverse := tiny.ShouldReverseLongitudinally(traveling...)
-	return tiny.Emit(std.Expression{
+// Width [𝑛] creates a std.Expression which will read the provided bit width while traveling.Eastbound, unless otherwise specified.
+func (t Target[T]) Width(width uint, travel ...traveling.Traveling) ([]std.Bit, error) {
+	reverse := tiny.ShouldReverseLongitudinally(travel...)
+	return itiny.Emit(istd.Expression{
 		Low:     &tiny.Start,
 		High:    &width,
 		Reverse: &reverse,
-	}, t.target)
+	}, t.target...)
 }
 
 // First [0] creates a std.Expression which will read the first index position of your binary information.
 func (t Target[T]) First() ([]std.Bit, error) {
-	return tiny.Emit(std.Expression{
+	return itiny.Emit(istd.Expression{
 		Positions: &tiny.Initial,
-	}, t.target)
+	}, t.target...)
 }
 
 // Last [𝑛 - 1] creates a std.Expression which will read the last index position of your binary information.
 func (t Target[T]) Last() ([]std.Bit, error) {
-	return tiny.Emit(std.Expression{
+	return itiny.Emit(istd.Expression{
 		Last: &core.True,
-	}, t.target)
+	}, t.target...)
 }
 
-// Low [low:] creates a std.Expression which will read from the provided index to the end of your binary information.
-func (t Target[T]) Low(low uint, traveling ...travel.Traveling) ([]std.Bit, error) {
-	reverse := tiny.ShouldReverseLongitudinally(traveling...)
-	return tiny.Emit(std.Expression{
+// Low [low:] creates a std.Expression which will read from the provided index to the end of your binary information while traveling.Eastbound, unless otherwise specified.
+func (t Target[T]) Low(low uint, travel ...traveling.Traveling) ([]std.Bit, error) {
+	reverse := tiny.ShouldReverseLongitudinally(travel...)
+	return itiny.Emit(istd.Expression{
 		Low:     &low,
 		Reverse: &reverse,
-	}, t.target)
+	}, t.target...)
 }
 
-// High [:high] creates a std.Expression which will read to the provided index from the start of your binary information.
-func (t Target[T]) High(high uint, traveling ...travel.Traveling) ([]std.Bit, error) {
-	reverse := tiny.ShouldReverseLongitudinally(traveling...)
-	return tiny.Emit(std.Expression{
+// High [:high] creates a std.Expression which will read to the provided index from the start of your binary information while traveling.Eastbound, unless otherwise specified.
+func (t Target[T]) High(high uint, travel ...traveling.Traveling) ([]std.Bit, error) {
+	reverse := tiny.ShouldReverseLongitudinally(travel...)
+	return itiny.Emit(istd.Expression{
 		High:    &high,
 		Reverse: &reverse,
-	}, t.target)
+	}, t.target...)
 }
 
-// Between [low:high:*] creates a std.Expression which will read between the provided indexes of your binary information up to the provided maximum in most→to→least significant order.
-//
-// Expression operations happen in most→to→least significant order - if you would like least←to←most order, please indicate "reverse".
-func (t Target[T]) Between(low uint, high uint, traveling ...travel.Traveling) ([]std.Bit, error) {
-	reverse := tiny.ShouldReverseLongitudinally(traveling...)
-	return tiny.Emit(std.Expression{
+// Between [low:high:*] creates a std.Expression which will read between the provided indexes of your binary information up to the provided maximum while traveling.Eastbound, unless otherwise specified.
+func (t Target[T]) Between(low uint, high uint, travel ...traveling.Traveling) ([]std.Bit, error) {
+	reverse := tiny.ShouldReverseLongitudinally(travel...)
+	return itiny.Emit(istd.Expression{
 		Low:     &low,
 		High:    &high,
 		Reverse: &reverse,
-	}, t.target)
+	}, t.target...)
 }
 
-// All [:] creates a std.Expression which will read the entirety of your binary information.
-//
-// Expression operations happen in most→to→least significant order - if you would like least←to←most order, please indicate "reverse".
-func (t Target[T]) All(traveling ...travel.Traveling) ([]std.Bit, error) {
-	reverse := tiny.ShouldReverseLongitudinally(traveling...)
-	return tiny.Emit(std.Expression{
+// All [:] creates a std.Expression which will read the entirety of your binary information while traveling.Eastbound, unless otherwise specified.
+func (t Target[T]) All(travel ...traveling.Traveling) ([]std.Bit, error) {
+	reverse := tiny.ShouldReverseLongitudinally(travel...)
+	return itiny.Emit(istd.Expression{
 		Reverse: &reverse,
-	}, t.target)
+	}, t.target...)
 }
 
 /**
 Logic Gates
 */
 
-// Gate creates a std.Expression which will apply the provided logic gate against every input bit.
-//
-// Expression operations happen in most→to→least significant order - if you would like least←to←most order, please indicate "reverse".
-func (t Target[T]) Gate(logic std.BitLogicFunc, traveling ...travel.Traveling) ([]std.Bit, error) {
-	reverse := tiny.ShouldReverseLongitudinally(traveling...)
-	return tiny.Emit(std.Expression{
+// Gate creates a std.Expression which will apply the provided logic gate against every input bit while traveling.Eastbound, unless otherwise specified.
+func (t Target[T]) Gate(logic std.BitLogicFunc, travel ...traveling.Traveling) ([]std.Bit, error) {
+	reverse := tiny.ShouldReverseLongitudinally(travel...)
+	return itiny.Emit(istd.Expression{
 		BitLogic: &logic,
 		Reverse:  &reverse,
-	}, t.target)
+	}, t.target...)
 }
 
-// NOT creates a std.Expression which will apply the below truth table against every input bit.
+// NOT creates a std.Expression which will apply the below truth table against every input bit while traveling.Eastbound, unless otherwise specified.
 //
 // NOTE: If no bits are provided, Zero is returned.
 //
@@ -128,17 +128,17 @@ func (t Target[T]) Gate(logic std.BitLogicFunc, traveling ...travel.Traveling) (
 //	        𝑎 | 𝑜𝑢𝑡
 //	        0 | 1
 //	        1 | 0
-func (t Target[T]) NOT(traveling ...travel.Traveling) ([]std.Bit, error) {
-	return t.Gate(tiny.Logic.NOT, traveling...)
+func (t Target[T]) NOT(travel ...traveling.Traveling) ([]std.Bit, error) {
+	return t.Gate(tiny.Logic.NOT, travel...)
 }
 
 /**
 Pattern Emission
 */
 
-// Pattern creates a std.Expression which will XOR the provided pattern against the input bits in most→to→least significant order.
-func (t Target[T]) Pattern(pattern []std.Bit, traveling ...travel.Traveling) ([]std.Bit, error) {
-	return t.Gate(patternLogic(pattern...), traveling...)
+// Pattern creates a std.Expression which will XOR the provided pattern against the input bits while traveling.Eastbound, unless otherwise specified.
+func (t Target[T]) Pattern(pattern []std.Bit, travel ...traveling.Traveling) ([]std.Bit, error) {
+	return t.Gate(patternLogic(pattern...), travel...)
 }
 
 func patternLogic(pattern ...std.Bit) std.BitLogicFunc {

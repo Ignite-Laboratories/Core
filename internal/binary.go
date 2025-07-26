@@ -2,7 +2,7 @@ package internal
 
 import (
 	"encoding/binary"
-	"github.com/ignite-laboratories/core/enum/endian"
+	"github.com/ignite-laboratories/core/tiny/enum/endian"
 	"reflect"
 	"unsafe"
 )

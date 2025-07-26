@@ -2,11 +2,10 @@ package main
 
 import (
 	"fmt"
-	"github.com/ignite-laboratories/core/emit"
-	"github.com/ignite-laboratories/core/enum/direction"
-	"github.com/ignite-laboratories/core/enum/traveling"
 	"github.com/ignite-laboratories/core/std"
-	"github.com/ignite-laboratories/core/tiny"
+	"github.com/ignite-laboratories/core/tiny/emit"
+	"github.com/ignite-laboratories/core/tiny/enum/direction"
+	"github.com/ignite-laboratories/core/tiny/enum/traveling"
 	"math/rand/v2"
 )
 
@@ -27,7 +26,7 @@ func main() {
 	fmt.Printf("%v ← %v(%v)\n\n", p.StringPretty(), p.Name, random)
 
 	fmt.Printf("#2 - Emitting from the end of %v until a condition has been met:\n", p.Name)
-	width = 11
+	width = 11 // This is a 'closure'
 	continueFn := func(i uint, data []std.Bit) bool {
 		if len(data) < int(width) {
 			return true
@@ -59,7 +58,7 @@ func main() {
 	fmt.Printf("%v ← Measurement of [%v]\n\n", m.StringPretty(), direction.Future)
 
 	fmt.Println("#7 - Recreating the original object from the measurement:")
-	fmt.Printf("%v ← Reconstructed Object\n\n", tiny.ToType[direction.Direction](m))
+	fmt.Printf("%v ← Reconstructed Object\n\n", emit.To[direction.Direction](m))
 
 	fmt.Println("#8 - Pattern measurement:")
 

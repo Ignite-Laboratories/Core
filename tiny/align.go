@@ -2,9 +2,9 @@ package tiny
 
 import (
 	"fmt"
-	"github.com/ignite-laboratories/core/enum/direction"
-	"github.com/ignite-laboratories/core/enum/traveling"
 	"github.com/ignite-laboratories/core/std"
+	"github.com/ignite-laboratories/core/tiny/enum/direction"
+	"github.com/ignite-laboratories/core/tiny/enum/traveling"
 )
 
 func middlePadOperands[T std.Operable](width uint, d direction.Direction, t traveling.Traveling, digits []std.Bit, operands ...T) []T {

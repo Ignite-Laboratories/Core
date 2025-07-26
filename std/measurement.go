@@ -2,9 +2,9 @@ package std
 
 import (
 	"fmt"
-	"github.com/ignite-laboratories/core/enum/endian"
-	"github.com/ignite-laboratories/core/enum/traveling"
 	"github.com/ignite-laboratories/core/internal"
+	"github.com/ignite-laboratories/core/tiny/enum/endian"
+	"github.com/ignite-laboratories/core/tiny/enum/traveling"
 	"strings"
 )
 

@@ -2,11 +2,11 @@ package itiny
 
 import (
 	"fmt"
-	"github.com/ignite-laboratories/core/enum/pad"
-	"github.com/ignite-laboratories/core/enum/traveling"
 	"github.com/ignite-laboratories/core/internal"
 	"github.com/ignite-laboratories/core/std"
 	"github.com/ignite-laboratories/core/tiny"
+	"github.com/ignite-laboratories/core/tiny/enum/pad"
+	"github.com/ignite-laboratories/core/tiny/enum/traveling"
 )
 
 // ShouldReverseLongitudinally indicates if the direction of travel is westerly and the emission should be reversed,

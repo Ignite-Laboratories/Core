@@ -5,11 +5,13 @@ package emit
 
 import (
 	"github.com/ignite-laboratories/core"
-	"github.com/ignite-laboratories/core/enum/traveling"
 	"github.com/ignite-laboratories/core/internal/istd"
 	"github.com/ignite-laboratories/core/internal/itiny"
 	"github.com/ignite-laboratories/core/std"
 	"github.com/ignite-laboratories/core/tiny"
+	"github.com/ignite-laboratories/core/tiny/enum/traveling"
+	"reflect"
+	"unsafe"
 )
 
 type Targets[T any] struct {
@@ -28,6 +30,72 @@ func From[T any](targets ...T) Targets[T] {
 	return Targets[T]{
 		targets: targets,
 	}
+}
+
+// To converts a Measurement of binary information into the specified type T.
+func To[T any](m std.Measurement) T {
+	bits := m.GetAllBits()
+	var zero T
+	typeOf := reflect.TypeOf(zero)
+
+	// Handle slices
+	if typeOf.Kind() == reflect.Slice {
+		elemType := typeOf.Elem()
+		elemSize := elemType.Size()
+
+		numElements := len(bits) / (8 * int(elemSize))
+		if numElements == 0 {
+			return zero
+		}
+
+		sliceVal := reflect.MakeSlice(typeOf, numElements, numElements)
+		slicePtr := unsafe.Pointer(sliceVal.UnsafePointer())
+		resultBytes := unsafe.Slice((*byte)(slicePtr), numElements*int(elemSize))
+
+		byteI := (len(bits) / 8) - 1
+		i := len(bits) - 1
+		for i > 0 {
+			var currentByte byte
+			for ii := 0; ii < 8; ii++ {
+				if bits[i] == 1 {
+					currentByte |= 1 << ii
+				}
+				i--
+			}
+
+			resultBytes[byteI] = currentByte
+			byteI--
+		}
+
+		return sliceVal.Interface().(T)
+	}
+
+	// Handle non-slices
+	size := typeOf.Size()
+	if len(bits) > int(size)*8 {
+		panic("bit slice too large for target type")
+	}
+
+	result := zero
+	resultPtr := unsafe.Pointer(&result)
+	resultBytes := unsafe.Slice((*byte)(resultPtr), size)
+
+	byteI := (len(bits) / 8) - 1
+	i := len(bits) - 1
+	for i > 0 {
+		var currentByte byte
+		for ii := 0; ii < 8; ii++ {
+			if bits[i] == 1 {
+				currentByte |= 1 << ii
+			}
+			i--
+		}
+
+		resultBytes[byteI] = currentByte
+		byteI--
+	}
+
+	return result
 }
 
 // Until keeps reading your binary information until the continue function returns false while traveling.Eastbound, unless otherwise specified.

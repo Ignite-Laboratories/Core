@@ -3,11 +3,11 @@ package selection
 
 import (
 	"github.com/ignite-laboratories/core"
-	"github.com/ignite-laboratories/core/enum/traveling"
 	"github.com/ignite-laboratories/core/internal/istd"
 	"github.com/ignite-laboratories/core/internal/itiny"
 	"github.com/ignite-laboratories/core/std"
 	"github.com/ignite-laboratories/core/tiny"
+	"github.com/ignite-laboratories/core/tiny/enum/traveling"
 )
 
 type Target[T any] struct {

@@ -9,15 +9,16 @@ import (
 )
 
 // Measurement is a variable-width slice of bits and is used to efficiently store them in operating memory.
-// As most languages inherently require at least 8 bits to store custom types, storing each bit individually
+// As Go inherently requires at least 8 bits to store custom types, storing each bit individually
 // would need 8 times the size of every bit - thus, the measurement was born.
 //
 // NOTE: ALL measurements are processed in standard endian.Big form - however, at the time of measurement we
-// ALSO capture the original endianness of the stored value.  It can generally be ignored - but it's still quite
-// interesting if you care to investigate =)
+// ALSO capture the original endianness of the stored value.  It's ENTIRELY informational and can be ignored - but
+// it's still quite interesting if you care to investigate =)
 type Measurement struct {
-	// Endianness indicates the endian.Endianness of the data as it was
-	// originally stored before being measured in standard endian.Big form.
+	// Endianness indicates the endian.Endianness of the data as it was originally stored before being measured in standard endian.Big form.
+	//
+	// NOTE: Don't get too caught up here - it's purely informational and has absolutely no bearing on tiny operations.
 	endian.Endianness
 
 	// Bytes holds complete byte data.
@@ -69,17 +70,10 @@ func NewMeasurementOfOnes(width int) Measurement {
 	return zeros.RollUp()
 }
 
-// NewMeasurementOfBit creates a new Measurement of the provided bit-width consisting entirely of the provided Bit.
-//
-// Inward and outward travel directions are supported and work from the midpoint of the width, biased towards the west.
-func NewMeasurementOfBit(w int, b Bit) Measurement {
-	return NewMeasurementOfPattern(w, traveling.Eastbound, b)
-}
-
 // NewMeasurementOfPattern creates a new Measurement of the provided bit-width consisting of the pattern emitted across it in the direction.Direction of travel.Traveling.
 //
 // Inward and outward travel directions are supported and work from the midpoint of the width, biased towards the west.
-func NewMeasurementOfPattern(w int, t traveling.Traveling, p ...Bit) Measurement {
+func NewMeasurementOfPattern(w uint, t traveling.Traveling, p ...Bit) Measurement {
 	if w <= 0 || len(p) == 0 {
 		return Measurement{
 			Endianness: endian.Big,
@@ -90,13 +84,13 @@ func NewMeasurementOfPattern(w int, t traveling.Traveling, p ...Bit) Measurement
 		panic(fmt.Sprintf("cannot take a latitudinal binary measurement [%v]", t.StringFull(true)))
 	}
 
-	printer := func(width int, tt traveling.Traveling) []Bit {
+	printer := func(width uint, tt traveling.Traveling) []Bit {
 		bits := make([]Bit, width)
 		patternI := 0
-		for i := 0; i < width; i++ {
+		for i := 0; i < int(width); i++ {
 			ii := i
 			if tt == traveling.Westbound {
-				ii = width - 1 - i
+				ii = int(width) - 1 - i
 			}
 
 			bits[ii] = p[patternI]

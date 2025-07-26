@@ -1,3 +1,4 @@
+// noinspection GoStructureTemplates
 // Package direction provides access to the Direction enumeration.
 package direction
 
@@ -20,9 +21,9 @@ package direction
 //	Present - Experience
 //	   Past - Reflection
 //
-// # See South, West, North, East, Future, Present, Past, Forward, Backward, Up, Up, Down, Down, Left, Right, Left, Right, B, A, Start
+// In addition, you may also require traveling.Traveling in a particular orientation.
 //
-// In addition, you may also require a direction of travel.Travel.
+// See South, West, North, East, Future, Present, Past, Forward, Backward, Up, Up, Down, Down, Left, Right, Left, Right, B, A, Start
 type Direction byte
 
 const (

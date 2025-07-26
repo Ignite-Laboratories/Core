@@ -12,7 +12,7 @@ func middlePadOperands[T std.Operable](width uint, d direction.Direction, t trav
 	out := make([]T, len(operands))
 
 	for i, o := range operands {
-		l := GetBitWidth(o)
+		l := GetOperableBitWidth(o)
 		toPad := width - l
 		left := toPad / 2
 		right := toPad - left
@@ -41,13 +41,13 @@ func padOperands[T std.Operable](width uint, d direction.Direction, t traveling.
 	}
 
 	for i, raw := range operands {
-		paddingWidth := width - GetBitWidth(raw)
+		paddingWidth := width - GetOperableBitWidth(raw)
 		if paddingWidth == 0 {
 			out[i] = raw
 			continue
 		}
 
-		padding := std.NewMeasurementOfPattern(int(paddingWidth), t, digits...).GetAllBits()
+		padding := std.NewMeasurementOfPattern(paddingWidth, t, digits...).GetAllBits()
 
 		switch operand := any(raw).(type) {
 		case std.Phrase, std.Complex, std.Index, std.Real, std.Natural:

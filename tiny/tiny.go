@@ -7,8 +7,8 @@ import (
 	"unsafe"
 )
 
-// GetBitWidth returns the bit width of the provided binary operand.
-func GetBitWidth[T std.Operable](operands ...T) uint {
+// GetOperableBitWidth returns the bit width of the provided binary operand, or panics if not a std.Operable type.
+func GetOperableBitWidth[T any](operands ...T) uint {
 	width := uint(0)
 	for _, raw := range operands {
 		switch operand := any(raw).(type) {
@@ -34,7 +34,7 @@ func GetBitWidth[T std.Operable](operands ...T) uint {
 		case std.Bit:
 			width += 1
 		default:
-			panic("invalid binary type: " + reflect.TypeOf(operand).String())
+			panic("invalid operable type: " + reflect.TypeOf(operand).String())
 		}
 	}
 	return width

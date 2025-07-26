@@ -35,7 +35,7 @@ func ShouldReverseLongitudinally(travel ...traveling.Traveling) bool {
 func GetWidestOperand[T std.Operable](operands ...T) uint {
 	var widest uint
 	for _, o := range operands {
-		width := tiny.GetBitWidth(o)
+		width := tiny.GetOperableBitWidth(o)
 		if width > widest {
 			widest = width
 		}

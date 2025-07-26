@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-// Phrase represents a collection of raw binary measurements and their observed endianness at the time of recording.
+// Phrase represents a collection of raw binary measurements at the time of recording.
 type Phrase struct {
 	Name string
 	Data []Measurement
@@ -155,7 +155,7 @@ func (a Phrase) Align(width ...int) Phrase {
 		w = int(a.BitWidth())
 	}
 
-	out := make([]Measurement, 0, int(a.BitWidth())/w)
+	out := make([]Measurement, 0, a.BitWidth())
 	current := make([]Bit, 0, w)
 	i := 0
 

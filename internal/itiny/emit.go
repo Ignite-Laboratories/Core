@@ -45,11 +45,26 @@ func Select[T any](expr istd.Expression, operands ...T) ([]T, error) {
 // Emit expresses the underlying bits of the Operable operands according to the provided logical expression.
 //
 // NOTE: This will return a tiny.ErrorOutOfData if the expression either couldn't be satisfied or no input data was provided.
-func Emit[T std.Operable](expr istd.Expression, operands ...T) ([]std.Bit, error) {
+func Emit[T any](expr istd.Expression, operands ...T) (std.Measurement, error) {
+	var totalWidth uint
+	var test T
+	switch any(test).(type) {
+	case std.Bit, byte, std.Measurement, std.Phrase, std.Natural, std.Real, std.Complex, std.Index:
+		for _, op := range operands {
+			totalWidth += tiny.GetOperableBitWidth(op)
+		}
+	default:
+		p := std.NewPhrase()
+		for _, op := range operands {
+			p = p.AppendMeasurement(tiny.Measure(op))
+		}
+
+		return Emit(expr, p)
+	}
+
 	// Do nothing if there is no binary information to emit
-	totalWidth := tiny.GetBitWidth(operands...)
 	if totalWidth == 0 {
-		return make([]std.Bit, 0), tiny.ErrorOutOfData
+		return std.NewMeasurement(), tiny.ErrorOutOfData
 	}
 
 	// Evaluate and set the appropriate expression boundary values
@@ -60,24 +75,24 @@ func Emit[T std.Operable](expr istd.Expression, operands ...T) ([]std.Bit, error
 	// Matrix logic - Performs logic at the phrase level while emitting out the underlying bits
 	if expr.Artifact != nil {
 		yield, _ := matrixLogic(0, expr, operands...)
-		return yield, nil
+		return std.NewMeasurement(yield...), nil
 	}
 
 	// Linear logic - Recurses to the bit level before performing logic
 	yield, _ := linearLogic(0, expr, operands...)
 	if len(yield) < int(expr.Limit) {
-		return yield, tiny.ErrorOutOfData
+		return std.NewMeasurement(yield...), tiny.ErrorOutOfData
 	}
 
-	return yield, nil
+	return std.NewMeasurement(yield...), nil
 }
 
-func linearLogic[T std.Operable](cursor uint, expr istd.Expression, operands ...T) ([]std.Bit, uint) {
+func linearLogic[T any](cursor uint, expr istd.Expression, operands ...T) ([]std.Bit, uint) {
 	yield := make([]std.Bit, 0, 1<<10) // Pre-allocate a reasonable chunk of memory
 
 	// Walk through the current operands one at a time
 	for _, raw := range operands {
-		if tiny.GetBitWidth(raw) == 0 {
+		if tiny.GetOperableBitWidth(raw) == 0 {
 			continue
 		}
 
@@ -121,8 +136,10 @@ func linearLogic[T std.Operable](cursor uint, expr istd.Expression, operands ...
 		case byte:
 			// Bytes recurse into their individual bits
 			bits := make([]std.Bit, 8)
+			ii := 0
 			for i := 7; i >= 0; i-- {
-				bits[i] = std.Bit((operand >> i) & 1)
+				bits[ii] = std.Bit((operand >> i) & 1)
+				ii++
 			}
 			bits, cursor = linearLogic(cursor, expr, bits...)
 			cycleBits = append(cycleBits, bits...)
@@ -172,7 +189,7 @@ func linearLogic[T std.Operable](cursor uint, expr istd.Expression, operands ...
 	return yield, cursor
 }
 
-func matrixLogic[T std.Operable](cursor uint, expr istd.Expression, operands ...T) ([]std.Bit, uint) {
+func matrixLogic[T any](cursor uint, expr istd.Expression, operands ...T) ([]std.Bit, uint) {
 	// TODO: start sub-expressions to grab bits and build a matrix for computation
 
 	//if expr._matrix != nil && *expr._matrix {

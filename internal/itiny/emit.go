@@ -10,42 +10,46 @@ import (
 // Select expresses the input operands according to the provided logical expression.
 //
 // NOTE: This will return a tiny.ErrorOutOfData if the expression either couldn't be satisfied or no input data was provided.
-func Select[T any](expr istd.Expression, operands ...T) ([]T, error) {
+func Select[T any](fluent istd.FluentExpression[T], operands ...T) istd.Expressed[T] {
 	totalWidth := uint(len(operands))
 	if totalWidth == 0 {
-		return make([]T, 0), tiny.ErrorOutOfData
+		return istd.NewExpressed[T](tiny.ErrorOutOfData)
 	}
 
-	// Evaluate and set the appropriate expression boundary values
-	expr, operands = evaluateExpression(expr, totalWidth, operands...)
+	for _, expr := range fluent.Expressions {
+		// Evaluate and set the appropriate expression boundary values
+		expr.Expression, operands = evaluateBaseExpression(expr.Expression, totalWidth, operands...)
 
-	var yield []T
+		var yield []T
 
-	if expr.Positions != nil {
-		yield = make([]T, expr.Limit)
+		if expr.Positions != nil {
+			yield = make([]T, expr.Limit)
 
-		for i, pos := range *expr.Positions {
-			yield[i] = operands[pos]
-		}
-		return yield, nil
-	}
-	if expr.Where != nil {
-		yield = make([]T, 0, expr.Limit)
-		for _, operand := range operands {
-			if (*expr.Where)(operand) {
-				yield = append(yield, operand)
+			for i, pos := range *expr.Positions {
+				yield[i] = operands[pos]
 			}
+			return istd.NewExpressed[T](nil, yield...)
 		}
-		return yield, nil
+		if expr.Where != nil {
+			yield = make([]T, 0, expr.Limit)
+			for _, operand := range operands {
+				if expr.Where(operand) {
+					yield = append(yield, operand)
+				}
+			}
+			return istd.NewExpressed[T](nil, yield...)
+		}
+		yield = operands[*expr.Low:*expr.High]
+
+		operands = yield
 	}
-	yield = operands[*expr.Low:*expr.High]
-	return yield, nil
+	return istd.NewExpressed[T](nil, operands...)
 }
 
 // Emit expresses the underlying bits of the Operable operands according to the provided logical expression.
 //
 // NOTE: This will return a tiny.ErrorOutOfData if the expression either couldn't be satisfied or no input data was provided.
-func Emit[T any](expr istd.Expression, operands ...T) (std.Measurement, error) {
+func Emit[T any](expr istd.Expression, operands ...T) istd.Expressed[std.Measurement] {
 	var totalWidth uint
 	var test T
 	switch any(test).(type) {
@@ -64,27 +68,27 @@ func Emit[T any](expr istd.Expression, operands ...T) (std.Measurement, error) {
 
 	// Do nothing if there is no binary information to emit
 	if totalWidth == 0 {
-		return std.NewMeasurement(), tiny.ErrorOutOfData
+		return istd.NewExpressed(tiny.ErrorOutOfData, std.NewMeasurement())
 	}
 
 	// Evaluate and set the appropriate expression boundary values
-	expr, operands = evaluateExpression(expr, totalWidth, operands...)
+	expr, operands = evaluateBaseExpression(expr, totalWidth, operands...)
 
 	// Switch between matrix or linear logic based upon the presence of an artifact function
 
 	// Matrix logic - Performs logic at the phrase level while emitting out the underlying bits
 	if expr.Artifact != nil {
 		yield, _ := matrixLogic(0, expr, operands...)
-		return std.NewMeasurement(yield...), nil
+		return istd.NewExpressed(nil, std.NewMeasurement(yield...))
 	}
 
 	// Linear logic - Recurses to the bit level before performing logic
 	yield, _ := linearLogic(0, expr, operands...)
 	if len(yield) < int(expr.Limit) {
-		return std.NewMeasurement(yield...), tiny.ErrorOutOfData
+		return istd.NewExpressed(tiny.ErrorOutOfData, std.NewMeasurement(yield...))
 	}
 
-	return std.NewMeasurement(yield...), nil
+	return istd.NewExpressed(nil, std.NewMeasurement(yield...))
 }
 
 func linearLogic[T any](cursor uint, expr istd.Expression, operands ...T) ([]std.Bit, uint) {
@@ -255,11 +259,11 @@ func matrixLogic[T any](cursor uint, expr istd.Expression, operands ...T) ([]std
 	//	yield = linear
 	//	count = uint(longest) // TODO: Alignment all the operands and set this to the number of returned operands
 	//} else {
-	return nil, tiny.Unlimited
+	return nil, 0
 }
 
-// evaluateExpression performs sanity checks and sets the boundary values for the expression.
-func evaluateExpression[T any](expr istd.Expression, totalWidth uint, operands ...T) (istd.Expression, []T) {
+// evaluateBaseExpression performs sanity checks and sets the boundary values for the expression.
+func evaluateBaseExpression[T any](expr istd.Expression, totalWidth uint, operands ...T) (istd.Expression, []T) {
 	if (expr.Positions != nil && len(*expr.Positions) > 0) && (expr.Low != nil || expr.High != nil) {
 		panic("cannot search for an explicit position inside of a range - you can perform that operation with compound emit operations")
 	}

@@ -101,9 +101,9 @@ func To[T any](m std.Measurement) T {
 	return result
 }
 
-// Until keeps reading your binary information until the continue function returns false.
-func (t Expressable[T]) Until(continueFn std.ContinueFunc, travel ...traveling.Traveling) (std.Measurement, error) {
-	reverse := itiny.ShouldReverseLongitudinally(travel...)
+// While keeps reading your binary information until the continue function returns false.
+func (t Expressable[T]) While(continueFn std.ContinueFunc, travel ...traveling.Traveling) istd.Expressed[std.Measurement] {
+	reverse := itiny.ShouldReverseLinearData(travel...)
 	return itiny.Emit(istd.Expression{
 		Continue: &continueFn,
 		Reverse:  &reverse,
@@ -111,41 +111,41 @@ func (t Expressable[T]) Until(continueFn std.ContinueFunc, travel ...traveling.T
 }
 
 // Positions [𝑛₀,𝑛₁,𝑛₂...] creates a std.Expression which will read the provided index positions of your binary information.
-func (t Expressable[T]) Positions(positions []uint, travel ...traveling.Traveling) (std.Measurement, error) {
-	reverse := itiny.ShouldReverseLongitudinally(travel...)
+func (t Expressable[T]) Positions(positions []uint, travel ...traveling.Traveling) istd.Expressed[std.Measurement] {
+	reverse := itiny.ShouldReverseLinearData(travel...)
 	return itiny.Emit(istd.Expression{
 		Positions: &positions,
 		Reverse:   &reverse,
 	}, t.targets...)
 }
 
-// Width [𝑛] creates a std.Expression which will read the provided bit width.
-func (t Expressable[T]) Width(width uint, travel ...traveling.Traveling) (std.Measurement, error) {
-	reverse := itiny.ShouldReverseLongitudinally(travel...)
+// Take [𝑛] creates a std.Expression which will read the provided bit width.
+func (t Expressable[T]) Take(count uint, travel ...traveling.Traveling) istd.Expressed[std.Measurement] {
+	reverse := itiny.ShouldReverseLinearData(travel...)
 	return itiny.Emit(istd.Expression{
 		Low:     &tiny.Start,
-		High:    &width,
+		High:    &count,
 		Reverse: &reverse,
 	}, t.targets...)
 }
 
 // First [0] creates a std.Expression which will read the first index position of your binary information.
-func (t Expressable[T]) First() (std.Measurement, error) {
+func (t Expressable[T]) First() istd.Expressed[std.Measurement] {
 	return itiny.Emit(istd.Expression{
 		Positions: &tiny.Initial,
 	}, t.targets...)
 }
 
 // Last [𝑛 - 1] creates a std.Expression which will read the last index position of your binary information.
-func (t Expressable[T]) Last() (std.Measurement, error) {
+func (t Expressable[T]) Last() istd.Expressed[std.Measurement] {
 	return itiny.Emit(istd.Expression{
 		Last: &core.True,
 	}, t.targets...)
 }
 
 // Low [low:] creates a std.Expression which will read from the provided index to the end of your binary information.
-func (t Expressable[T]) Low(low uint, travel ...traveling.Traveling) (std.Measurement, error) {
-	reverse := itiny.ShouldReverseLongitudinally(travel...)
+func (t Expressable[T]) Low(low uint, travel ...traveling.Traveling) istd.Expressed[std.Measurement] {
+	reverse := itiny.ShouldReverseLinearData(travel...)
 	return itiny.Emit(istd.Expression{
 		Low:     &low,
 		Reverse: &reverse,
@@ -153,17 +153,17 @@ func (t Expressable[T]) Low(low uint, travel ...traveling.Traveling) (std.Measur
 }
 
 // High [:high] creates a std.Expression which will read to the provided index from the start of your binary information.
-func (t Expressable[T]) High(high uint, travel ...traveling.Traveling) (std.Measurement, error) {
-	reverse := itiny.ShouldReverseLongitudinally(travel...)
+func (t Expressable[T]) High(high uint, travel ...traveling.Traveling) istd.Expressed[std.Measurement] {
+	reverse := itiny.ShouldReverseLinearData(travel...)
 	return itiny.Emit(istd.Expression{
 		High:    &high,
 		Reverse: &reverse,
 	}, t.targets...)
 }
 
-// Between [low:high:*] creates a std.Expression which will read between the provided indexes of your binary information up to the provided maximum.
-func (t Expressable[T]) Between(low uint, high uint, travel ...traveling.Traveling) (std.Measurement, error) {
-	reverse := itiny.ShouldReverseLongitudinally(travel...)
+// Between [low:high:*] creates a std.Expression which will read between the provided indexes of your binary information.
+func (t Expressable[T]) Between(low uint, high uint, travel ...traveling.Traveling) istd.Expressed[std.Measurement] {
+	reverse := itiny.ShouldReverseLinearData(travel...)
 	return itiny.Emit(istd.Expression{
 		Low:     &low,
 		High:    &high,
@@ -172,10 +172,24 @@ func (t Expressable[T]) Between(low uint, high uint, travel ...traveling.Traveli
 }
 
 // All [:] creates a std.Expression which will read the entirety of your binary information.
-func (t Expressable[T]) All(travel ...traveling.Traveling) (std.Measurement, error) {
-	reverse := itiny.ShouldReverseLongitudinally(travel...)
+func (t Expressable[T]) All(travel ...traveling.Traveling) istd.Expressed[std.Measurement] {
+	reverse := itiny.ShouldReverseLinearData(travel...)
 	return itiny.Emit(istd.Expression{
 		Reverse: &reverse,
+	}, t.targets...)
+}
+
+/**
+Querying
+*/
+
+// Where creates a std.Expression which will call the provided predicate for each element of your data and return only the elements in which the predicate returned true.
+func (t Expressable[T]) Where(predicate std.SelectionFunc[std.Bit], traveling ...traveling.Traveling) istd.Expressed[std.Measurement] {
+	reverse := itiny.ShouldReverseLinearData(traveling...)
+	p := any(predicate).(std.SelectionFunc[std.Bit])
+	return itiny.Emit(istd.Expression{
+		WhereBit: &p,
+		Reverse:  &reverse,
 	}, t.targets...)
 }
 
@@ -184,8 +198,8 @@ Logic Gates
 */
 
 // Gate creates a std.Expression which will apply the provided logic gate against every input bit.
-func (t Expressable[T]) Gate(logic std.BitLogicFunc, travel ...traveling.Traveling) (std.Measurement, error) {
-	reverse := itiny.ShouldReverseLongitudinally(travel...)
+func (t Expressable[T]) Gate(logic std.BitLogicFunc, travel ...traveling.Traveling) istd.Expressed[std.Measurement] {
+	reverse := itiny.ShouldReverseLinearData(travel...)
 	return itiny.Emit(istd.Expression{
 		BitLogic: &logic,
 		Reverse:  &reverse,
@@ -201,6 +215,6 @@ func (t Expressable[T]) Gate(logic std.BitLogicFunc, travel ...traveling.Traveli
 //	        𝑎 | 𝑜𝑢𝑡
 //	        0 | 1
 //	        1 | 0
-func (t Expressable[T]) NOT(travel ...traveling.Traveling) (std.Measurement, error) {
+func (t Expressable[T]) NOT(travel ...traveling.Traveling) istd.Expressed[std.Measurement] {
 	return t.Gate(tiny.Logic.NOT, travel...)
 }

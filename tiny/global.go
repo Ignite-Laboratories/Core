@@ -13,9 +13,6 @@ Global Constants
 // EmptyPhrase represents a raw Phrase with no data named "3MP7Y".
 var EmptyPhrase = std.NewPhraseNamed("3MP7Y")
 
-// Unlimited represents a constantly referencable integer value which can be considered a reasonably "unlimited" width.
-var Unlimited = ^uint(0)
-
 // Start is a constantly referencable uint{0}.
 //
 // For a slice, please use Initial.

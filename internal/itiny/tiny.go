@@ -9,9 +9,9 @@ import (
 	"github.com/ignite-laboratories/core/tiny/enum/traveling"
 )
 
-// ShouldReverseLongitudinally indicates if the direction of travel is westerly and the emission should be reversed,
+// ShouldReverseLinearData indicates if the direction of travel is westerly and the data should be reversed,
 // easterly and remain as is, or panic.
-func ShouldReverseLongitudinally(travel ...traveling.Traveling) bool {
+func ShouldReverseLinearData(travel ...traveling.Traveling) bool {
 	reverse := false
 	if len(travel) > 0 {
 		t := travel[0]
@@ -21,9 +21,9 @@ func ShouldReverseLongitudinally(travel ...traveling.Traveling) bool {
 		case traveling.Eastbound:
 			reverse = false
 		case traveling.Inbound, traveling.Outbound:
-			panic(fmt.Sprintf("cannot emit in multiple directions [%v]", t.StringFull()))
+			panic(fmt.Sprintf("cannot travel in multiple directions at once [%v]", t.StringFull()))
 		case traveling.Northbound, traveling.Southbound:
-			panic(fmt.Sprintf("cannot emit latitudinally from a linear binary measurement [%v]", t.StringFull()))
+			panic(fmt.Sprintf("cannot travel vertically across linear data [%v]", t.StringFull()))
 		default:
 			panic(fmt.Sprintf("unknown direction of travel [%v]", t))
 		}

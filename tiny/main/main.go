@@ -3,9 +3,11 @@ package main
 import (
 	"fmt"
 	"github.com/ignite-laboratories/core/std"
+	"github.com/ignite-laboratories/core/tiny"
 	"github.com/ignite-laboratories/core/tiny/emit"
 	"github.com/ignite-laboratories/core/tiny/enum/direction"
 	"github.com/ignite-laboratories/core/tiny/enum/traveling"
+	"github.com/ignite-laboratories/core/tiny/selection"
 	"math/rand/v2"
 )
 
@@ -34,10 +36,10 @@ func main() {
 		return false
 	}
 
-	m, err = emit.From(p).Until(continueFn, traveling.Westbound)
+	m, err = emit.From(p).While(continueFn, traveling.Westbound)
 	fmt.Printf("%v ← %v %v while ( len(found) < %d )\n", m.AsPhrase(-1).StringPretty(), p.Name, traveling.Westbound.StringFull(true), width)
 
-	m, err = emit.From(p).Until(continueFn, traveling.Eastbound)
+	m, err = emit.From(p).While(continueFn, traveling.Eastbound)
 	fmt.Printf("%v ← %v %v while ( len(found) < %d )\n\n", m.AsPhrase(-1).StringPretty(), p.Name, traveling.Eastbound.StringFull(true), width)
 
 	fmt.Printf("#3 - Emitting specific bits of %v:\n", p.Name)
@@ -71,4 +73,6 @@ func main() {
 	width = 11
 	fmt.Printf("%v ← %d repeating `0`s\n", emit.Pattern(width, traveling.Westbound, 0).AsPhrase(-1).StringPretty(), width)
 	fmt.Printf("%v ← %d repeating `1`s\n\n", emit.Pattern(width, traveling.Westbound, 1).AsPhrase(-1).StringPretty(), width)
+
+	selection.From().
 }

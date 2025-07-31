@@ -1,0 +1,5 @@
+package std
+
+import (
+	"fmt"
+)

@@ -1,9 +1,5 @@
 package std
 
-import (
-	"github.com/ignite-laboratories/core/internal"
-)
-
 // Natural represents a kind of Measurement with a value belonging to the set of naturally countable numbers - or all
 // positive whole numbers, including zero.
 //
@@ -29,21 +25,6 @@ import (
 // See Real, Complex, Index, and Operable
 type Natural struct {
 	Measurement
-}
-
-// NewNatural takes a Measurement of the provided unsigned integer value as a Natural number.
-func NewNatural(value uint) Natural {
-	return Natural{
-		Measurement: NewMeasurementOfBytes(internal.Measure(value)[0]...),
-	}
-}
-
-// NewNaturalFromString creates a new Natural measurement that represents the provided base-encoded string.
-//
-// NOTE: The input string must be encoded as expected by Real.SetBase()
-func NewNaturalFromString(base byte, value string) Natural {
-	// TODO: Implement this
-	panic("unsupported")
 }
 
 // Text converts the Natural to a string of the provided base, encoded to the specification defined by Real.SetBase()

@@ -1,17 +1,17 @@
-package name
+package std
 
 import (
 	"fmt"
 	"github.com/ignite-laboratories/core/enum/gender"
 )
 
-// Details represents the cultural and gender details behind a name.
-type Details struct {
+// GivenNameDetails represents the cultural and gender details behind a name.
+type GivenNameDetails struct {
 	Origin string
 	Gender gender.Gender
 }
 
-func (d Details) String() string {
+func (d GivenNameDetails) String() string {
 	switch d.Gender {
 	case gender.Male:
 		return fmt.Sprintf("%v - Male", d.Origin)

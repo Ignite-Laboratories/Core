@@ -1,9 +1,11 @@
 // Package greek provides quick access to the greek alphabet.
+//
+// See Lower and Upper
 package greek
 
 import (
-	"github.com/ignite-laboratories/core/std/greek/lower"
-	"github.com/ignite-laboratories/core/std/greek/upper"
+	"github.com/ignite-laboratories/core/enum/greek/lower"
+	"github.com/ignite-laboratories/core/enum/greek/upper"
 )
 
 type _lower struct {
@@ -64,6 +66,8 @@ type _lower struct {
 }
 
 // Lower provides access to the lowercase Greek alphabet.
+//
+// See lower.Alpha, lower.Beta, lower.Gamma, lower.Delta, lower.Epsilon, lower.Zeta, lower.Eta, lower.Theta, lower.Iota, lower.Kappa, lower.Lambda, lower.Mu, lower.Nu, lower.Xi, lower.Omicron, lower.Pi, lower.Rho, lower.Sigma, lower.SigmaFinal, lower.Tau, lower.Upsilon, lower.Phi, lower.Chi, lower.Psi, and lower.Omega
 var Lower = _lower{
 	Alpha:      lower.Alpha,
 	Beta:       lower.Beta,
@@ -144,6 +148,8 @@ type _upper struct {
 }
 
 // Upper provides access to the uppercase Greek alphabet.
+//
+// See upper.Alpha, upper.Beta, upper.Gamma, upper.Delta, upper.Epsilon, upper.Zeta, upper.Eta, upper.Theta, upper.Iota, upper.Kappa, upper.Lambda, upper.Mu, upper.Nu, upper.Xi, upper.Omicron, upper.Pi, upper.Rho, upper.Sigma, upper.Tau, upper.Upsilon, upper.Phi, upper.Chi, upper.Psi, and upper.Omega
 var Upper = _upper{
 	Alpha:   upper.Alpha,
 	Beta:    upper.Beta,

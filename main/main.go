@@ -1,13 +1,16 @@
 package main
 
 import (
-	"github.com/ignite-laboratories/core/std/givenName"
-	"github.com/ignite-laboratories/core/std/greek"
+	"fmt"
+	"github.com/ignite-laboratories/core/enum/greek"
+	"github.com/ignite-laboratories/core/std/name"
+	"github.com/ignite-laboratories/core/sys/tiny"
 )
 
 func main() {
-	alpha := greek.Lower.SigmaFinal
-	name := name.New("bob")
+	fmt.Println(greek.Lower.SigmaFinal)
+	name.New("bob")
 
-	phrase
+	name.Filtered(tiny.NameFilter)
+	name.Tiny()
 }

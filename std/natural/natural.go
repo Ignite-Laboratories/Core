@@ -2,13 +2,12 @@ package natural
 
 import (
 	"github.com/ignite-laboratories/core/std"
-	"github.com/ignite-laboratories/core/std/measurement"
 )
 
 // From takes a Measurement of the provided unsigned integer value as a Natural number.
 func From(value uint) std.Natural {
 	return std.Natural{
-		Measurement: measurement.FromBytes(internal.Measure(value)[0]...),
+		Measurement: std.FromBytes(internal.Measure(value)[0]...),
 	}
 }
 

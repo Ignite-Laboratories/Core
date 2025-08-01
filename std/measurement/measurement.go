@@ -8,8 +8,8 @@ import (
 	"github.com/ignite-laboratories/core/std"
 )
 
-// AllZeros creates a new std.Measurement[any] of the provided bit-width consisting entirely of 0s.
-func AllZeros(width int) std.Measurement[any] {
+// OfZeros creates a new std.Measurement[any] of the provided bit-width consisting entirely of 0s.
+func OfZeros(width int) std.Measurement[any] {
 	return std.Measurement[any]{
 		Bytes:      make([]byte, width/8),
 		Bits:       make([]std.Bit, width%8),
@@ -17,9 +17,9 @@ func AllZeros(width int) std.Measurement[any] {
 	}.RollUp()
 }
 
-// AllOnes creates a new std.Measurement[any] of the provided bit-width consisting entirely of 1s.
-func AllOnes(width int) std.Measurement[any] {
-	zeros := AllZeros(width)
+// OfOnes creates a new std.Measurement[any] of the provided bit-width consisting entirely of 1s.
+func OfOnes(width int) std.Measurement[any] {
+	zeros := OfZeros(width)
 	for i := range zeros.Bytes {
 		zeros.Bytes[i] = 255
 	}
@@ -29,13 +29,13 @@ func AllOnes(width int) std.Measurement[any] {
 	return zeros.RollUp()
 }
 
-// From creates a new std.Measurement[T] of the provided input data by reading it directly from memory.
-func From[T any](data T) std.Measurement[T] {
+// Of creates a new std.Measurement[T] of the provided input data by reading it directly from memory.
+func Of[T any](data T) std.Measurement[T] {
 
 }
 
-// FromBits creates a new std.Measurement[any] of the provided std.Bit slice.
-func FromBits(bits ...std.Bit) std.Measurement[any] {
+// OfBits creates a new std.Measurement[any] of the provided std.Bit slice.
+func OfBits(bits ...std.Bit) std.Measurement[any] {
 	std.BitSanityCheck(bits...)
 	return std.Measurement[any]{
 		Bits:       bits,
@@ -43,18 +43,18 @@ func FromBits(bits ...std.Bit) std.Measurement[any] {
 	}.RollUp()
 }
 
-// FromBytes creates a new std.Measurement[any] of the provided byte slice.
-func FromBytes(bytes ...byte) std.Measurement[any] {
+// OfBytes creates a new std.Measurement[any] of the provided byte slice.
+func OfBytes(bytes ...byte) std.Measurement[any] {
 	return std.Measurement[any]{
 		Bytes:      bytes,
 		Endianness: endian.Big,
 	}.RollUp()
 }
 
-// FromPattern creates a new std.Measurement[T] of the provided bit-width consisting of the pattern emitted across it in the direction.Direction of travel.Traveling.
+// OfPattern creates a new std.Measurement[T] of the provided bit-width consisting of the pattern emitted across it in the direction.Direction of travel.Traveling.
 //
 // Inward and outward travel directions are supported and work from the midpoint of the width, biased towards the west.
-func FromPattern(w uint, t traveling.Traveling, pattern ...std.Bit) std.Measurement[any] {
+func OfPattern(w uint, t traveling.Traveling, pattern ...std.Bit) std.Measurement[any] {
 	if w <= 0 || len(pattern) == 0 {
 		return std.Measurement[any]{
 			Endianness: endian.Big,
@@ -85,22 +85,22 @@ func FromPattern(w uint, t traveling.Traveling, pattern ...std.Bit) std.Measurem
 		rightWidth := w - leftWidth
 
 		if t == traveling.Inbound {
-			left := FromBits(printer(leftWidth, traveling.Eastbound)...)
-			right := FromBits(printer(rightWidth, traveling.Westbound)...)
+			left := OfBits(printer(leftWidth, traveling.Eastbound)...)
+			right := OfBits(printer(rightWidth, traveling.Westbound)...)
 			return left.AppendMeasurements(right)
 		}
-		return FromBits(printer(leftWidth, traveling.Westbound)...).Append(printer(rightWidth, traveling.Eastbound)...)
+		return OfBits(printer(leftWidth, traveling.Westbound)...).Append(printer(rightWidth, traveling.Eastbound)...)
 	}
-	return FromBits(printer(w, t)...)
+	return OfBits(printer(w, t)...)
 }
 
-// FromString creates a new std.Measurement[T] from the provided binary input string.
+// OfString creates a new std.Measurement[T] from the provided binary input string.
 //
 // NOTE: This will panic if anything but a 1 or 0 is found in the input string.
-func FromString(s string) std.Measurement[any] {
+func OfString(s string) std.Measurement[any] {
 	bits := make([]std.Bit, len(s))
 	for i := 0; i < len(s); i++ {
 		bits[i] = std.Bit(s[i])
 	}
-	return FromBits(bits...)
+	return OfBits(bits...)
 }

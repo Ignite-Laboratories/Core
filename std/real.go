@@ -2,7 +2,7 @@ package std
 
 import (
 	"fmt"
-	"github.com/ignite-laboratories/core"
+	"github.com/ignite-laboratories/core/std/name"
 	"math"
 	"math/big"
 	"strings"
@@ -65,7 +65,7 @@ type Real struct {
 //
 // NOTE: You may also set the desired precision at this point, though it defaults to 256.
 func NewReal[T Primitive](value T, precision ...uint) Real {
-	return NewRealNamed(core.RandomTinyName().Name, value, precision...)
+	return NewRealNamed(name.Tiny().Name, value, precision...)
 }
 
 // NewRealNamed creates a new instance of a named Real number from the provided Primitive value and name.

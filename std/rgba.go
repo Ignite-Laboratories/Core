@@ -2,11 +2,11 @@ package std
 
 import (
 	"fmt"
-	"github.com/ignite-laboratories/core"
+	"github.com/ignite-laboratories/core/math"
 )
 
 // RGBA is a structure for holding red, green, and blue color values.
-type RGBA[T core.Numeric] struct {
+type RGBA[T math.Numeric] struct {
 	// R is the red channel.
 	R T
 
@@ -47,7 +47,7 @@ func RGBFromHex(value uint32, alpha ...byte) RGBA[byte] {
 	}
 }
 
-// RandomRGBA returns a pseudo-random RGBA[T] of the provided type using core.RandomNumber[T].
+// RandomRGBA returns a pseudo-random RGBA[T] of the provided type using math.RandomNumber[T].
 //
 // If requesting a floating point type, the resulting number will be bounded
 // in the fully closed interval [0.0, 1.0]
@@ -55,16 +55,16 @@ func RGBFromHex(value uint32, alpha ...byte) RGBA[byte] {
 // If requesting an integer type, the resulting number will be bounded
 // in the fully closed interval [0, n] - where n is the maximum value of
 // the provided type.
-func RandomRGBA[T core.Numeric]() RGBA[T] {
+func RandomRGBA[T math.Numeric]() RGBA[T] {
 	return RGBA[T]{
-		R: core.RandomNumber[T](),
-		G: core.RandomNumber[T](),
-		B: core.RandomNumber[T](),
-		A: core.RandomNumber[T](),
+		R: math.RandomNumber[T](),
+		G: math.RandomNumber[T](),
+		B: math.RandomNumber[T](),
+		A: math.RandomNumber[T](),
 	}
 }
 
-// RandomRGB returns a pseudo-random RGB[T] of the provided type using core.RandomNumber[T].
+// RandomRGB returns a pseudo-random RGB[T] of the provided type using math.RandomNumber[T].
 //
 // If requesting a floating point type, the resulting number will be bounded
 // in the fully closed interval [0.0, 1.0]
@@ -74,68 +74,68 @@ func RandomRGBA[T core.Numeric]() RGBA[T] {
 // the provided type.
 //
 // The alpha channel can optionally be provided, otherwise it defaults to 0.
-func RandomRGB[T core.Numeric](alpha ...T) RGBA[T] {
+func RandomRGB[T math.Numeric](alpha ...T) RGBA[T] {
 	a := T(0)
 	if len(alpha) > 0 {
 		a = alpha[0]
 	}
 
 	return RGBA[T]{
-		R: core.RandomNumber[T](),
-		G: core.RandomNumber[T](),
-		B: core.RandomNumber[T](),
+		R: math.RandomNumber[T](),
+		G: math.RandomNumber[T](),
+		B: math.RandomNumber[T](),
 		A: a,
 	}
 }
 
 // RandomRGBAUpTo returns a pseudo-random RGBA[T] of the provided type bounded in the closed interval [0, max].
-func RandomRGBAUpTo[T core.Numeric](rUpper T, gUpper T, bUpper T, aUpper T) RGBA[T] {
+func RandomRGBAUpTo[T math.Numeric](rUpper T, gUpper T, bUpper T, aUpper T) RGBA[T] {
 	return RGBA[T]{
-		R: core.RandomNumberRange[T](core.Tuple[T]{B: rUpper}),
-		G: core.RandomNumberRange[T](core.Tuple[T]{B: gUpper}),
-		B: core.RandomNumberRange[T](core.Tuple[T]{B: bUpper}),
-		A: core.RandomNumberRange[T](core.Tuple[T]{B: aUpper}),
+		R: math.RandomNumberRange[T](math.Tuple[T]{B: rUpper}),
+		G: math.RandomNumberRange[T](math.Tuple[T]{B: gUpper}),
+		B: math.RandomNumberRange[T](math.Tuple[T]{B: bUpper}),
+		A: math.RandomNumberRange[T](math.Tuple[T]{B: aUpper}),
 	}
 }
 
 // RandomRGBUpTo returns a pseudo-random RGB[T] of the provided type bounded in the closed interval [0, max].
 //
 // The alpha channel can optionally be provided, otherwise it defaults to 0.
-func RandomRGBUpTo[T core.Numeric](rUpper T, gUpper T, bUpper T, alpha ...T) RGBA[T] {
+func RandomRGBUpTo[T math.Numeric](rUpper T, gUpper T, bUpper T, alpha ...T) RGBA[T] {
 	a := T(0)
 	if len(alpha) > 0 {
 		a = alpha[0]
 	}
 
 	return RGBA[T]{
-		R: core.RandomNumberRange[T](core.Tuple[T]{B: rUpper}),
-		G: core.RandomNumberRange[T](core.Tuple[T]{B: gUpper}),
-		B: core.RandomNumberRange[T](core.Tuple[T]{B: bUpper}),
+		R: math.RandomNumberRange[T](math.Tuple[T]{B: rUpper}),
+		G: math.RandomNumberRange[T](math.Tuple[T]{B: gUpper}),
+		B: math.RandomNumberRange[T](math.Tuple[T]{B: bUpper}),
 		A: a,
 	}
 }
 
 // RandomRGBARange returns a pseudo-random RGBA[T] of the provided type bounded in the closed interval [min, max].
-func RandomRGBARange[T core.Numeric](rRange core.Tuple[T], gRange core.Tuple[T], bRange core.Tuple[T], aRange core.Tuple[T]) RGBA[T] {
+func RandomRGBARange[T math.Numeric](rRange math.Tuple[T], gRange math.Tuple[T], bRange math.Tuple[T], aRange math.Tuple[T]) RGBA[T] {
 	return RGBA[T]{
-		R: core.RandomNumberRange[T](rRange),
-		G: core.RandomNumberRange[T](gRange),
-		B: core.RandomNumberRange[T](bRange),
-		A: core.RandomNumberRange[T](aRange),
+		R: math.RandomNumberRange[T](rRange),
+		G: math.RandomNumberRange[T](gRange),
+		B: math.RandomNumberRange[T](bRange),
+		A: math.RandomNumberRange[T](aRange),
 	}
 }
 
 // RandomRGBRange returns a pseudo-random RGB[T] of the provided type bounded in the closed interval [min, max].
-func RandomRGBRange[T core.Numeric](rRange core.Tuple[T], gRange core.Tuple[T], bRange core.Tuple[T], alpha ...T) RGBA[T] {
+func RandomRGBRange[T math.Numeric](rRange math.Tuple[T], gRange math.Tuple[T], bRange math.Tuple[T], alpha ...T) RGBA[T] {
 	a := T(0)
 	if len(alpha) > 0 {
 		a = alpha[0]
 	}
 
 	return RGBA[T]{
-		R: core.RandomNumberRange[T](rRange),
-		G: core.RandomNumberRange[T](gRange),
-		B: core.RandomNumberRange[T](bRange),
+		R: math.RandomNumberRange[T](rRange),
+		G: math.RandomNumberRange[T](gRange),
+		B: math.RandomNumberRange[T](bRange),
 		A: a,
 	}
 }
@@ -143,49 +143,49 @@ func RandomRGBRange[T core.Numeric](rRange core.Tuple[T], gRange core.Tuple[T], 
 // NormalizeToFloat32 returns an RGBA[float32] ranging from 0.0-1.0.
 func (c RGBA[T]) NormalizeToFloat32() RGBA[float32] {
 	return RGBA[float32]{
-		R: core.NormalizeToFloat32(c.R),
-		G: core.NormalizeToFloat32(c.G),
-		B: core.NormalizeToFloat32(c.B),
-		A: core.NormalizeToFloat32(c.A),
+		R: math.NormalizeToFloat32(c.R),
+		G: math.NormalizeToFloat32(c.G),
+		B: math.NormalizeToFloat32(c.B),
+		A: math.NormalizeToFloat32(c.A),
 	}
 }
 
 // NormalizeToFloat64 returns an RGBA[float64] ranging from 0.0-1.0.
 func (c RGBA[T]) NormalizeToFloat64() RGBA[float64] {
 	return RGBA[float64]{
-		R: core.NormalizeToFloat64(c.R),
-		G: core.NormalizeToFloat64(c.G),
-		B: core.NormalizeToFloat64(c.B),
-		A: core.NormalizeToFloat64(c.A),
+		R: math.NormalizeToFloat64(c.R),
+		G: math.NormalizeToFloat64(c.G),
+		B: math.NormalizeToFloat64(c.B),
+		A: math.NormalizeToFloat64(c.A),
 	}
 }
 
 // ScaleToTypeRGBA32 returns a scaled value of the provided type in the range [0, T.MaxValue].
 //
 // NOTE: This will panic if the provided value is greater than the maximum value of the provided type.
-func ScaleToTypeRGBA32[TOut core.Integer](source RGBA[float32]) RGBA[TOut] {
+func ScaleToTypeRGBA32[TOut math.Integer](source RGBA[float32]) RGBA[TOut] {
 	return RGBA[TOut]{
-		R: core.ScaleFloat32ToType[TOut](source.R),
-		G: core.ScaleFloat32ToType[TOut](source.G),
-		B: core.ScaleFloat32ToType[TOut](source.B),
-		A: core.ScaleFloat32ToType[TOut](source.A),
+		R: math.ScaleFloat32ToType[TOut](source.R),
+		G: math.ScaleFloat32ToType[TOut](source.G),
+		B: math.ScaleFloat32ToType[TOut](source.B),
+		A: math.ScaleFloat32ToType[TOut](source.A),
 	}
 }
 
 // ScaleToTypeRGBA64 returns a scaled value of the provided type in the range [0, T.MaxValue].
 //
 // NOTE: This will panic if the provided value is greater than the maximum value of the provided type.
-func ScaleToTypeRGBA64[TOut core.Integer](source RGBA[float64]) RGBA[TOut] {
+func ScaleToTypeRGBA64[TOut math.Integer](source RGBA[float64]) RGBA[TOut] {
 	return RGBA[TOut]{
-		R: core.ScaleFloat64ToType[TOut](source.R),
-		G: core.ScaleFloat64ToType[TOut](source.G),
-		B: core.ScaleFloat64ToType[TOut](source.B),
-		A: core.ScaleFloat64ToType[TOut](source.A),
+		R: math.ScaleFloat64ToType[TOut](source.R),
+		G: math.ScaleFloat64ToType[TOut](source.G),
+		B: math.ScaleFloat64ToType[TOut](source.B),
+		A: math.ScaleFloat64ToType[TOut](source.A),
 	}
 }
 
 // RGBAComparator returns if the two RGBA values are equal in values.
-func RGBAComparator[T core.Numeric](a RGBA[T], b RGBA[T]) bool {
+func RGBAComparator[T math.Numeric](a RGBA[T], b RGBA[T]) bool {
 	return a.R == b.R && a.G == b.G && a.B == b.B && a.A == b.A
 }
 

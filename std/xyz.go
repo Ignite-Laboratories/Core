@@ -2,17 +2,17 @@ package std
 
 import (
 	"fmt"
-	"github.com/ignite-laboratories/core"
+	"github.com/ignite-laboratories/core/math"
 )
 
 // XYZ is a general structure for holding generic (x,y,z) coordinate values.
-type XYZ[T core.Numeric] struct {
+type XYZ[T math.Numeric] struct {
 	X T
 	Y T
 	Z T
 }
 
-// RandomXYZ returns a pseudo-random XYZ[T] of the provided type using core.RandomNumber[T].
+// RandomXYZ returns a pseudo-random XYZ[T] of the provided type using math.RandomNumber[T].
 //
 // If requesting a floating point type, the resulting number will be bounded
 // in the fully closed interval [0.0, 1.0]
@@ -20,74 +20,74 @@ type XYZ[T core.Numeric] struct {
 // If requesting an integer type, the resulting number will be bounded
 // in the fully closed interval [0, n] - where n is the maximum value of
 // the provided type.
-func RandomXYZ[T core.Numeric]() XYZ[T] {
+func RandomXYZ[T math.Numeric]() XYZ[T] {
 	return XYZ[T]{
-		X: core.RandomNumber[T](),
-		Y: core.RandomNumber[T](),
-		Z: core.RandomNumber[T](),
+		X: math.RandomNumber[T](),
+		Y: math.RandomNumber[T](),
+		Z: math.RandomNumber[T](),
 	}
 }
 
 // RandomXYZUpTo returns a pseudo-random XYZ[T] of the provided type bounded in the closed interval [0, max].
-func RandomXYZUpTo[T core.Numeric](xUpper T, yUpper T, zUpper T) XYZ[T] {
+func RandomXYZUpTo[T math.Numeric](xUpper T, yUpper T, zUpper T) XYZ[T] {
 	return XYZ[T]{
-		X: core.RandomNumberRange[T](core.Tuple[T]{B: xUpper}),
-		Y: core.RandomNumberRange[T](core.Tuple[T]{B: yUpper}),
-		Z: core.RandomNumberRange[T](core.Tuple[T]{B: zUpper}),
+		X: math.RandomNumberRange[T](math.Tuple[T]{B: xUpper}),
+		Y: math.RandomNumberRange[T](math.Tuple[T]{B: yUpper}),
+		Z: math.RandomNumberRange[T](math.Tuple[T]{B: zUpper}),
 	}
 }
 
 // RandomXYZRange returns a pseudo-random XYZ[T] of the provided type bounded in the closed interval [min, max].
-func RandomXYZRange[T core.Numeric](xRange core.Tuple[T], yRange core.Tuple[T], zRange core.Tuple[T]) XYZ[T] {
+func RandomXYZRange[T math.Numeric](xRange math.Tuple[T], yRange math.Tuple[T], zRange math.Tuple[T]) XYZ[T] {
 	return XYZ[T]{
-		X: core.RandomNumberRange[T](xRange),
-		Y: core.RandomNumberRange[T](yRange),
-		Z: core.RandomNumberRange[T](zRange),
+		X: math.RandomNumberRange[T](xRange),
+		Y: math.RandomNumberRange[T](yRange),
+		Z: math.RandomNumberRange[T](zRange),
 	}
 }
 
 // NormalizeXYZ32 returns an XYZ[float32] ranging from 0.0-1.0.
-func NormalizeXYZ32[T core.Integer](source XYZ[T]) XYZ[float32] {
+func NormalizeXYZ32[T math.Integer](source XYZ[T]) XYZ[float32] {
 	return XYZ[float32]{
-		X: core.NormalizeToFloat32(source.X),
-		Y: core.NormalizeToFloat32(source.Y),
-		Z: core.NormalizeToFloat32(source.Z),
+		X: math.NormalizeToFloat32(source.X),
+		Y: math.NormalizeToFloat32(source.Y),
+		Z: math.NormalizeToFloat32(source.Z),
 	}
 }
 
 // NormalizeXYZ64 returns an XYZ[float64] ranging from 0.0-1.0.
-func NormalizeXYZ64[T core.Integer](source XYZ[T]) XYZ[float64] {
+func NormalizeXYZ64[T math.Integer](source XYZ[T]) XYZ[float64] {
 	return XYZ[float64]{
-		X: core.NormalizeToFloat64(source.X),
-		Y: core.NormalizeToFloat64(source.Y),
-		Z: core.NormalizeToFloat64(source.Z),
+		X: math.NormalizeToFloat64(source.X),
+		Y: math.NormalizeToFloat64(source.Y),
+		Z: math.NormalizeToFloat64(source.Z),
 	}
 }
 
 // ScaleToTypeXYZ32 returns a scaled value of the provided type in the range [0, T.MaxValue].
 //
 // NOTE: This will panic if the provided value is greater than the maximum value of the provided type.
-func ScaleToTypeXYZ32[TOut core.Integer](source XYZ[float32]) XYZ[TOut] {
+func ScaleToTypeXYZ32[TOut math.Integer](source XYZ[float32]) XYZ[TOut] {
 	return XYZ[TOut]{
-		X: core.ScaleFloat32ToType[TOut](source.X),
-		Y: core.ScaleFloat32ToType[TOut](source.Y),
-		Z: core.ScaleFloat32ToType[TOut](source.Z),
+		X: math.ScaleFloat32ToType[TOut](source.X),
+		Y: math.ScaleFloat32ToType[TOut](source.Y),
+		Z: math.ScaleFloat32ToType[TOut](source.Z),
 	}
 }
 
 // ScaleToTypeXYZ64 returns a scaled value of the provided type in the range [0, T.MaxValue].
 //
 // NOTE: This will panic if the provided value is greater than the maximum value of the provided type.
-func ScaleToTypeXYZ64[TOut core.Integer](source XYZ[float64]) XYZ[TOut] {
+func ScaleToTypeXYZ64[TOut math.Integer](source XYZ[float64]) XYZ[TOut] {
 	return XYZ[TOut]{
-		X: core.ScaleFloat64ToType[TOut](source.X),
-		Y: core.ScaleFloat64ToType[TOut](source.Y),
-		Z: core.ScaleFloat64ToType[TOut](source.Z),
+		X: math.ScaleFloat64ToType[TOut](source.X),
+		Y: math.ScaleFloat64ToType[TOut](source.Y),
+		Z: math.ScaleFloat64ToType[TOut](source.Z),
 	}
 }
 
 // XYZComparator returns if the two XYZ values are equal in values.
-func XYZComparator[T core.Numeric](a XYZ[T], b XYZ[T]) bool {
+func XYZComparator[T math.Numeric](a XYZ[T], b XYZ[T]) bool {
 	return a.X == b.X && a.Y == b.Y && a.Z == b.Z
 }
 

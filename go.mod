@@ -1,4 +1,4 @@
-module github.com/ignite-laboratories/core
+module git.ignitelabs.net/core
 
 go 1.24.1
 

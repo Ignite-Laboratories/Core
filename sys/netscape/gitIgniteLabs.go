@@ -4,12 +4,10 @@ import (
 	"html/template"
 	"log"
 	"net/http"
-	"os"
+	"strconv"
 )
 
 // GitIgniteLabs drives the git.ignitelabs.net service, which acts as a "vanity URL" for Go imports.
-//
-// NOTE: The address 'git.ignitelabs.net' is implied through the request and not present in the below code.
 //
 // The system is very simple.  All access to the URI https://git.ignitelabs.net/module is redirected towards
 // https://github.com/ignite-laboratories/module.  To support vanity imports, you must ALSO print out an HTML page
@@ -24,11 +22,19 @@ import (
 //	</html>
 //
 // That's really it!  No fany libraries are needed, just a simple HTTP handler =)
+//
+// NOTE: The address 'git.ignitelabs.net' is implied through the request and not present in the actual code.
 var GitIgniteLabs _gitIgniteLabs
 
 type _gitIgniteLabs byte
 
-func (_gitIgniteLabs) Navigate() {
+// Navigate executes a web server that listens on port 8080 (unless otherwise specified).
+func (_gitIgniteLabs) Navigate(port ...uint) {
+	p := "8080"
+	if len(port) > 0 {
+		p = strconv.Itoa(int(port[0]))
+	}
+
 	metaTmpl := template.Must(template.New("meta").Parse(`<!doctype html>
 <html><head>
 <meta name="go-import" content="{{.ImportPath}} git {{.Remote}}">
@@ -59,10 +65,7 @@ func (_gitIgniteLabs) Navigate() {
 		http.Redirect(w, r, repo, http.StatusFound)
 	})
 
-	addr := ":8080"
-	if p := os.Getenv("PORT"); p != "" {
-		addr = ":" + p
-	}
+	addr := ":" + p
 	log.Printf("'git.ignitelabs.net' listening on %s", addr)
 	log.Fatal(http.ListenAndServe(addr, nil))
 }

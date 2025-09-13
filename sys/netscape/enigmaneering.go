@@ -1,8 +1,8 @@
 package netscape
 
-var Enigmaneering _enigmaneering
+//var Enigmaneering _enigmaneering
 
 type _enigmaneering byte
 
-func (_enigmaneering) Navigate() {
-}
+//func (_enigmaneering) Navigate() {
+//}

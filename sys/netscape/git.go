@@ -7,11 +7,17 @@ import (
 	"strconv"
 )
 
-// GitIgniteLabs drives the git.ignitelabs.net service, which acts as a "vanity URL" for Go imports.
+// GitVanity drives the git.ignitelabs.net service, which acts as a "vanity URL" for Go imports.
 //
-// The system is very simple.  All access to the URI https://git.ignitelabs.net/module is redirected towards
-// https://github.com/ignite-laboratories/module.  To support vanity imports, you must ALSO print out an HTML page
-// when Go requests https://git.ignitelabs.net/module?go-get=1
+// NOTE: The address 'git.ignitelabs.net' is implicit through the request and not present in the actual code.
+//
+// It's quite simple - just tell it where you want your hostname to redirect to and what port to listen on (default 8080)
+//
+// To facilitate vanity requests, you have to do two things:
+//
+// 0. Route your address (i.e. https://git.ignitelabs.net) to the Git repo (i.e. https://github.com/ignite-laboratories)
+//
+// 1. Handle the "go-get=1" query parameter and return the below template:
 //
 //	<html>
 //	  <head>
@@ -21,15 +27,13 @@ import (
 //	  <body>OK</body>
 //	</html>
 //
-// That's really it!  No fany libraries are needed, just a simple HTTP handler =)
-//
-// NOTE: The address 'git.ignitelabs.net' is implied through the request and not present in the actual code.
-var GitIgniteLabs _gitIgniteLabs
+// That's really it!  No fancy libraries are needed, just a simple HTTP handler =)
+var GitVanity _gitVanity
 
-type _gitIgniteLabs byte
+type _gitVanity byte
 
 // Navigate executes a web server that listens on port 8080 (unless otherwise specified).
-func (_gitIgniteLabs) Navigate(port ...uint) {
+func (_gitVanity) Navigate(remote string, port ...uint) {
 	p := "8080"
 	if len(port) > 0 {
 		p = strconv.Itoa(int(port[0]))
@@ -47,7 +51,7 @@ func (_gitIgniteLabs) Navigate(port ...uint) {
 	}
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		repo := "https://github.com/ignite-laboratories" + r.URL.Path
+		repo := remote + r.URL.Path
 
 		// Go toolchain probe: serve meta tags (no redirect).
 		if r.URL.Query().Get("go-get") == "1" {

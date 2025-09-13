@@ -3,5 +3,5 @@ package main
 import "git.ignitelabs.net/core/sys/netscape"
 
 func main() {
-	netscape.GitIgniteLabs.Navigate()
+	netscape.GitVanity.Navigate("https://github.com/ignite-laboratories", 8080)
 }

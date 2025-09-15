@@ -6,7 +6,6 @@ import (
 	"reflect"
 
 	"tiny5.0/atlas"
-	"tiny5.0/test"
 )
 
 func main() {
